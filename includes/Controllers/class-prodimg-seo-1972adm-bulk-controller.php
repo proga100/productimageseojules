@@ -29,7 +29,7 @@ class Prodimg_Seo_1972adm_Bulk_Controller {
         }
 
         // Normally we'd take selected IDs or filter parameters, for now we assume 'generate for all missing' or receive IDs
-        $product_ids = isset( $_POST['product_ids'] ) ? array_map( 'absint', (array) $_POST['product_ids'] ) : array();
+        $product_ids = isset( $_POST['product_ids'] ) ? array_map( 'absint', (array) wp_unslash( $_POST['product_ids'] ) ) : array();
 
         if ( empty( $product_ids ) ) {
             // fallback: get all products needing review
@@ -37,6 +37,7 @@ class Prodimg_Seo_1972adm_Bulk_Controller {
                 'limit'  => -1,
                 'status' => 'publish',
                 'return' => 'ids',
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- fallback query when no explicit IDs; bounded by status taxonomy.
                 'tax_query' => array(
                     array(
                         'taxonomy' => Prodimg_Seo_1972adm_Status_Taxonomy::TAXONOMY,

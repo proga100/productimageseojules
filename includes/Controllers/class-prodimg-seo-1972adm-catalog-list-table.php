@@ -31,6 +31,7 @@ class Prodimg_Seo_1972adm_Catalog_List_Table extends WP_List_Table {
             'sku'      => __( 'SKU', 'product-image-seo' ),
             'price'    => __( 'Price', 'product-image-seo' ),
             'coverage' => __( 'Coverage', 'product-image-seo' ),
+            'score'    => __( 'Score', 'product-image-seo' ),
             'status'   => __( 'Status', 'product-image-seo' ),
             'actions'  => __( 'Actions', 'product-image-seo' ),
         );
@@ -68,6 +69,18 @@ class Prodimg_Seo_1972adm_Catalog_List_Table extends WP_List_Table {
                     return esc_html( $total . ' / ' . $expected );
                 }
                 return '-';
+            case 'score':
+                $score_local = get_post_meta( $item->ID, '_prodimg_seo_1972adm_score_local', true );
+                if ( '' === $score_local ) {
+                    return '<span class="prodimg-score-pill prodimg-score-pill--unknown">—</span>';
+                }
+                $score_local = intval( $score_local );
+                $band        = $score_local >= 80 ? 'good' : ( $score_local >= 50 ? 'ok' : 'poor' );
+                return sprintf(
+                    '<span class="prodimg-score-pill prodimg-score-pill--%s">%d</span>',
+                    esc_attr( $band ),
+                    $score_local
+                );
             case 'status':
                 $terms = wp_get_post_terms( $item->ID, Prodimg_Seo_1972adm_Status_Taxonomy::TAXONOMY, array( 'fields' => 'names' ) );
                 if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
@@ -99,9 +112,11 @@ class Prodimg_Seo_1972adm_Catalog_List_Table extends WP_List_Table {
             return;
         }
 
+        // phpcs:disable WordPress.Security.NonceVerification.Recommended -- read-only list-table filter inputs; values are unslashed + sanitized and the screen requires manage_woocommerce.
         $current_category = isset( $_REQUEST['product_cat'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['product_cat'] ) ) : '';
         $current_status   = isset( $_REQUEST['prodimg_status'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['prodimg_status'] ) ) : '';
         $current_stock    = isset( $_REQUEST['stock_status'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['stock_status'] ) ) : '';
+        // phpcs:enable WordPress.Security.NonceVerification.Recommended
 
         ?>
         <div class="alignleft actions">
@@ -142,7 +157,8 @@ class Prodimg_Seo_1972adm_Catalog_List_Table extends WP_List_Table {
 
     public function process_bulk_action() {
         if ( 'generate' === $this->current_action() ) {
-            $product_ids = isset( $_REQUEST['product_ids'] ) ? array_map( 'absint', (array) $_REQUEST['product_ids'] ) : array();
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- WP_List_Table bulk-action submit; values are absint-cast and the screen requires manage_woocommerce.
+            $product_ids = isset( $_REQUEST['product_ids'] ) ? array_map( 'absint', (array) wp_unslash( $_REQUEST['product_ids'] ) ) : array();
 
             if ( ! empty( $product_ids ) ) {
                 // Cannot call instance()->container directly if it's private,
@@ -182,6 +198,7 @@ class Prodimg_Seo_1972adm_Catalog_List_Table extends WP_List_Table {
             'paginate' => true,
         );
 
+        // phpcs:disable WordPress.Security.NonceVerification.Recommended -- read-only list-table sort/filter inputs; values are unslashed + sanitized and the screen requires manage_woocommerce.
         // Sorting
         if ( ! empty( $_REQUEST['orderby'] ) ) {
             $orderby = sanitize_text_field( wp_unslash( $_REQUEST['orderby'] ) );
@@ -191,10 +208,12 @@ class Prodimg_Seo_1972adm_Catalog_List_Table extends WP_List_Table {
                 $args['orderby'] = 'title';
                 $args['order'] = $order;
             } elseif ( $orderby === '_sku' ) {
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- catalog audit requires SKU sort.
                 $args['meta_key'] = '_sku';
                 $args['orderby']  = 'meta_value';
                 $args['order']    = $order;
             } elseif ( $orderby === '_price' ) {
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- catalog audit requires price sort.
                 $args['meta_key'] = '_price';
                 $args['orderby']  = 'meta_value_num';
                 $args['order']    = $order;
@@ -211,6 +230,7 @@ class Prodimg_Seo_1972adm_Catalog_List_Table extends WP_List_Table {
         }
 
         if ( ! empty( $_REQUEST['prodimg_status'] ) ) {
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- catalog audit requires taxonomy filter; results paginated.
             $args['tax_query'] = array(
                 array(
                     'taxonomy' => Prodimg_Seo_1972adm_Status_Taxonomy::TAXONOMY,
@@ -219,6 +239,7 @@ class Prodimg_Seo_1972adm_Catalog_List_Table extends WP_List_Table {
                 ),
             );
         }
+        // phpcs:enable WordPress.Security.NonceVerification.Recommended
 
         $results = wc_get_products( $args );
 

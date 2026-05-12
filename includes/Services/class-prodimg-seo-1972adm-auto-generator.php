@@ -13,10 +13,12 @@ class Prodimg_Seo_1972adm_Auto_Generator {
 
     private $settings;
     private $bulk_processor;
+    private $calculator;
 
-    public function __construct( Prodimg_Seo_1972adm_Settings $settings, Prodimg_Seo_1972adm_Bulk_Processor $bulk_processor ) {
+    public function __construct( Prodimg_Seo_1972adm_Settings $settings, Prodimg_Seo_1972adm_Bulk_Processor $bulk_processor, Prodimg_Seo_1972adm_Score_Calculator $calculator ) {
         $this->settings       = $settings;
         $this->bulk_processor = $bulk_processor;
+        $this->calculator     = $calculator;
     }
 
     public function init_hooks() {
@@ -38,5 +40,10 @@ class Prodimg_Seo_1972adm_Auto_Generator {
 
         // Just enqueue this single product for async processing
         $this->bulk_processor->enqueue_batch( array( $product_id ) );
+
+        // Also write a synchronous local-score snapshot so the UI reflects current state immediately.
+        $prodimg_seo_score = $this->calculator->calculate_for_product( $product_id );
+        update_post_meta( $product_id, '_prodimg_seo_1972adm_score_local', $prodimg_seo_score['score'] );
+        update_post_meta( $product_id, '_prodimg_seo_1972adm_score_breakdown', wp_json_encode( $prodimg_seo_score ) );
     }
 }

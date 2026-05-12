@@ -13,10 +13,12 @@ class Prodimg_Seo_1972adm_Bulk_Processor {
 
     private $api_client;
     private $settings;
+    private $calculator;
 
-    public function __construct( Prodimg_Seo_1972adm_Api_Client $api_client, Prodimg_Seo_1972adm_Settings $settings ) {
+    public function __construct( Prodimg_Seo_1972adm_Api_Client $api_client, Prodimg_Seo_1972adm_Settings $settings, Prodimg_Seo_1972adm_Score_Calculator $calculator ) {
         $this->api_client = $api_client;
         $this->settings   = $settings;
+        $this->calculator = $calculator;
     }
 
     public function init_hooks() {
@@ -96,6 +98,11 @@ class Prodimg_Seo_1972adm_Bulk_Processor {
         $result = $this->api_client->generate_for_product( $product_id, $image_id, $role );
         if ( ! is_wp_error( $result ) && ! empty( $result['alt_text'] ) ) {
             update_post_meta( $image_id, '_wp_attachment_image_alt', sanitize_text_field( $result['alt_text'] ) );
+
+            $prodimg_seo_score = $this->calculator->calculate_for_product( $product_id );
+            update_post_meta( $product_id, '_prodimg_seo_1972adm_score_local', $prodimg_seo_score['score'] );
+            update_post_meta( $product_id, '_prodimg_seo_1972adm_score_breakdown', wp_json_encode( $prodimg_seo_score ) );
+
             if ( isset( $result['quality_score'] ) ) {
                 update_post_meta( $product_id, '_prodimg_seo_1972adm_score', absint( $result['quality_score'] ) );
             }

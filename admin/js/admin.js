@@ -174,10 +174,65 @@ jQuery(document).ready(function($) {
                 if (response.data.status === 'completed') {
                     clearInterval(bulkPollInterval);
                     $('#prodimg-seo-bulk-progress-text').text('Completed!');
+                    jQuery(document).trigger('prodimg-seo:bulk-completed', [response.data]);
                 }
             } else {
                 clearInterval(bulkPollInterval);
             }
         });
     }
+});
+
+jQuery(function($) {
+    // Settings tabs
+    $(document).on('click', '.prodimg-tabs [role="tab"]', function(e) {
+        e.preventDefault();
+        var $tab = $(this);
+        var $tabs = $tab.closest('.prodimg-tabs');
+        $tabs.find('[role="tab"]').attr('aria-selected', 'false');
+        $tab.attr('aria-selected', 'true');
+        var panelId = $tab.attr('aria-controls');
+        $tabs.parent().find('[role="tabpanel"]').attr('hidden', 'hidden');
+        $('#' + panelId).removeAttr('hidden');
+        if (history.replaceState) {
+            history.replaceState(null, '', '#' + $tab.attr('id'));
+        }
+    });
+
+    if (location.hash) {
+        var $target = $('.prodimg-tabs [role="tab"]' + location.hash);
+        if ($target.length) {
+            $target.trigger('click');
+        }
+    }
+
+    // Score gauge count-up animation
+    $('.prodimg-score-gauge[data-score]').each(function() {
+        var $g = $(this);
+        var target = parseInt($g.attr('data-score'), 10) || 0;
+        var $val = $g.find('.prodimg-score-gauge__value');
+        var start = 0;
+        var step = Math.max(1, Math.floor(target / 30));
+        if (target === 0) {
+            $val.text(0);
+            return;
+        }
+        var timer = setInterval(function() {
+            start += step;
+            if (start >= target) {
+                start = target;
+                clearInterval(timer);
+            }
+            $val.text(start);
+        }, 30);
+    });
+
+    // Bulk-fix completion summary card
+    var originalPoll = window.pollBulkStatus;
+    $(document).on('prodimg-seo:bulk-completed', function(e, data) {
+        var $body = $('#prodimg-seo-bulk-results-body');
+        var msg = 'Bulk fix finished. Processed ' + (data && data.total_products ? data.total_products : 'all') + ' products.';
+        $body.text(msg);
+        $('#prodimg-seo-bulk-results').removeAttr('hidden');
+    });
 });

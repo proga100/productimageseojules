@@ -18,9 +18,10 @@ delete_option( 'prodimg_seo_1972adm_version' );
 delete_transient( 'prodimg_seo_1972adm_scan_cache' );
 
 // Delete postmeta only if user opted in.
-$delete_data = get_option( 'prodimg_seo_1972adm_delete_data_on_uninstall', false );
-if ( $delete_data ) {
+$prodimg_seo_delete_data = get_option( 'prodimg_seo_1972adm_delete_data_on_uninstall', false );
+if ( $prodimg_seo_delete_data ) {
     global $wpdb;
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- uninstall cleanup; cache layer not loaded at uninstall time.
     $wpdb->query(
         "DELETE FROM {$wpdb->postmeta} WHERE meta_key LIKE '\\_prodimg\\_seo\\_1972adm\\_%'"
     );

@@ -62,14 +62,20 @@ class Prodimg_Seo_1972adm_Container {
                     $this->get( 'Prodimg_Seo_1972adm_Coverage_Calculator' )
                 );
 
+            case 'Prodimg_Seo_1972adm_Score_Calculator':
+                return new Prodimg_Seo_1972adm_Score_Calculator();
+
             case 'Prodimg_Seo_1972adm_Bulk_Processor':
                 return new Prodimg_Seo_1972adm_Bulk_Processor(
                     $this->get( 'Prodimg_Seo_1972adm_Api_Client' ),
-                    $this->get( 'Prodimg_Seo_1972adm_Settings' )
+                    $this->get( 'Prodimg_Seo_1972adm_Settings' ),
+                    $this->get( 'Prodimg_Seo_1972adm_Score_Calculator' )
                 );
 
             case 'Prodimg_Seo_1972adm_Statistics':
-                return new Prodimg_Seo_1972adm_Statistics();
+                return new Prodimg_Seo_1972adm_Statistics(
+                    $this->get( 'Prodimg_Seo_1972adm_Score_Calculator' )
+                );
 
             case 'Prodimg_Seo_1972adm_Csv_Exporter':
                 return new Prodimg_Seo_1972adm_Csv_Exporter(
@@ -81,7 +87,8 @@ class Prodimg_Seo_1972adm_Container {
                     $this->get( 'Prodimg_Seo_1972adm_Settings' ),
                     $this->get( 'Prodimg_Seo_1972adm_Api_Client' ),
                     $this->get( 'Prodimg_Seo_1972adm_Statistics' ),
-                    $this->get( 'Prodimg_Seo_1972adm_Product_Scanner' )
+                    $this->get( 'Prodimg_Seo_1972adm_Product_Scanner' ),
+                    $this->get( 'Prodimg_Seo_1972adm_Score_Calculator' )
                 );
 
             case 'Prodimg_Seo_1972adm_Bulk_Controller':
@@ -92,7 +99,8 @@ class Prodimg_Seo_1972adm_Container {
             case 'Prodimg_Seo_1972adm_Auto_Generator':
                 return new Prodimg_Seo_1972adm_Auto_Generator(
                     $this->get( 'Prodimg_Seo_1972adm_Settings' ),
-                    $this->get( 'Prodimg_Seo_1972adm_Bulk_Processor' )
+                    $this->get( 'Prodimg_Seo_1972adm_Bulk_Processor' ),
+                    $this->get( 'Prodimg_Seo_1972adm_Score_Calculator' )
                 );
 
             default:

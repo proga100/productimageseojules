@@ -66,6 +66,7 @@ class Prodimg_Seo_1972adm_Plugin {
         require_once PRODIMG_SEO_1972ADM_INCLUDES_DIR . 'Services/class-prodimg-seo-1972adm-csv-exporter.php';
         require_once PRODIMG_SEO_1972ADM_INCLUDES_DIR . 'Services/class-prodimg-seo-1972adm-statistics.php';
         require_once PRODIMG_SEO_1972ADM_INCLUDES_DIR . 'Services/class-prodimg-seo-1972adm-auto-generator.php';
+        require_once PRODIMG_SEO_1972ADM_INCLUDES_DIR . 'Services/class-prodimg-seo-1972adm-score-calculator.php';
 
         // Controllers
         require_once PRODIMG_SEO_1972ADM_INCLUDES_DIR . 'Controllers/class-prodimg-seo-1972adm-admin-controller.php';
@@ -86,7 +87,6 @@ class Prodimg_Seo_1972adm_Plugin {
      * Initialize hooks.
      */
     private function init_hooks() {
-        add_action( 'init', array( $this, 'load_textdomain' ) );
         add_action( 'init', array( $this, 'register_taxonomy' ) );
 
         if ( is_admin() ) {
@@ -107,17 +107,6 @@ class Prodimg_Seo_1972adm_Plugin {
         if ( $auto_generator ) {
             $auto_generator->init_hooks();
         }
-    }
-
-    /**
-     * Load plugin textdomain.
-     */
-    public function load_textdomain() {
-        load_plugin_textdomain(
-            PRODIMG_SEO_1972ADM_TEXT_DOMAIN,
-            false,
-            dirname( PRODIMG_SEO_1972ADM_PLUGIN_BASENAME ) . '/languages'
-        );
     }
 
     /**
