@@ -33,6 +33,12 @@ class Prodimg_Seo_1972adm_Auto_Generator {
             return;
         }
 
+        // Skip if no API key is configured — avoids enqueueing no-op Action Scheduler jobs.
+        $api_key = $this->settings->get( 'api_key', '' );
+        if ( empty( $api_key ) ) {
+            return;
+        }
+
         // Avoid infinite loops if generation somehow saves product
         if ( doing_action( 'prodimg_seo_1972adm_process_product_batch' ) ) {
             return;

@@ -16,19 +16,22 @@ class Prodimg_Seo_1972adm_Admin_Controller {
     private $statistics;
     private $scanner;
     private $calculator;
+    private $coverage_calculator;
 
     public function __construct(
         Prodimg_Seo_1972adm_Settings $settings,
         Prodimg_Seo_1972adm_Api_Client $api_client,
         Prodimg_Seo_1972adm_Statistics $statistics,
         Prodimg_Seo_1972adm_Product_Scanner $scanner,
-        Prodimg_Seo_1972adm_Score_Calculator $calculator
+        Prodimg_Seo_1972adm_Score_Calculator $calculator,
+        Prodimg_Seo_1972adm_Coverage_Calculator $coverage_calculator
     ) {
-        $this->settings   = $settings;
-        $this->api_client = $api_client;
-        $this->statistics = $statistics;
-        $this->scanner    = $scanner;
-        $this->calculator = $calculator;
+        $this->settings            = $settings;
+        $this->api_client          = $api_client;
+        $this->statistics          = $statistics;
+        $this->scanner             = $scanner;
+        $this->calculator          = $calculator;
+        $this->coverage_calculator = $coverage_calculator;
     }
 
     public function init_hooks() {
@@ -54,6 +57,7 @@ class Prodimg_Seo_1972adm_Admin_Controller {
         check_ajax_referer( 'prodimg_seo_1972adm_admin_nonce', 'nonce' );
         if ( ! current_user_can( 'manage_woocommerce' ) ) {
             wp_send_json_error( __( 'Permission denied.', 'product-image-seo' ) );
+            return;
         }
         $product_id = isset( $_POST['product_id'] ) ? absint( wp_unslash( $_POST['product_id'] ) ) : 0;
         if ( ! $product_id ) {
@@ -186,7 +190,7 @@ class Prodimg_Seo_1972adm_Admin_Controller {
                 'include_category' => sanitize_text_field( wp_unslash( $_POST['include_category'] ?? 'no' ) ),
                 'include_sku' => sanitize_text_field( wp_unslash( $_POST['include_sku'] ?? 'no' ) ),
                 'include_price' => sanitize_text_field( wp_unslash( $_POST['include_price'] ?? 'no' ) ),
-                'max_length' => absint( $_POST['max_length'] ?? 125 ),
+                'max_length' => absint( wp_unslash( $_POST['max_length'] ?? 125 ) ),
             );
             $this->settings->update_all( $new_settings );
 
@@ -203,6 +207,7 @@ class Prodimg_Seo_1972adm_Admin_Controller {
         check_ajax_referer( 'prodimg_seo_1972adm_admin_nonce', 'nonce' );
         if ( ! current_user_can( 'manage_woocommerce' ) ) {
             wp_send_json_error( __( 'Permission denied.', 'product-image-seo' ) );
+            return;
         }
 
         $result = $this->api_client->test_connection();
@@ -216,9 +221,10 @@ class Prodimg_Seo_1972adm_Admin_Controller {
         check_ajax_referer( 'prodimg_seo_1972adm_admin_nonce', 'nonce' );
         if ( ! current_user_can( 'manage_woocommerce' ) ) {
             wp_send_json_error( __( 'Permission denied.', 'product-image-seo' ) );
+            return;
         }
 
-        $page = isset( $_POST['scan_page'] ) ? absint( $_POST['scan_page'] ) : 1;
+        $page = isset( $_POST['scan_page'] ) ? absint( wp_unslash( $_POST['scan_page'] ) ) : 1;
         $result = $this->scanner->scan_all( $page );
 
         wp_send_json_success( $result );
@@ -228,9 +234,10 @@ class Prodimg_Seo_1972adm_Admin_Controller {
         check_ajax_referer( 'prodimg_seo_1972adm_admin_nonce', 'nonce' );
         if ( ! current_user_can( 'manage_woocommerce' ) ) {
             wp_send_json_error( __( 'Permission denied.', 'product-image-seo' ) );
+            return;
         }
 
-        $product_id = absint( $_POST['product_id'] ?? 0 );
+        $product_id = absint( wp_unslash( $_POST['product_id'] ?? 0 ) );
 
         if ( ! $product_id ) {
             wp_send_json_error( __( 'Invalid parameters.', 'product-image-seo' ) );
@@ -306,9 +313,10 @@ class Prodimg_Seo_1972adm_Admin_Controller {
         check_ajax_referer( 'prodimg_seo_1972adm_admin_nonce', 'nonce' );
         if ( ! current_user_can( 'manage_woocommerce' ) ) {
             wp_send_json_error( __( 'Permission denied.', 'product-image-seo' ) );
+            return;
         }
 
-        $product_id = absint( $_POST['product_id'] ?? 0 );
+        $product_id = absint( wp_unslash( $_POST['product_id'] ?? 0 ) );
         $alt_texts_raw = isset( $_POST['alt_texts'] ) ? (array) wp_unslash( $_POST['alt_texts'] ) : array();
         $alt_texts     = array();
         foreach ( $alt_texts_raw as $alt_image_id => $alt_value ) {
@@ -327,8 +335,11 @@ class Prodimg_Seo_1972adm_Admin_Controller {
 
         update_post_meta( $product_id, '_prodimg_seo_1972adm_processed_at', time() );
 
-        // Calculate coverage again to update status
-        $this->scanner->calculate( wc_get_product( $product_id ) );
+        // Recompute coverage + status taxonomy for this product after alt text save.
+        $product = wc_get_product( $product_id );
+        if ( $product ) {
+            $this->coverage_calculator->calculate( $product );
+        }
 
         wp_send_json_success( __( 'Saved successfully.', 'product-image-seo' ) );
     }

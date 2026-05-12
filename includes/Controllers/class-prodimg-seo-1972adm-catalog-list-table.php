@@ -157,18 +157,20 @@ class Prodimg_Seo_1972adm_Catalog_List_Table extends WP_List_Table {
 
     public function process_bulk_action() {
         if ( 'generate' === $this->current_action() ) {
-            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- WP_List_Table bulk-action submit; values are absint-cast and the screen requires manage_woocommerce.
+            if ( ! current_user_can( 'manage_woocommerce' ) ) {
+                return;
+            }
+            // WP_List_Table generates a nonce named bulk-<plural> ('bulk-products' here).
+            check_admin_referer( 'bulk-' . $this->_args['plural'] );
+
             $product_ids = isset( $_REQUEST['product_ids'] ) ? array_map( 'absint', (array) wp_unslash( $_REQUEST['product_ids'] ) ) : array();
 
             if ( ! empty( $product_ids ) ) {
-                // Cannot call instance()->container directly if it's private,
-                // instead we'll handle this differently or add a getter.
-                // Assuming we can't add getter right now easily, we'll instantiate for the bulk process
-                // or assume we have it via global or a new instance.
-                $settings = new Prodimg_Seo_1972adm_Settings();
+                // Inline instantiation (option 1) — list table has no DI container reference; keeps the change tightly scoped.
+                $settings   = new Prodimg_Seo_1972adm_Settings();
                 $api_client = new Prodimg_Seo_1972adm_Api_Client( $settings );
-                $processor = new Prodimg_Seo_1972adm_Bulk_Processor( $api_client, $settings );
-                $result = $processor->enqueue_batch( $product_ids );
+                $processor  = new Prodimg_Seo_1972adm_Bulk_Processor( $api_client, $settings, new Prodimg_Seo_1972adm_Score_Calculator() );
+                $result     = $processor->enqueue_batch( $product_ids );
 
                 if ( ! is_wp_error( $result ) ) {
                     echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Bulk generation started. Please go to Bulk Fix to view progress.', 'product-image-seo' ) . '</p></div>';

@@ -185,7 +185,15 @@ plugin's core functionality.
 - When a user clicks "Generate Alt Text" on a product, the plugin sends
   the product image URL, product title, category path, attributes, SKU,
   and short description to the Alt Audit API.
-- Data is only sent when the user explicitly triggers generation.
+- When a user runs a bulk generation job from the Bulk Fix or Catalog
+  screens, the plugin sends the same product data for each selected
+  product to the Alt Audit API.
+- When the "Auto-generate on save" setting is enabled in the plugin
+  settings, the plugin also sends product data to the Alt Audit API
+  automatically each time a product is saved or updated in WooCommerce
+  (whether via the admin UI, REST API, CSV import, or programmatic save).
+  This setting is disabled by default — no data is sent automatically
+  unless the user explicitly enables it.
 - No data is sent on plugin activation, deactivation, or during normal
   browsing.
 - The API key is sent with each request to authenticate the account.

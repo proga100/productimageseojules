@@ -88,7 +88,8 @@ class Prodimg_Seo_1972adm_Container {
                     $this->get( 'Prodimg_Seo_1972adm_Api_Client' ),
                     $this->get( 'Prodimg_Seo_1972adm_Statistics' ),
                     $this->get( 'Prodimg_Seo_1972adm_Product_Scanner' ),
-                    $this->get( 'Prodimg_Seo_1972adm_Score_Calculator' )
+                    $this->get( 'Prodimg_Seo_1972adm_Score_Calculator' ),
+                    $this->get( 'Prodimg_Seo_1972adm_Coverage_Calculator' )
                 );
 
             case 'Prodimg_Seo_1972adm_Bulk_Controller':
