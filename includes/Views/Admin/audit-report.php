@@ -36,24 +36,61 @@ $prodimg_seo_pct = function ( $part, $total ) {
 };
 
 $prodimg_seo_gauge_band = $prodimg_seo_avg_score >= 80 ? 'good' : ( $prodimg_seo_avg_score >= 50 ? 'ok' : 'poor' );
+
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only page slug for active nav state.
+$prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : 'prodimg-seo-report';
 ?>
-<div class="wrap">
-    <h1><?php esc_html_e( 'SEO Audit Report', 'product-image-seo' ); ?></h1>
+<div class="wrap prodimg-app">
+
+    <header class="prodimg-page-header">
+        <div class="prodimg-page-header__inner">
+            <div class="prodimg-page-header__titleblock">
+                <h1 class="prodimg-page-header__title"><?php esc_html_e( 'SEO Audit Report', 'product-image-seo' ); ?></h1>
+            </div>
+            <div class="prodimg-page-header__actions">
+                <a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-ajax.php?action=prodimg_seo_1972adm_export_csv' ), 'prodimg_seo_1972adm_admin_nonce', 'nonce' ) ); ?>" class="button button-primary">
+                    <?php esc_html_e( 'Download CSV Report', 'product-image-seo' ); ?>
+                </a>
+            </div>
+        </div>
+        <nav class="prodimg-segnav" aria-label="<?php esc_attr_e( 'Plugin sections', 'product-image-seo' ); ?>">
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-dashboard' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-dashboard' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Dashboard', 'product-image-seo' ); ?>
+            </a>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-report' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-report' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Audit', 'product-image-seo' ); ?>
+            </a>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-catalog' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-catalog' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Catalog', 'product-image-seo' ); ?>
+            </a>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-bulk' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-bulk' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Bulk Fix', 'product-image-seo' ); ?>
+            </a>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-settings' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-settings' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Settings', 'product-image-seo' ); ?>
+            </a>
+        </nav>
+    </header>
 
     <div class="prodimg-grid">
 
         <div class="prodimg-card">
             <h2 class="prodimg-card__title"><?php esc_html_e( 'Average score', 'product-image-seo' ); ?></h2>
-            <div
-                class="prodimg-score-gauge prodimg-score-gauge--<?php echo esc_attr( $prodimg_seo_gauge_band ); ?>"
-                data-score="<?php echo esc_attr( $prodimg_seo_avg_score ); ?>"
-                style="--prodimg-gauge-pct: <?php echo esc_attr( $prodimg_seo_avg_score ); ?>;"
-            >
-                <div style="text-align:center;">
-                    <span class="prodimg-score-gauge__value"><?php echo esc_html( $prodimg_seo_avg_score ); ?></span>
-                    <span class="prodimg-score-gauge__label"><?php esc_html_e( '/ 100', 'product-image-seo' ); ?></span>
-                </div>
-            </div>
+            <svg class="prodimg-score-gauge prodimg-score-gauge--<?php echo esc_attr( $prodimg_seo_gauge_band ); ?>"
+                 viewBox="0 0 120 120"
+                 data-score="<?php echo esc_attr( $prodimg_seo_avg_score ); ?>"
+                 role="img"
+                 aria-label="<?php echo esc_attr( sprintf( /* translators: %d score value */ __( 'Score %d', 'product-image-seo' ), $prodimg_seo_avg_score ) ); ?>">
+                <circle class="prodimg-score-gauge__track"    cx="60" cy="60" r="52" />
+                <circle class="prodimg-score-gauge__progress" cx="60" cy="60" r="52" />
+                <text   class="prodimg-score-gauge__value"    x="60" y="64" text-anchor="middle">0</text>
+                <text   class="prodimg-score-gauge__label"    x="60" y="82" text-anchor="middle"><?php esc_html_e( 'Score', 'product-image-seo' ); ?></text>
+            </svg>
         </div>
 
         <div class="prodimg-card">
@@ -102,15 +139,10 @@ $prodimg_seo_gauge_band = $prodimg_seo_avg_score >= 80 ? 'good' : ( $prodimg_seo
             <div class="prodimg-progress__segment prodimg-progress__segment--poor" style="width: <?php echo esc_attr( $prodimg_seo_pct( $prodimg_seo_band_poor, $prodimg_seo_band_sum ) ); ?>%;"></div>
         </div>
         <div class="prodimg-progress__legend">
-            <span><span class="prodimg-progress__legend-dot" style="background: #00a32a;"></span><?php esc_html_e( 'Good', 'product-image-seo' ); ?> (<?php echo esc_html( $prodimg_seo_band_good ); ?>)</span>
-            <span><span class="prodimg-progress__legend-dot" style="background: #dba617;"></span><?php esc_html_e( 'OK', 'product-image-seo' ); ?> (<?php echo esc_html( $prodimg_seo_band_ok ); ?>)</span>
-            <span><span class="prodimg-progress__legend-dot" style="background: #d63638;"></span><?php esc_html_e( 'Poor', 'product-image-seo' ); ?> (<?php echo esc_html( $prodimg_seo_band_poor ); ?>)</span>
+            <span><span class="prodimg-legend-dot prodimg-legend-dot--good"></span><?php esc_html_e( 'Good', 'product-image-seo' ); ?> (<?php echo esc_html( $prodimg_seo_band_good ); ?>)</span>
+            <span><span class="prodimg-legend-dot prodimg-legend-dot--ok"></span><?php esc_html_e( 'OK', 'product-image-seo' ); ?> (<?php echo esc_html( $prodimg_seo_band_ok ); ?>)</span>
+            <span><span class="prodimg-legend-dot prodimg-legend-dot--poor"></span><?php esc_html_e( 'Poor', 'product-image-seo' ); ?> (<?php echo esc_html( $prodimg_seo_band_poor ); ?>)</span>
         </div>
     </div>
 
-    <p style="margin-top: 20px;">
-        <a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-ajax.php?action=prodimg_seo_1972adm_export_csv' ), 'prodimg_seo_1972adm_admin_nonce', 'nonce' ) ); ?>" class="button button-primary">
-            <?php esc_html_e( 'Download CSV Report', 'product-image-seo' ); ?>
-        </a>
-    </p>
 </div>

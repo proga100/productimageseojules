@@ -28,21 +28,57 @@ $prodimg_seo_csv_url = wp_nonce_url(
     'prodimg_seo_1972adm_admin_nonce',
     'nonce'
 );
+
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only page slug for active nav state.
+$prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : 'prodimg-seo-dashboard';
 ?>
-<div class="wrap">
-    <h1>
-        <?php esc_html_e( 'Product Image SEO', 'product-image-seo' ); ?>
-        <?php if ( defined( 'PRODIMG_SEO_1972ADM_VERSION' ) ) : ?>
-            <span class="prodimg-version-tag">v<?php echo esc_html( PRODIMG_SEO_1972ADM_VERSION ); ?></span>
-        <?php endif; ?>
-    </h1>
+<div class="wrap prodimg-app">
+
+    <header class="prodimg-page-header">
+        <div class="prodimg-page-header__inner">
+            <div class="prodimg-page-header__titleblock">
+                <h1 class="prodimg-page-header__title"><?php esc_html_e( 'Dashboard', 'product-image-seo' ); ?></h1>
+                <p class="prodimg-page-header__subtitle"><?php esc_html_e( 'Image SEO at a glance', 'product-image-seo' ); ?></p>
+            </div>
+            <div class="prodimg-page-header__actions">
+                <button type="button" class="button button-primary" id="prodimg-seo-scan-catalog">
+                    <?php esc_html_e( 'Run Audit', 'product-image-seo' ); ?>
+                </button>
+                <span class="spinner" id="prodimg-seo-scan-spinner"></span>
+            </div>
+        </div>
+        <nav class="prodimg-segnav" aria-label="<?php esc_attr_e( 'Plugin sections', 'product-image-seo' ); ?>">
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-dashboard' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-dashboard' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Dashboard', 'product-image-seo' ); ?>
+            </a>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-report' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-report' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Audit', 'product-image-seo' ); ?>
+            </a>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-catalog' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-catalog' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Catalog', 'product-image-seo' ); ?>
+            </a>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-bulk' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-bulk' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Bulk Fix', 'product-image-seo' ); ?>
+            </a>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-settings' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-settings' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Settings', 'product-image-seo' ); ?>
+            </a>
+        </nav>
+    </header>
+
+    <div id="prodimg-seo-scan-result" style="margin-top: 10px;"></div>
 
     <?php if ( 0 === $prodimg_seo_total ) : ?>
 
         <div class="prodimg-empty-state">
-            <div class="prodimg-empty-state__icon">
+            <span class="prodimg-empty-state__icon-bubble">
                 <span class="dashicons dashicons-format-image"></span>
-            </div>
+            </span>
             <h2 class="prodimg-empty-state__title">
                 <?php esc_html_e( 'Welcome to Product Image SEO', 'product-image-seo' ); ?>
             </h2>
@@ -53,33 +89,26 @@ $prodimg_seo_csv_url = wp_nonce_url(
                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-settings' ) ); ?>" class="button button-secondary">
                     <?php esc_html_e( 'Visit Settings', 'product-image-seo' ); ?>
                 </a>
-                <button type="button" class="button button-primary" id="prodimg-seo-scan-catalog">
-                    <?php esc_html_e( 'Start Catalog Scan', 'product-image-seo' ); ?>
-                </button>
-                <span class="spinner" id="prodimg-seo-scan-spinner"></span>
             </p>
-            <div id="prodimg-seo-scan-result" style="margin-top: 10px;"></div>
         </div>
 
     <?php else : ?>
-
-        <p><?php esc_html_e( 'Snapshot of your catalog\'s image SEO health.', 'product-image-seo' ); ?></p>
 
         <div class="prodimg-grid">
 
             <!-- Avg score gauge card -->
             <div class="prodimg-card">
                 <h2 class="prodimg-card__title"><?php esc_html_e( 'Average score', 'product-image-seo' ); ?></h2>
-                <div
-                    class="prodimg-score-gauge prodimg-score-gauge--<?php echo esc_attr( $prodimg_seo_gauge_band ); ?>"
-                    data-score="<?php echo esc_attr( $prodimg_seo_avg_score ); ?>"
-                    style="--prodimg-gauge-pct: <?php echo esc_attr( $prodimg_seo_avg_score ); ?>;"
-                >
-                    <div style="text-align:center;">
-                        <span class="prodimg-score-gauge__value"><?php echo esc_html( $prodimg_seo_avg_score ); ?></span>
-                        <span class="prodimg-score-gauge__label"><?php esc_html_e( '/ 100', 'product-image-seo' ); ?></span>
-                    </div>
-                </div>
+                <svg class="prodimg-score-gauge prodimg-score-gauge--<?php echo esc_attr( $prodimg_seo_gauge_band ); ?>"
+                     viewBox="0 0 120 120"
+                     data-score="<?php echo esc_attr( $prodimg_seo_avg_score ); ?>"
+                     role="img"
+                     aria-label="<?php echo esc_attr( sprintf( /* translators: %d score value */ __( 'Score %d', 'product-image-seo' ), $prodimg_seo_avg_score ) ); ?>">
+                    <circle class="prodimg-score-gauge__track"    cx="60" cy="60" r="52" />
+                    <circle class="prodimg-score-gauge__progress" cx="60" cy="60" r="52" />
+                    <text   class="prodimg-score-gauge__value"    x="60" y="64" text-anchor="middle">0</text>
+                    <text   class="prodimg-score-gauge__label"    x="60" y="82" text-anchor="middle"><?php esc_html_e( 'Score', 'product-image-seo' ); ?></text>
+                </svg>
                 <p class="prodimg-card__footnote">
                     <?php
                     /* translators: %d total products */
@@ -143,14 +172,6 @@ $prodimg_seo_csv_url = wp_nonce_url(
                 <?php esc_html_e( 'Export CSV', 'product-image-seo' ); ?>
             </a>
         </div>
-
-        <p>
-            <button type="button" class="button" id="prodimg-seo-scan-catalog">
-                <?php esc_html_e( 'Re-scan catalog', 'product-image-seo' ); ?>
-            </button>
-            <span class="spinner" id="prodimg-seo-scan-spinner"></span>
-        </p>
-        <div id="prodimg-seo-scan-result" style="margin-top: 10px;"></div>
 
     <?php endif; ?>
 

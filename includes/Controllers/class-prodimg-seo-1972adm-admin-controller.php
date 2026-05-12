@@ -39,6 +39,15 @@ class Prodimg_Seo_1972adm_Admin_Controller {
         add_action( 'wp_ajax_prodimg_seo_1972adm_generate_single', array( $this, 'ajax_generate_single' ) );
         add_action( 'wp_ajax_prodimg_seo_1972adm_save_single', array( $this, 'ajax_save_single' ) );
         add_action( 'wp_ajax_prodimg_seo_1972adm_recalc_score', array( $this, 'ajax_recalc_score' ) );
+        add_filter( 'admin_body_class', array( $this, 'add_skin_body_class' ) );
+    }
+
+    public function add_skin_body_class( $classes ) {
+        $screen = get_current_screen();
+        if ( $screen && false !== strpos( $screen->id, 'prodimg-seo' ) ) {
+            $classes .= ' prodimg-seo-skin';
+        }
+        return $classes;
     }
 
     public function ajax_recalc_score() {

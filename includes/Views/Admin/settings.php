@@ -19,9 +19,41 @@ $prodimg_seo_include_sku      = $this->settings->get( 'include_sku', 'yes' );
 $prodimg_seo_include_price    = $this->settings->get( 'include_price', 'no' );
 $prodimg_seo_max_length       = $this->settings->get( 'max_length', 125 );
 $prodimg_seo_delete_data      = get_option( 'prodimg_seo_1972adm_delete_data_on_uninstall', false );
+
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only page slug for active nav state.
+$prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : 'prodimg-seo-settings';
 ?>
-<div class="wrap">
-    <h1><?php esc_html_e( 'Product Image SEO Settings', 'product-image-seo' ); ?></h1>
+<div class="wrap prodimg-app">
+
+    <header class="prodimg-page-header">
+        <div class="prodimg-page-header__inner">
+            <div class="prodimg-page-header__titleblock">
+                <h1 class="prodimg-page-header__title"><?php esc_html_e( 'Settings', 'product-image-seo' ); ?></h1>
+            </div>
+        </div>
+        <nav class="prodimg-segnav" aria-label="<?php esc_attr_e( 'Plugin sections', 'product-image-seo' ); ?>">
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-dashboard' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-dashboard' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Dashboard', 'product-image-seo' ); ?>
+            </a>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-report' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-report' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Audit', 'product-image-seo' ); ?>
+            </a>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-catalog' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-catalog' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Catalog', 'product-image-seo' ); ?>
+            </a>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-bulk' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-bulk' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Bulk Fix', 'product-image-seo' ); ?>
+            </a>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-settings' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-settings' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Settings', 'product-image-seo' ); ?>
+            </a>
+        </nav>
+    </header>
 
     <nav class="prodimg-tabs" role="tablist" aria-label="<?php esc_attr_e( 'Settings sections', 'product-image-seo' ); ?>">
         <button type="button" role="tab" id="tab-api" aria-controls="panel-api" aria-selected="true"><?php esc_html_e( 'API', 'product-image-seo' ); ?></button>
@@ -96,26 +128,32 @@ $prodimg_seo_delete_data      = get_option( 'prodimg_seo_1972adm_delete_data_on_
                 <tr>
                     <th scope="row"><?php esc_html_e( 'Auto-generate on save', 'product-image-seo' ); ?></th>
                     <td>
-                        <label>
-                            <input type="radio" name="auto_generate" value="yes" <?php checked( $prodimg_seo_auto_generate, 'yes' ); ?> />
-                            <?php esc_html_e( 'Yes', 'product-image-seo' ); ?>
-                        </label><br>
-                        <label>
-                            <input type="radio" name="auto_generate" value="no" <?php checked( $prodimg_seo_auto_generate, 'no' ); ?> />
-                            <?php esc_html_e( 'No', 'product-image-seo' ); ?>
+                        <label class="prodimg-switch" for="auto_generate">
+                            <input type="checkbox"
+                                   id="auto_generate"
+                                   name="auto_generate"
+                                   value="yes"
+                                   <?php checked( $prodimg_seo_auto_generate, 'yes' ); ?> />
+                            <span class="prodimg-switch__track">
+                                <span class="prodimg-switch__knob"></span>
+                            </span>
+                            <span class="prodimg-switch__label"><?php esc_html_e( 'Auto-generate on save', 'product-image-seo' ); ?></span>
                         </label>
                     </td>
                 </tr>
                 <tr>
                     <th scope="row"><?php esc_html_e( 'Skip images with existing alt text', 'product-image-seo' ); ?></th>
                     <td>
-                        <label>
-                            <input type="radio" name="skip_existing" value="yes" <?php checked( $prodimg_seo_skip_existing, 'yes' ); ?> />
-                            <?php esc_html_e( 'Yes', 'product-image-seo' ); ?>
-                        </label><br>
-                        <label>
-                            <input type="radio" name="skip_existing" value="no" <?php checked( $prodimg_seo_skip_existing, 'no' ); ?> />
-                            <?php esc_html_e( 'No', 'product-image-seo' ); ?>
+                        <label class="prodimg-switch" for="skip_existing">
+                            <input type="checkbox"
+                                   id="skip_existing"
+                                   name="skip_existing"
+                                   value="yes"
+                                   <?php checked( $prodimg_seo_skip_existing, 'yes' ); ?> />
+                            <span class="prodimg-switch__track">
+                                <span class="prodimg-switch__knob"></span>
+                            </span>
+                            <span class="prodimg-switch__label"><?php esc_html_e( 'Skip images with existing alt text', 'product-image-seo' ); ?></span>
                         </label>
                     </td>
                 </tr>

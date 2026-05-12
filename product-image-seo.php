@@ -40,6 +40,13 @@ require_once PRODIMG_SEO_1972ADM_INCLUDES_DIR . 'class-prodimg-seo-1972adm-plugi
 
 add_action( 'plugins_loaded', 'prodimg_seo_1972adm_bootstrap' );
 
+// Declare WooCommerce HPOS (Custom Order Tables) compatibility.
+add_action( 'before_woocommerce_init', function() {
+    if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', PRODIMG_SEO_1972ADM_PLUGIN_FILE, true );
+    }
+} );
+
 function prodimg_seo_1972adm_bootstrap() {
     if ( ! class_exists( 'WooCommerce' ) ) {
         add_action( 'admin_notices', 'prodimg_seo_1972adm_woocommerce_required_notice' );

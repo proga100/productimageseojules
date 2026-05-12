@@ -8,9 +8,42 @@
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
+
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only page slug for active nav state.
+$prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : 'prodimg-seo-bulk';
 ?>
-<div class="wrap">
-    <h1><?php esc_html_e( 'Bulk Fix', 'product-image-seo' ); ?></h1>
+<div class="wrap prodimg-app">
+
+    <header class="prodimg-page-header">
+        <div class="prodimg-page-header__inner">
+            <div class="prodimg-page-header__titleblock">
+                <h1 class="prodimg-page-header__title"><?php esc_html_e( 'Bulk Fix', 'product-image-seo' ); ?></h1>
+                <p class="prodimg-page-header__subtitle"><?php esc_html_e( 'Generate alt text for all products needing review', 'product-image-seo' ); ?></p>
+            </div>
+        </div>
+        <nav class="prodimg-segnav" aria-label="<?php esc_attr_e( 'Plugin sections', 'product-image-seo' ); ?>">
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-dashboard' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-dashboard' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Dashboard', 'product-image-seo' ); ?>
+            </a>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-report' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-report' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Audit', 'product-image-seo' ); ?>
+            </a>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-catalog' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-catalog' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Catalog', 'product-image-seo' ); ?>
+            </a>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-bulk' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-bulk' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Bulk Fix', 'product-image-seo' ); ?>
+            </a>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-settings' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-settings' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Settings', 'product-image-seo' ); ?>
+            </a>
+        </nav>
+    </header>
 
     <div class="prodimg-card">
         <p><?php esc_html_e( 'Generate alt text for all products needing review.', 'product-image-seo' ); ?></p>
