@@ -1,42 +1,198 @@
 /**
  * Product Image SEO – Admin styles.
  *
- * Component library for dashboard, audit, settings, catalog, and bulk-fix views.
- * Vanilla CSS – matches native wp-admin look & feel.
+ * macOS Sonoma/Sequoia-inspired component library.
+ * Tokens scoped to .prodimg-app so wp-admin globals stay untouched.
+ * Vanilla CSS — no build step, WP.org-safe.
  */
 
 /* =========================================================================
- * 1. Design tokens
+ * 1. Design tokens — scoped to .prodimg-app
  * ========================================================================= */
-.wrap {
-    --prodimg-primary: #2271b1;
-    --prodimg-primary-dark: #135e96;
-    --prodimg-red: #d63638;
-    --prodimg-red-bg: #fcf0f1;
-    --prodimg-orange: #dba617;
-    --prodimg-orange-bg: #fcf6e2;
-    --prodimg-green: #00a32a;
-    --prodimg-green-bg: #edfaef;
-    --prodimg-green-dark: #00712b;
-    --prodimg-gray: #50575e;
-    --prodimg-gray-bg: #f0f0f1;
-    --prodimg-border: #c3c4c7;
-    --prodimg-radius: 8px;
-    --prodimg-shadow: 0 1px 2px rgba( 0, 0, 0, 0.04 );
-    --prodimg-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-        Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+.prodimg-app {
+    /* Surfaces */
+    --prodimg-bg-page:      #F5F5F7;
+    --prodimg-bg-surface:   #FFFFFF;
+    --prodimg-bg-elevated:  #FBFBFD;
+    --prodimg-bg-vibrancy:  rgba(255, 255, 255, 0.8);
+
+    /* Lines & text */
+    --prodimg-border-hairline: rgba(0, 0, 0, 0.07);
+    --prodimg-border-strong:   rgba(0, 0, 0, 0.12);
+    --prodimg-text-primary:    #1D1D1F;
+    --prodimg-text-secondary:  #86868B;
+    --prodimg-text-tertiary:   #AEAEB2;
+
+    /* Accents (system) */
+    --prodimg-accent-blue:       #007AFF;
+    --prodimg-accent-green:      #34C759;
+    --prodimg-accent-red:        #FF3B30;
+    --prodimg-accent-orange:     #FF9500;
+    --prodimg-accent-purple:     #AF52DE;
+    --prodimg-accent-blue-bg:    rgba(0, 122, 255, 0.10);
+    --prodimg-accent-green-bg:   rgba(52, 199, 89, 0.12);
+    --prodimg-accent-orange-bg:  rgba(255, 149, 0, 0.12);
+    --prodimg-accent-red-bg:     rgba(255, 59, 48, 0.10);
+
+    /* Radii */
+    --prodimg-radius-sm:   6px;
+    --prodimg-radius-md:   8px;
+    --prodimg-radius-lg:   12px;
+    --prodimg-radius-xl:   16px;
+    --prodimg-radius-pill: 999px;
+
+    /* Shadows (the macOS signature) */
+    --prodimg-shadow-hairline: 0 0 0 0.5px rgba(0, 0, 0, 0.07);
+    --prodimg-shadow-card:     0 0 0 0.5px rgba(0, 0, 0, 0.07), 0 8px 24px rgba(0, 0, 0, 0.08);
+    --prodimg-shadow-pop:      0 0 0 0.5px rgba(0, 0, 0, 0.07), 0 16px 48px rgba(0, 0, 0, 0.16);
+    --prodimg-shadow-focus:    0 0 0 3px rgba(0, 122, 255, 0.30);
+
+    /* Effects */
+    --prodimg-blur-vibrancy: saturate(180%) blur(20px);
+
+    /* Type */
+    --prodimg-font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", system-ui, sans-serif;
+
+    background: var(--prodimg-bg-page);
+    color: var(--prodimg-text-primary);
+    font-family: var(--prodimg-font);
 }
 
 /* =========================================================================
- * 2. Card
+ * 2. Dark-mode override — CSS-only, no UI toggle in v2
+ * ========================================================================= */
+@media (prefers-color-scheme: dark) {
+    .prodimg-app {
+        --prodimg-bg-page:      #1C1C1E;
+        --prodimg-bg-surface:   #2C2C2E;
+        --prodimg-bg-elevated:  #3A3A3C;
+        --prodimg-bg-vibrancy:  rgba(28, 28, 30, 0.72);
+        --prodimg-border-hairline: rgba(255, 255, 255, 0.08);
+        --prodimg-border-strong:   rgba(255, 255, 255, 0.14);
+        --prodimg-text-primary:    #F5F5F7;
+        --prodimg-text-secondary:  #98989D;
+        --prodimg-text-tertiary:   #6C6C70;
+        --prodimg-shadow-card:     0 0 0 0.5px rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+}
+
+/* =========================================================================
+ * 3. Reduced-motion killswitch
+ * ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+    .prodimg-app * { transition: none !important; animation: none !important; }
+}
+
+/* =========================================================================
+ * 4. Body-scope skin overrides
+ * ========================================================================= */
+body.prodimg-seo-skin .wrap > h1 {
+    display: none; /* our sticky header replaces it */
+}
+
+/* WP notice breathing room when sticky header is present */
+.prodimg-app > .notice { margin-top: 12px; }
+
+/* =========================================================================
+ * 5. Frosted sticky page header
+ * ========================================================================= */
+.prodimg-page-header {
+    position: sticky;
+    top: 32px; /* below wp-admin bar; use CSS var when WP ships it */
+    z-index: 20;
+    background: var(--prodimg-bg-vibrancy);
+    backdrop-filter: var(--prodimg-blur-vibrancy);
+    -webkit-backdrop-filter: var(--prodimg-blur-vibrancy);
+    border-bottom: 1px solid var(--prodimg-border-hairline);
+    margin: -10px -20px 16px;
+    padding: 16px 20px 12px;
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+    .prodimg-page-header { background: var(--prodimg-bg-surface); }
+}
+
+@media (max-width: 600px) {
+    .prodimg-page-header { top: 46px; }
+}
+
+.prodimg-page-header__inner {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.prodimg-page-header__titleblock {
+    min-width: 0;
+}
+
+.prodimg-page-header__title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--prodimg-text-primary);
+    line-height: 1.2;
+}
+
+.prodimg-page-header__subtitle {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: var(--prodimg-text-secondary);
+}
+
+.prodimg-page-header__actions {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* =========================================================================
+ * 6. Segmented sub-nav (.prodimg-segnav)
+ * ========================================================================= */
+.prodimg-segnav {
+    display: flex;
+    gap: 2px;
+    background: var(--prodimg-bg-page);
+    border-radius: var(--prodimg-radius-pill);
+    padding: 3px;
+    width: fit-content;
+}
+
+.prodimg-segnav__item {
+    padding: 5px 14px;
+    border-radius: var(--prodimg-radius-pill);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--prodimg-text-secondary);
+    text-decoration: none;
+    transition: color 150ms ease;
+    white-space: nowrap;
+}
+
+.prodimg-segnav__item:hover {
+    color: var(--prodimg-text-primary);
+    text-decoration: none;
+}
+
+.prodimg-segnav__item.is-active {
+    background: var(--prodimg-bg-surface);
+    color: var(--prodimg-text-primary);
+    box-shadow: var(--prodimg-shadow-hairline), 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* =========================================================================
+ * 7. Card
  * ========================================================================= */
 .prodimg-card {
-    background: #fff;
-    border: 1px solid var( --prodimg-border );
-    border-radius: var( --prodimg-radius );
+    background: var(--prodimg-bg-surface);
+    border: 0;
+    border-radius: var(--prodimg-radius-lg);
     padding: 16px;
-    box-shadow: var( --prodimg-shadow );
-    font-family: var( --prodimg-font );
+    box-shadow: var(--prodimg-shadow-card);
+    font-family: var(--prodimg-font);
     box-sizing: border-box;
 }
 
@@ -48,23 +204,23 @@
     margin: 0 0 8px 0;
     font-size: 13px;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var( --prodimg-gray );
+    color: var(--prodimg-text-secondary);
 }
 
 .prodimg-card__value {
     margin: 0;
-    font-size: 32px;
+    font-size: 34px;
     font-weight: 600;
     line-height: 1.1;
-    color: #1d2327;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--prodimg-text-primary);
 }
 
 .prodimg-card__footnote {
     margin: 8px 0 0 0;
     font-size: 12px;
-    color: var( --prodimg-gray );
+    color: var(--prodimg-text-secondary);
 }
 
 .prodimg-card__cta {
@@ -72,16 +228,21 @@
     margin-top: 8px;
     font-size: 13px;
     text-decoration: none;
-    color: var( --prodimg-primary );
+    color: var(--prodimg-accent-blue);
 }
 
 .prodimg-card__cta:hover {
-    color: var( --prodimg-primary-dark );
+    color: var(--prodimg-accent-blue);
     text-decoration: underline;
+    opacity: 0.85;
+}
+
+.prodimg-card__footer-actions {
+    margin-top: 16px;
 }
 
 /* =========================================================================
- * 3. Grid
+ * 8. Grid
  * ========================================================================= */
 .prodimg-grid {
     display: grid;
@@ -90,267 +251,53 @@
     margin: 16px 0;
 }
 
-@media ( min-width: 782px ) {
+@media (min-width: 782px) {
     .prodimg-grid {
-        grid-template-columns: repeat( 2, minmax( 0, 1fr ) );
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
-@media ( min-width: 1200px ) {
+@media (min-width: 1200px) {
     .prodimg-grid {
-        grid-template-columns: repeat( 4, minmax( 0, 1fr ) );
+        grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 }
 
 /* =========================================================================
- * 4. Score gauge (120 x 120 conic ring)
+ * 9. Coverage list
  * ========================================================================= */
-.prodimg-score-gauge {
-    position: relative;
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    background: conic-gradient( var( --prodimg-gauge-color, var( --prodimg-primary ) ) calc( var( --prodimg-gauge-pct, 0 ) * 1% ), #e5e7eb 0 );
+.prodimg-coverage-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    color: var(--prodimg-text-secondary);
+}
+
+.prodimg-coverage-list li {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+}
+
+.prodimg-coverage-list strong {
+    color: var(--prodimg-text-primary);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.prodimg-coverage-list__icon {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto;
-}
-
-.prodimg-score-gauge::before {
-    content: "";
-    position: absolute;
-    inset: 10px;
-    background: #fff;
+    width: 22px;
+    height: 22px;
+    background: var(--prodimg-accent-blue-bg);
     border-radius: 50%;
-}
-
-.prodimg-score-gauge--good { --prodimg-gauge-color: var( --prodimg-green ); }
-.prodimg-score-gauge--ok   { --prodimg-gauge-color: var( --prodimg-orange ); }
-.prodimg-score-gauge--poor { --prodimg-gauge-color: var( --prodimg-red ); }
-
-.prodimg-score-gauge__value {
-    position: relative;
-    z-index: 1;
-    font-size: 28px;
-    font-weight: 700;
-    line-height: 1;
-    color: #1d2327;
-}
-
-.prodimg-score-gauge__label {
-    position: relative;
-    z-index: 1;
-    display: block;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var( --prodimg-gray );
-    margin-top: 2px;
-    text-align: center;
-}
-
-/* =========================================================================
- * 5. Score pill
- * ========================================================================= */
-.prodimg-score-pill {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 1.6;
-    background: var( --prodimg-gray-bg );
-    color: #1d2327;
-}
-
-.prodimg-score-pill--good    { background: var( --prodimg-green-bg ); color: var( --prodimg-green-dark ); }
-.prodimg-score-pill--ok      { background: var( --prodimg-orange-bg ); color: #8a6300; }
-.prodimg-score-pill--poor    { background: var( --prodimg-red-bg ); color: var( --prodimg-red ); }
-.prodimg-score-pill--unknown { background: var( --prodimg-gray-bg ); color: var( --prodimg-gray ); }
-
-/* =========================================================================
- * 6. Progress bar
- * ========================================================================= */
-.prodimg-progress {
-    width: 100%;
-    background: var( --prodimg-gray-bg );
-    border-radius: 999px;
-    height: 8px;
-    overflow: hidden;
-}
-
-.prodimg-progress__label {
-    display: block;
-    margin-bottom: 4px;
-    font-size: 12px;
-    color: var( --prodimg-gray );
-}
-
-.prodimg-progress__bar {
-    background: var( --prodimg-primary );
-    height: 100%;
-    width: 0;
-    border-radius: 999px;
-    transition: width 0.4s ease;
-}
-
-/* Stacked distribution bar */
-.prodimg-progress--stacked {
-    display: flex;
-    height: 14px;
-    background: var( --prodimg-gray-bg );
-}
-
-.prodimg-progress--stacked .prodimg-progress__segment {
-    height: 100%;
-    transition: width 0.4s ease;
-}
-
-.prodimg-progress__segment--good { background: var( --prodimg-green ); }
-.prodimg-progress__segment--ok   { background: var( --prodimg-orange ); }
-.prodimg-progress__segment--poor { background: var( --prodimg-red ); }
-
-.prodimg-progress__legend {
-    display: flex;
-    gap: 16px;
-    margin-top: 8px;
-    font-size: 12px;
-    color: var( --prodimg-gray );
-    flex-wrap: wrap;
-}
-
-.prodimg-progress__legend-dot {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    margin-right: 4px;
-    vertical-align: middle;
-}
-
-/* =========================================================================
- * 7. Tabs
- * ========================================================================= */
-.prodimg-tabs {
-    display: flex;
-    gap: 0;
-    border-bottom: 1px solid var( --prodimg-border );
-    margin: 16px 0 0 0;
-    flex-wrap: wrap;
-}
-
-.prodimg-tabs [role="tab"] {
-    background: none;
-    border: 0;
-    border-bottom: 2px solid transparent;
-    padding: 10px 16px;
+    margin-right: 6px;
     font-size: 14px;
-    font-weight: 500;
-    color: var( --prodimg-gray );
-    cursor: pointer;
-    margin-bottom: -1px;
-    font-family: inherit;
-}
-
-.prodimg-tabs [role="tab"]:hover {
-    color: var( --prodimg-primary );
-}
-
-.prodimg-tabs [role="tab"][aria-selected="true"] {
-    color: var( --prodimg-primary );
-    border-bottom-color: var( --prodimg-primary );
-}
-
-.prodimg-tabs [role="tab"]:focus {
-    outline: 2px solid var( --prodimg-primary );
-    outline-offset: -2px;
-}
-
-[role="tabpanel"] {
-    padding: 16px 0;
-}
-
-[role="tabpanel"][hidden] {
-    display: none;
-}
-
-/* =========================================================================
- * 8. Empty state
- * ========================================================================= */
-.prodimg-empty-state {
-    text-align: center;
-    padding: 48px 24px;
-    background: #fff;
-    border: 1px solid var( --prodimg-border );
-    border-radius: var( --prodimg-radius );
-    box-shadow: var( --prodimg-shadow );
-    margin: 16px 0;
-}
-
-.prodimg-empty-state__icon {
-    font-size: 48px;
-    line-height: 1;
-    color: var( --prodimg-primary );
-    margin-bottom: 12px;
-}
-
-.prodimg-empty-state__icon .dashicons {
-    width: 48px;
-    height: 48px;
-    font-size: 48px;
-}
-
-.prodimg-empty-state__title {
-    font-size: 18px;
-    margin: 0 0 8px 0;
-    font-weight: 600;
-}
-
-.prodimg-empty-state__body {
-    color: var( --prodimg-gray );
-    max-width: 480px;
-    margin: 0 auto 16px auto;
-    font-size: 14px;
-}
-
-/* =========================================================================
- * 9. Filter chips
- * ========================================================================= */
-.prodimg-filter-chips {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin: 12px 0;
-}
-
-.prodimg-filter-chip {
-    display: inline-block;
-    padding: 4px 12px;
-    border: 1px solid var( --prodimg-border );
-    border-radius: 999px;
-    background: #fff;
-    color: var( --prodimg-gray );
-    text-decoration: none;
-    font-size: 13px;
-    line-height: 1.6;
-    transition: background 0.15s, border-color 0.15s;
-}
-
-.prodimg-filter-chip:hover {
-    border-color: var( --prodimg-primary );
-    color: var( --prodimg-primary );
-}
-
-.prodimg-filter-chip.is-active {
-    background: var( --prodimg-primary );
-    border-color: var( --prodimg-primary );
-    color: #fff;
-}
-
-.prodimg-filter-chip.is-active:hover {
-    color: #fff;
-    background: var( --prodimg-primary-dark );
+    color: var(--prodimg-accent-blue);
 }
 
 /* =========================================================================
@@ -359,7 +306,7 @@
 .prodimg-quick-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 10px;
     margin: 16px 0;
 }
 
@@ -367,8 +314,6 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 8px 16px;
-    min-height: 40px;
     font-size: 14px;
 }
 
@@ -389,61 +334,574 @@
 
 .prodimg-signal-row__label {
     flex: 0 0 160px;
-    color: #1d2327;
+    color: var(--prodimg-text-primary);
 }
 
 .prodimg-signal-row__bar {
     flex: 1;
-    height: 6px;
-    background: var( --prodimg-gray-bg );
-    border-radius: 999px;
+    height: 4px;
+    background: var(--prodimg-border-hairline);
+    border-radius: var(--prodimg-radius-pill);
     overflow: hidden;
 }
 
 .prodimg-signal-row__bar-fill {
     height: 100%;
-    background: var( --prodimg-primary );
+    background: var(--prodimg-accent-blue);
     transition: width 0.4s ease;
 }
+
+.prodimg-signal-row__bar-fill--good { background: var(--prodimg-accent-green); }
+.prodimg-signal-row__bar-fill--ok   { background: var(--prodimg-accent-orange); }
+.prodimg-signal-row__bar-fill--poor { background: var(--prodimg-accent-red); }
 
 .prodimg-signal-row__weight {
     flex: 0 0 80px;
     text-align: right;
     font-variant-numeric: tabular-nums;
-    color: var( --prodimg-gray );
-    font-size: 12px;
+    color: var(--prodimg-text-secondary);
+    font-size: 11px;
+    font-weight: 500;
+    background: var(--prodimg-bg-elevated);
+    border-radius: var(--prodimg-radius-pill);
+    padding: 2px 8px;
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
+    box-shadow: var(--prodimg-shadow-hairline);
 }
 
 /* =========================================================================
- * 12. Misc
+ * 12. SVG score gauge
+ * ========================================================================= */
+.prodimg-score-gauge {
+    display: block;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto;
+    overflow: visible;
+}
+
+.prodimg-score-gauge__track,
+.prodimg-score-gauge__progress {
+    fill: none;
+    stroke-width: 12;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: 60px 60px;
+}
+
+.prodimg-score-gauge__track {
+    stroke: var(--prodimg-border-hairline);
+}
+
+.prodimg-score-gauge__progress {
+    stroke: var(--prodimg-accent-green);
+    stroke-dasharray: 326.7;  /* 2 * π * 52 */
+    stroke-dashoffset: 326.7; /* start empty */
+    transition: stroke-dashoffset 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.prodimg-score-gauge--ok   .prodimg-score-gauge__progress { stroke: var(--prodimg-accent-orange); }
+.prodimg-score-gauge--poor .prodimg-score-gauge__progress { stroke: var(--prodimg-accent-red); }
+
+.prodimg-score-gauge__value {
+    font-size: 28px;
+    font-weight: 600;
+    fill: var(--prodimg-text-primary);
+    font-family: var(--prodimg-font);
+    font-variant-numeric: tabular-nums;
+}
+
+.prodimg-score-gauge__label {
+    font-size: 12px;
+    fill: var(--prodimg-text-secondary);
+    font-family: var(--prodimg-font);
+}
+
+/* =========================================================================
+ * 13. Score pill
+ * ========================================================================= */
+.prodimg-score-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: var(--prodimg-radius-pill);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.6;
+    background: var(--prodimg-bg-elevated);
+    color: var(--prodimg-text-secondary);
+    box-shadow: var(--prodimg-shadow-hairline);
+}
+
+.prodimg-score-pill--good    { background: var(--prodimg-accent-green-bg); color: #1a7c3a; }
+.prodimg-score-pill--ok      { background: var(--prodimg-accent-orange-bg); color: #8a5000; }
+.prodimg-score-pill--poor    { background: var(--prodimg-accent-red-bg); color: #c0291f; }
+.prodimg-score-pill--unknown { background: var(--prodimg-bg-elevated); color: var(--prodimg-text-secondary); }
+
+/* =========================================================================
+ * 14. Progress bar (linear + stacked) + legend dots
+ * ========================================================================= */
+.prodimg-progress {
+    width: 100%;
+    background: var(--prodimg-border-hairline);
+    border-radius: var(--prodimg-radius-pill);
+    height: 6px;
+    overflow: hidden;
+    box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.04);
+}
+
+.prodimg-progress__label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 12px;
+    color: var(--prodimg-text-secondary);
+}
+
+.prodimg-progress__bar {
+    background: var(--prodimg-accent-green);
+    height: 100%;
+    width: 0;
+    border-radius: var(--prodimg-radius-pill);
+    transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Stacked distribution bar */
+.prodimg-progress--stacked {
+    display: flex;
+    height: 10px;
+    background: var(--prodimg-bg-elevated);
+    border-radius: var(--prodimg-radius-pill);
+    overflow: hidden;
+}
+
+.prodimg-progress--stacked .prodimg-progress__segment {
+    height: 100%;
+    transition: width 0.4s ease;
+}
+
+.prodimg-progress--stacked .prodimg-progress__segment + .prodimg-progress__segment {
+    border-left: 1px solid var(--prodimg-bg-surface);
+}
+
+.prodimg-progress__segment--good { background: var(--prodimg-accent-green); }
+.prodimg-progress__segment--ok   { background: var(--prodimg-accent-orange); }
+.prodimg-progress__segment--poor { background: var(--prodimg-accent-red); }
+
+.prodimg-progress__legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--prodimg-text-secondary);
+    flex-wrap: wrap;
+}
+
+/* Legend dots — class-based, no inline hex */
+.prodimg-legend-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+.prodimg-legend-dot--good { background: var(--prodimg-accent-green); }
+.prodimg-legend-dot--ok   { background: var(--prodimg-accent-orange); }
+.prodimg-legend-dot--poor { background: var(--prodimg-accent-red); }
+
+/* =========================================================================
+ * 15. Tabs as segmented control
+ * ========================================================================= */
+.prodimg-tabs {
+    display: inline-flex;
+    gap: 2px;
+    background: var(--prodimg-bg-page);
+    border-radius: var(--prodimg-radius-pill);
+    padding: 3px;
+    margin: 16px 0 0 0;
+    flex-wrap: wrap;
+    border: 0;
+}
+
+.prodimg-tabs [role="tab"] {
+    background: transparent;
+    border: 0;
+    border-radius: var(--prodimg-radius-pill);
+    padding: 6px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--prodimg-text-secondary);
+    cursor: pointer;
+    font-family: var(--prodimg-font);
+    transition: color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+    margin-bottom: 0;
+}
+
+.prodimg-tabs [role="tab"]:hover {
+    color: var(--prodimg-text-primary);
+}
+
+.prodimg-tabs [role="tab"][aria-selected="true"] {
+    background: var(--prodimg-bg-surface);
+    color: var(--prodimg-text-primary);
+    box-shadow: var(--prodimg-shadow-hairline), 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.prodimg-tabs [role="tab"]:focus-visible {
+    outline: none;
+    box-shadow: var(--prodimg-shadow-focus);
+}
+
+[role="tabpanel"] {
+    padding: 16px 0;
+}
+
+[role="tabpanel"][hidden] {
+    display: none;
+}
+
+/* =========================================================================
+ * 16. Filter chips
+ * ========================================================================= */
+.prodimg-filter-chips {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin: 12px 0;
+}
+
+.prodimg-filter-chip {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: var(--prodimg-radius-pill);
+    background: var(--prodimg-bg-surface);
+    color: var(--prodimg-text-secondary);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.6;
+    box-shadow: var(--prodimg-shadow-hairline);
+    transition: background 150ms ease, color 150ms ease, box-shadow 150ms ease;
+}
+
+.prodimg-filter-chip:hover {
+    color: var(--prodimg-text-primary);
+    box-shadow: var(--prodimg-shadow-card);
+    text-decoration: none;
+}
+
+.prodimg-filter-chip.is-active {
+    background: var(--prodimg-accent-blue);
+    color: #fff;
+    box-shadow: none;
+}
+
+.prodimg-filter-chip.is-active:hover {
+    color: #fff;
+    opacity: 0.90;
+}
+
+/* =========================================================================
+ * 17. Empty state with bubble icon
+ * ========================================================================= */
+.prodimg-empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    background: var(--prodimg-bg-elevated);
+    border-radius: var(--prodimg-radius-xl);
+    box-shadow: var(--prodimg-shadow-card);
+    margin: 16px 0;
+}
+
+.prodimg-empty-state__icon-bubble {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--prodimg-accent-blue-bg);
+    margin-bottom: 16px;
+}
+
+.prodimg-empty-state__icon {
+    font-size: 48px;
+    line-height: 1;
+    color: var(--prodimg-accent-blue);
+    margin-bottom: 12px;
+}
+
+.prodimg-empty-state__icon .dashicons {
+    width: 32px;
+    height: 32px;
+    font-size: 32px;
+    color: var(--prodimg-accent-blue);
+}
+
+.prodimg-empty-state__title {
+    font-size: 18px;
+    margin: 0 0 8px 0;
+    font-weight: 600;
+    color: var(--prodimg-text-primary);
+}
+
+.prodimg-empty-state__body {
+    color: var(--prodimg-text-secondary);
+    max-width: 480px;
+    margin: 0 auto 16px auto;
+    font-size: 17px;
+    line-height: 1.5;
+}
+
+/* =========================================================================
+ * 18. Buttons scoped to .prodimg-app
+ * ========================================================================= */
+.prodimg-app .button-primary,
+.prodimg-app .button.button-primary {
+    height: 36px;
+    line-height: 34px;
+    padding: 0 16px;
+    border-radius: var(--prodimg-radius-md);
+    background: var(--prodimg-accent-blue);
+    border-color: var(--prodimg-accent-blue);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 1px 2px rgba(0, 122, 255, 0.20);
+    transition: opacity 150ms ease, box-shadow 150ms ease;
+}
+
+.prodimg-app .button-primary:hover,
+.prodimg-app .button.button-primary:hover {
+    background: var(--prodimg-accent-blue);
+    border-color: var(--prodimg-accent-blue);
+    color: #fff;
+    opacity: 0.88;
+    box-shadow: 0 2px 6px rgba(0, 122, 255, 0.30);
+}
+
+.prodimg-app .button-primary:focus,
+.prodimg-app .button.button-primary:focus {
+    box-shadow: var(--prodimg-shadow-focus);
+}
+
+.prodimg-app .button-primary:active,
+.prodimg-app .button.button-primary:active {
+    opacity: 0.80;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05) inset;
+}
+
+.prodimg-app .button-secondary,
+.prodimg-app .button:not(.button-primary) {
+    height: 36px;
+    line-height: 34px;
+    padding: 0 16px;
+    border-radius: var(--prodimg-radius-md);
+    background: var(--prodimg-bg-surface);
+    border: 1px solid var(--prodimg-border-strong);
+    color: var(--prodimg-text-primary);
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: var(--prodimg-shadow-hairline);
+    transition: opacity 150ms ease, box-shadow 150ms ease;
+}
+
+.prodimg-app .button-secondary:hover,
+.prodimg-app .button:not(.button-primary):hover {
+    background: var(--prodimg-bg-elevated);
+    color: var(--prodimg-text-primary);
+    box-shadow: var(--prodimg-shadow-card);
+}
+
+/* =========================================================================
+ * 19. Pill switch (.prodimg-switch)
+ * ========================================================================= */
+.prodimg-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.prodimg-switch input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.prodimg-switch__track {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 26px;
+    background: var(--prodimg-border-strong);
+    border-radius: var(--prodimg-radius-pill);
+    transition: background 200ms ease;
+    flex-shrink: 0;
+}
+
+.prodimg-switch input:checked + .prodimg-switch__track {
+    background: var(--prodimg-accent-green);
+}
+
+.prodimg-switch__knob {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.20);
+    transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.prodimg-switch input:checked ~ .prodimg-switch__track .prodimg-switch__knob {
+    transform: translateX(18px);
+}
+
+.prodimg-switch input:focus-visible + .prodimg-switch__track {
+    box-shadow: var(--prodimg-shadow-focus);
+}
+
+.prodimg-switch__label {
+    font-size: 14px;
+    color: var(--prodimg-text-primary);
+}
+
+/* =========================================================================
+ * 20. Modal (catalog single-product overlay)
+ * ========================================================================= */
+.prodimg-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.40);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 9999;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 20px;
+    box-sizing: border-box;
+}
+
+.prodimg-modal-overlay.is-visible,
+.prodimg-modal-overlay[style*="display:block"],
+.prodimg-modal-overlay[style*="display: block"] {
+    display: flex;
+}
+
+.prodimg-modal {
+    background: var(--prodimg-bg-surface);
+    width: 720px;
+    max-width: 100%;
+    border-radius: var(--prodimg-radius-xl);
+    box-shadow: var(--prodimg-shadow-pop);
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    padding: 24px;
+}
+
+.prodimg-modal__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: var(--prodimg-bg-elevated);
+    border: 0;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--prodimg-text-secondary);
+    box-shadow: var(--prodimg-shadow-hairline);
+    transition: background 150ms ease;
+    line-height: 1;
+    padding: 0;
+}
+
+.prodimg-modal__close:hover {
+    background: var(--prodimg-accent-red-bg);
+    color: var(--prodimg-accent-red);
+}
+
+.prodimg-modal__footer {
+    margin-top: 20px;
+    text-align: right;
+    padding-top: 16px;
+    border-top: 1px solid var(--prodimg-border-hairline);
+}
+
+/* Error message inside modal */
+.prodimg-error-msg {
+    color: var(--prodimg-accent-red);
+}
+
+/* =========================================================================
+ * 21. Toast (HUD notification)
+ * ========================================================================= */
+.prodimg-toast {
+    position: fixed;
+    top: 48px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-12px);
+    z-index: 99999;
+    padding: 10px 18px;
+    border-radius: var(--prodimg-radius-md);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: var(--prodimg-font);
+    color: var(--prodimg-text-primary);
+    background: var(--prodimg-bg-vibrancy);
+    backdrop-filter: var(--prodimg-blur-vibrancy);
+    -webkit-backdrop-filter: var(--prodimg-blur-vibrancy);
+    box-shadow: var(--prodimg-shadow-pop);
+    border: 1px solid var(--prodimg-border-hairline);
+    opacity: 0;
+    transition: opacity 250ms ease, transform 350ms cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+}
+
+.prodimg-toast.is-visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.prodimg-toast--success { border-left: 3px solid var(--prodimg-accent-green); }
+.prodimg-toast--error   { border-left: 3px solid var(--prodimg-accent-red); }
+.prodimg-toast--info    { border-left: 3px solid var(--prodimg-accent-blue); }
+
+@supports not (backdrop-filter: blur(1px)) {
+    .prodimg-toast { background: var(--prodimg-bg-surface); }
+}
+
+/* =========================================================================
+ * 22. State classes
+ * ========================================================================= */
+.is-success { color: #1a7c3a; }
+.is-error   { color: #c0291f; }
+
+/* =========================================================================
+ * 23. Misc
  * ========================================================================= */
 .prodimg-version-tag {
     display: inline-block;
     font-size: 11px;
     font-weight: 500;
-    background: var( --prodimg-gray-bg );
-    color: var( --prodimg-gray );
+    background: var(--prodimg-bg-elevated);
+    color: var(--prodimg-text-secondary);
     padding: 2px 8px;
-    border-radius: 999px;
+    border-radius: var(--prodimg-radius-pill);
     margin-left: 8px;
     vertical-align: middle;
-}
-
-.prodimg-coverage-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    font-size: 13px;
-    color: var( --prodimg-gray );
-}
-
-.prodimg-coverage-list li {
-    display: flex;
-    justify-content: space-between;
-    padding: 2px 0;
-}
-
-.prodimg-coverage-list strong {
-    color: #1d2327;
-    font-weight: 600;
+    box-shadow: var(--prodimg-shadow-hairline);
 }

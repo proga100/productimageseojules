@@ -1,3 +1,20 @@
+/**
+ * prodimgToast — HUD notification helper.
+ *
+ * @param {string} msg  Message text.
+ * @param {string} type 'success' | 'error' | 'info'  (default 'success')
+ */
+function prodimgToast( msg, type ) {
+    type = type || 'success';
+    var $t = jQuery('<div class="prodimg-toast prodimg-toast--' + type + '">' + msg + '</div>');
+    jQuery('body').append( $t );
+    setTimeout(function() { $t.addClass('is-visible'); }, 10);
+    setTimeout(function() {
+        $t.removeClass('is-visible');
+        setTimeout(function() { $t.remove(); }, 400);
+    }, 2400);
+}
+
 jQuery(document).ready(function($) {
     // Test Connection
     $('#prodimg-seo-test-connection').on('click', function() {
@@ -6,7 +23,7 @@ jQuery(document).ready(function($) {
         var $result = $('#prodimg-seo-test-result');
 
         $spinner.addClass('is-active');
-        $result.text('').removeClass('error success');
+        $result.text('').removeClass('is-success is-error');
 
         $.post(prodimg_seo_1972adm_admin.ajax_url, {
             action: 'prodimg_seo_1972adm_test_connection',
@@ -14,9 +31,11 @@ jQuery(document).ready(function($) {
         }, function(response) {
             $spinner.removeClass('is-active');
             if (response.success) {
-                $result.text(response.data).addClass('success').css('color', 'green');
+                $result.text(response.data).removeClass('is-success is-error').addClass('is-success');
+                prodimgToast(response.data, 'success');
             } else {
-                $result.text(response.data).addClass('error').css('color', 'red');
+                $result.text(response.data).removeClass('is-success is-error').addClass('is-error');
+                prodimgToast(response.data, 'error');
             }
         });
     });
@@ -29,7 +48,7 @@ jQuery(document).ready(function($) {
 
         $btn.prop('disabled', true);
         $spinner.addClass('is-active');
-        $result.text('Scanning catalog...').css('color', '');
+        $result.text('Scanning catalog...').removeClass('is-success is-error');
 
         var totalScanned = 0;
 
@@ -45,7 +64,9 @@ jQuery(document).ready(function($) {
                     if (response.data.done) {
                         $btn.prop('disabled', false);
                         $spinner.removeClass('is-active');
-                        $result.text('Scan complete! Scanned ' + totalScanned + ' products.').css('color', 'green');
+                        var doneMsg = 'Scan complete! Scanned ' + totalScanned + ' products.';
+                        $result.text(doneMsg).removeClass('is-success is-error').addClass('is-success');
+                        prodimgToast(doneMsg, 'success');
                     } else {
                         var pct = Math.round((page / response.data.total_pages) * 100);
                         $result.text('Scanning... ' + pct + '% (' + page + '/' + response.data.total_pages + ')');
@@ -54,12 +75,15 @@ jQuery(document).ready(function($) {
                 } else {
                     $btn.prop('disabled', false);
                     $spinner.removeClass('is-active');
-                    $result.text('Error: ' + response.data).css('color', 'red');
+                    $result.text('Error: ' + response.data).removeClass('is-success is-error').addClass('is-error');
+                    prodimgToast('Error: ' + response.data, 'error');
                 }
             }).fail(function() {
                 $btn.prop('disabled', false);
                 $spinner.removeClass('is-active');
-                $result.text('An error occurred during the scan. Please try again.').css('color', 'red');
+                var errMsg = 'An error occurred during the scan. Please try again.';
+                $result.text(errMsg).removeClass('is-success is-error').addClass('is-error');
+                prodimgToast(errMsg, 'error');
             });
         }
 
@@ -99,7 +123,7 @@ jQuery(document).ready(function($) {
                 $('#prodimg-seo-modal-content').html(html);
                 $('#prodimg-seo-modal-save').show();
             } else {
-                $('#prodimg-seo-modal-content').html('<p style="color:red;">Error: ' + response.data + '</p>');
+                $('#prodimg-seo-modal-content').html('<p class="prodimg-error-msg">Error: ' + response.data + '</p>');
             }
         });
     });
@@ -126,10 +150,12 @@ jQuery(document).ready(function($) {
         }, function(response) {
             $btn.prop('disabled', false).text('Save Approved Alt Text');
             if (response.success) {
+                prodimgToast('Saved successfully.', 'success');
                 $('#prodimg-seo-modal-overlay').fadeOut();
-                // Optionally reload the page to update list table status
+                // Reload to update list table status (defer elimination to v3).
                 location.reload();
             } else {
+                prodimgToast('Error saving: ' + response.data, 'error');
                 alert('Error saving: ' + response.data);
             }
         });
@@ -206,33 +232,40 @@ jQuery(function($) {
         }
     }
 
-    // Score gauge count-up animation
+    // Score gauge ring-sweep + count-up animation
     $('.prodimg-score-gauge[data-score]').each(function() {
-        var $g = $(this);
-        var target = parseInt($g.attr('data-score'), 10) || 0;
-        var $val = $g.find('.prodimg-score-gauge__value');
-        var start = 0;
-        var step = Math.max(1, Math.floor(target / 30));
-        if (target === 0) {
-            $val.text(0);
+        var $g     = $(this);
+        var target = parseInt( $g.attr('data-score'), 10 ) || 0;
+        var $prog  = $g.find('.prodimg-score-gauge__progress');
+        var $val   = $g.find('.prodimg-score-gauge__value');
+        var C      = 326.7; // circumference = 2 * Math.PI * 52
+        var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        if ( reduce ) {
+            $prog.css('stroke-dashoffset', C - ( C * target / 100 ) );
+            $val.text( target );
             return;
         }
+        // Trigger ring sweep
+        requestAnimationFrame(function() {
+            $prog.css('stroke-dashoffset', C - ( C * target / 100 ) );
+        });
+        // Synchronized number count-up (~1.2s, ~30 ticks)
+        var start = 0;
+        var step  = Math.max( 1, Math.floor( target / 30 ) );
         var timer = setInterval(function() {
             start += step;
-            if (start >= target) {
-                start = target;
-                clearInterval(timer);
-            }
-            $val.text(start);
-        }, 30);
+            if ( start >= target ) { start = target; clearInterval(timer); }
+            $val.text( start );
+        }, 40);
     });
 
     // Bulk-fix completion summary card
-    var originalPoll = window.pollBulkStatus;
     $(document).on('prodimg-seo:bulk-completed', function(e, data) {
         var $body = $('#prodimg-seo-bulk-results-body');
         var msg = 'Bulk fix finished. Processed ' + (data && data.total_products ? data.total_products : 'all') + ' products.';
         $body.text(msg);
         $('#prodimg-seo-bulk-results').removeAttr('hidden');
+        prodimgToast(msg, 'success');
     });
 });

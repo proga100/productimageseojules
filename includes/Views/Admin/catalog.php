@@ -16,6 +16,9 @@ $prodimg_seo_page_slug    = isset( $_REQUEST['page'] ) ? sanitize_key( wp_unslas
 $prodimg_seo_active_chip  = isset( $_REQUEST['prodimg_status'] ) ? sanitize_key( wp_unslash( $_REQUEST['prodimg_status'] ) ) : '';
 // phpcs:enable WordPress.Security.NonceVerification.Recommended
 
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only page slug for active nav state.
+$prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : 'prodimg-seo-catalog';
+
 $prodimg_seo_chips = array(
     ''             => __( 'All', 'product-image-seo' ),
     'needs_review' => __( 'Missing alt', 'product-image-seo' ),
@@ -23,8 +26,37 @@ $prodimg_seo_chips = array(
     'optimized'    => __( 'Good', 'product-image-seo' ),
 );
 ?>
-<div class="wrap">
-    <h1><?php esc_html_e( 'Catalog Audit', 'product-image-seo' ); ?></h1>
+<div class="wrap prodimg-app">
+
+    <header class="prodimg-page-header">
+        <div class="prodimg-page-header__inner">
+            <div class="prodimg-page-header__titleblock">
+                <h1 class="prodimg-page-header__title"><?php esc_html_e( 'Catalog Audit', 'product-image-seo' ); ?></h1>
+            </div>
+        </div>
+        <nav class="prodimg-segnav" aria-label="<?php esc_attr_e( 'Plugin sections', 'product-image-seo' ); ?>">
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-dashboard' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-dashboard' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Dashboard', 'product-image-seo' ); ?>
+            </a>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-report' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-report' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Audit', 'product-image-seo' ); ?>
+            </a>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-catalog' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-catalog' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Catalog', 'product-image-seo' ); ?>
+            </a>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-bulk' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-bulk' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Bulk Fix', 'product-image-seo' ); ?>
+            </a>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-settings' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-settings' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Settings', 'product-image-seo' ); ?>
+            </a>
+        </nav>
+    </header>
 
     <nav class="prodimg-filter-chips" aria-label="<?php esc_attr_e( 'Filter products by status', 'product-image-seo' ); ?>">
         <?php foreach ( $prodimg_seo_chips as $prodimg_seo_chip_slug => $prodimg_seo_chip_label ) :
@@ -49,14 +81,14 @@ $prodimg_seo_chips = array(
 </div>
 
 <!-- Modal for Single Product Generation -->
-<div id="prodimg-seo-modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999;">
-    <div id="prodimg-seo-modal" style="background:#fff; width:800px; max-width:90%; margin:50px auto; padding:20px; border-radius:4px; max-height:80vh; overflow-y:auto; position:relative;">
-        <button id="prodimg-seo-modal-close" style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:20px; cursor:pointer;">&times;</button>
+<div id="prodimg-seo-modal-overlay" class="prodimg-modal-overlay">
+    <div id="prodimg-seo-modal" class="prodimg-modal">
+        <button id="prodimg-seo-modal-close" class="prodimg-modal__close" aria-label="<?php esc_attr_e( 'Close', 'product-image-seo' ); ?>">&times;</button>
         <h2><?php esc_html_e( 'Review Alt Text Suggestions', 'product-image-seo' ); ?></h2>
         <div id="prodimg-seo-modal-content">
             <p><?php esc_html_e( 'Loading...', 'product-image-seo' ); ?></p>
         </div>
-        <div style="margin-top:20px; text-align:right;">
+        <div class="prodimg-modal__footer">
             <button class="button button-primary" id="prodimg-seo-modal-save" style="display:none;"><?php esc_html_e( 'Save Approved Alt Text', 'product-image-seo' ); ?></button>
         </div>
     </div>
