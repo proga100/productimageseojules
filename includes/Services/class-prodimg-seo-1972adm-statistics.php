@@ -11,6 +11,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Prodimg_Seo_1972adm_Statistics {
 
+    private $calculator;
+
+    public function __construct( Prodimg_Seo_1972adm_Score_Calculator $calculator ) {
+        $this->calculator = $calculator;
+    }
+
     public function get_stats() {
         $stats = array(
             'total_products' => 0,
@@ -28,6 +34,11 @@ class Prodimg_Seo_1972adm_Statistics {
                 'optimized'    => 0,
                 'excellent'    => 0,
                 'ignored'      => 0,
+            ),
+            'by_band'        => array(
+                'good' => 0,
+                'ok'   => 0,
+                'poor' => 0,
             ),
         );
 
@@ -56,13 +67,24 @@ class Prodimg_Seo_1972adm_Statistics {
                 $stats['missing_alt']++;
             }
 
-            // Quality score (if set)
-            $score = get_post_meta( $pid, '_prodimg_seo_1972adm_score', true );
+            // Quality score: prefer local, fall back to remote.
+            $score = get_post_meta( $pid, '_prodimg_seo_1972adm_score_local', true );
+            if ( ! is_numeric( $score ) ) {
+                $score = get_post_meta( $pid, '_prodimg_seo_1972adm_score', true );
+            }
             if ( is_numeric( $score ) ) {
-                $total_score += intval( $score );
+                $score_int = intval( $score );
+                $total_score += $score_int;
                 $scored_products++;
-                if ( intval( $score ) < 50 ) {
+                if ( $score_int < 50 ) {
                     $stats['weak_alt']++;
+                }
+                if ( $score_int >= 80 ) {
+                    $stats['by_band']['good']++;
+                } elseif ( $score_int >= 50 ) {
+                    $stats['by_band']['ok']++;
+                } else {
+                    $stats['by_band']['poor']++;
                 }
             }
 

@@ -15,17 +15,20 @@ class Prodimg_Seo_1972adm_Admin_Controller {
     private $api_client;
     private $statistics;
     private $scanner;
+    private $calculator;
 
     public function __construct(
         Prodimg_Seo_1972adm_Settings $settings,
         Prodimg_Seo_1972adm_Api_Client $api_client,
         Prodimg_Seo_1972adm_Statistics $statistics,
-        Prodimg_Seo_1972adm_Product_Scanner $scanner
+        Prodimg_Seo_1972adm_Product_Scanner $scanner,
+        Prodimg_Seo_1972adm_Score_Calculator $calculator
     ) {
         $this->settings   = $settings;
         $this->api_client = $api_client;
         $this->statistics = $statistics;
         $this->scanner    = $scanner;
+        $this->calculator = $calculator;
     }
 
     public function init_hooks() {
@@ -35,49 +38,75 @@ class Prodimg_Seo_1972adm_Admin_Controller {
         add_action( 'wp_ajax_prodimg_seo_1972adm_scan_catalog', array( $this, 'ajax_scan_catalog' ) );
         add_action( 'wp_ajax_prodimg_seo_1972adm_generate_single', array( $this, 'ajax_generate_single' ) );
         add_action( 'wp_ajax_prodimg_seo_1972adm_save_single', array( $this, 'ajax_save_single' ) );
+        add_action( 'wp_ajax_prodimg_seo_1972adm_recalc_score', array( $this, 'ajax_recalc_score' ) );
+    }
+
+    public function ajax_recalc_score() {
+        check_ajax_referer( 'prodimg_seo_1972adm_admin_nonce', 'nonce' );
+        if ( ! current_user_can( 'manage_woocommerce' ) ) {
+            wp_send_json_error( __( 'Permission denied.', 'product-image-seo' ) );
+        }
+        $product_id = isset( $_POST['product_id'] ) ? absint( wp_unslash( $_POST['product_id'] ) ) : 0;
+        if ( ! $product_id ) {
+            wp_send_json_error( __( 'Invalid product ID.', 'product-image-seo' ) );
+        }
+        $result = $this->calculator->calculate_for_product( $product_id );
+        update_post_meta( $product_id, '_prodimg_seo_1972adm_score_local', $result['score'] );
+        update_post_meta( $product_id, '_prodimg_seo_1972adm_score_breakdown', wp_json_encode( $result ) );
+        wp_send_json_success( $result );
     }
 
     public function admin_menu() {
-        add_submenu_page(
-            'woocommerce',
-            __( 'Product Image SEO Dashboard', 'product-image-seo' ),
+        add_menu_page(
             __( 'Product Image SEO', 'product-image-seo' ),
+            __( 'Product Image SEO', 'product-image-seo' ),
+            'manage_woocommerce',
+            'prodimg-seo-dashboard',
+            array( $this, 'render_dashboard_page' ),
+            'dashicons-format-image',
+            58.5
+        );
+
+        add_submenu_page(
+            'prodimg-seo-dashboard',
+            __( 'Dashboard', 'product-image-seo' ),
+            __( 'Dashboard', 'product-image-seo' ),
             'manage_woocommerce',
             'prodimg-seo-dashboard',
             array( $this, 'render_dashboard_page' )
         );
 
         add_submenu_page(
-            'woocommerce',
+            'prodimg-seo-dashboard',
             __( 'Catalog Audit', 'product-image-seo' ),
-            __( '↳ Catalog', 'product-image-seo' ),
+            __( 'Catalog', 'product-image-seo' ),
             'manage_woocommerce',
             'prodimg-seo-catalog',
             array( $this, 'render_catalog_page' )
         );
 
         add_submenu_page(
-            'woocommerce',
+            'prodimg-seo-dashboard',
             __( 'Bulk Fix', 'product-image-seo' ),
-            __( '↳ Bulk Fix', 'product-image-seo' ),
+            __( 'Bulk Fix', 'product-image-seo' ),
             'manage_woocommerce',
             'prodimg-seo-bulk',
             array( $this, 'render_bulk_page' )
         );
 
         add_submenu_page(
-            'woocommerce',
+            'prodimg-seo-dashboard',
             __( 'SEO Audit Report', 'product-image-seo' ),
-            __( '↳ Audit Report', 'product-image-seo' ),
+            __( 'Audit Report', 'product-image-seo' ),
             'manage_woocommerce',
             'prodimg-seo-report',
             array( $this, 'render_report_page' )
         );
 
         add_submenu_page(
-            'woocommerce',
+            'prodimg-seo-dashboard',
             __( 'Product Image SEO Settings', 'product-image-seo' ),
-            __( '↳ Settings', 'product-image-seo' ),
+            __( 'Settings', 'product-image-seo' ),
             'manage_woocommerce',
             'prodimg-seo-settings',
             array( $this, 'render_settings_page' )
@@ -271,15 +300,17 @@ class Prodimg_Seo_1972adm_Admin_Controller {
         }
 
         $product_id = absint( $_POST['product_id'] ?? 0 );
-        $alt_texts  = isset( $_POST['alt_texts'] ) ? (array) $_POST['alt_texts'] : array();
+        $alt_texts_raw = isset( $_POST['alt_texts'] ) ? (array) wp_unslash( $_POST['alt_texts'] ) : array();
+        $alt_texts     = array();
+        foreach ( $alt_texts_raw as $alt_image_id => $alt_value ) {
+            $alt_texts[ absint( $alt_image_id ) ] = sanitize_text_field( $alt_value );
+        }
 
         if ( ! $product_id || empty( $alt_texts ) ) {
             wp_send_json_error( __( 'Invalid parameters.', 'product-image-seo' ) );
         }
 
         foreach ( $alt_texts as $image_id => $alt ) {
-            $image_id = absint( $image_id );
-            $alt      = sanitize_text_field( wp_unslash( $alt ) );
             if ( $image_id ) {
                 update_post_meta( $image_id, '_wp_attachment_image_alt', $alt );
             }

@@ -32,8 +32,9 @@ class Prodimg_Seo_1972adm_Csv_Exporter {
         }
 
         header( 'Content-Type: text/csv; charset=utf-8' );
-        header( 'Content-Disposition: attachment; filename=product-image-seo-audit-' . date( 'Y-m-d' ) . '.csv' );
+        header( 'Content-Disposition: attachment; filename=product-image-seo-audit-' . gmdate( 'Y-m-d' ) . '.csv' );
 
+        // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen -- php://output stream not supported by WP_Filesystem.
         $output = fopen( 'php://output', 'w' );
 
         // CSV headers
@@ -89,6 +90,7 @@ class Prodimg_Seo_1972adm_Csv_Exporter {
             }
         }
 
+        // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- php://output stream not supported by WP_Filesystem.
         fclose( $output );
         exit;
     }
