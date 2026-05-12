@@ -300,6 +300,7 @@ class Prodimg_Seo_1972adm_Admin_Controller {
         }
 
         $product_id = absint( $_POST['product_id'] ?? 0 );
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- each element is sanitized via sanitize_text_field in the loop below.
         $alt_texts_raw = isset( $_POST['alt_texts'] ) ? (array) wp_unslash( $_POST['alt_texts'] ) : array();
         $alt_texts     = array();
         foreach ( $alt_texts_raw as $alt_image_id => $alt_value ) {
