@@ -31,7 +31,14 @@ $prodimg_seo_chips = array(
     <header class="prodimg-page-header">
         <div class="prodimg-page-header__inner">
             <div class="prodimg-page-header__titleblock">
-                <h1 class="prodimg-page-header__title"><?php esc_html_e( 'Catalog Audit', 'product-image-seo' ); ?></h1>
+                <h1 class="prodimg-page-header__title"><?php esc_html_e( 'Product Image Audit', 'product-image-seo' ); ?></h1>
+            </div>
+            <div class="prodimg-page-header__actions">
+                <button type="button" class="button button-primary" id="prodimg-seo-scan-images">
+                    <?php esc_html_e( 'Scan Images', 'product-image-seo' ); ?>
+                </button>
+                <span class="spinner" id="prodimg-scan-images-spinner"></span>
+                <span id="prodimg-scan-images-progress"></span>
             </div>
         </div>
         <nav class="prodimg-segnav" aria-label="<?php esc_attr_e( 'Plugin sections', 'product-image-seo' ); ?>">
@@ -45,7 +52,7 @@ $prodimg_seo_chips = array(
             </a>
             <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-catalog' ) ); ?>"
                class="prodimg-segnav__item<?php echo ( 'prodimg-seo-catalog' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
-                <?php esc_html_e( 'Catalog', 'product-image-seo' ); ?>
+                <?php esc_html_e( 'Product Images', 'product-image-seo' ); ?>
             </a>
             <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-bulk' ) ); ?>"
                class="prodimg-segnav__item<?php echo ( 'prodimg-seo-bulk' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">

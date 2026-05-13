@@ -42,6 +42,7 @@ class Prodimg_Seo_1972adm_Admin_Controller {
         add_action( 'wp_ajax_prodimg_seo_1972adm_generate_single', array( $this, 'ajax_generate_single' ) );
         add_action( 'wp_ajax_prodimg_seo_1972adm_save_single', array( $this, 'ajax_save_single' ) );
         add_action( 'wp_ajax_prodimg_seo_1972adm_recalc_score', array( $this, 'ajax_recalc_score' ) );
+        add_action( 'wp_ajax_prodimg_seo_1972adm_scan_all_images', array( $this, 'ajax_scan_all_images' ) );
         add_filter( 'admin_body_class', array( $this, 'add_skin_body_class' ) );
     }
 
@@ -91,8 +92,8 @@ class Prodimg_Seo_1972adm_Admin_Controller {
 
         add_submenu_page(
             'prodimg-seo-dashboard',
-            __( 'Catalog Audit', 'product-image-seo' ),
-            __( 'Catalog', 'product-image-seo' ),
+            __( 'Product Image Audit', 'product-image-seo' ),
+            __( 'Product Images', 'product-image-seo' ),
             'manage_woocommerce',
             'prodimg-seo-catalog',
             array( $this, 'render_catalog_page' )
@@ -342,5 +343,52 @@ class Prodimg_Seo_1972adm_Admin_Controller {
         }
 
         wp_send_json_success( __( 'Saved successfully.', 'product-image-seo' ) );
+    }
+
+    /**
+     * AJAX: Scan all image attachments and compute their quality scores.
+     *
+     * Paginates through image attachments in chunks of 50. The JS caller
+     * increments the page number until `done` is true.
+     *
+     * @return void Sends JSON response.
+     */
+    public function ajax_scan_all_images() {
+        check_ajax_referer( 'prodimg_seo_1972adm_admin_nonce', 'nonce' );
+        if ( ! current_user_can( 'manage_woocommerce' ) ) {
+            wp_send_json_error( __( 'Permission denied.', 'product-image-seo' ) );
+            return;
+        }
+
+        $page     = isset( $_POST['scan_page'] ) ? absint( wp_unslash( $_POST['scan_page'] ) ) : 1;
+        $per_page = 50;
+
+        $query = new WP_Query( array(
+            'post_type'      => 'attachment',
+            'post_status'    => 'inherit',
+            'post_mime_type' => 'image',
+            'posts_per_page' => $per_page,
+            'paged'          => $page,
+            'fields'         => 'ids',
+        ) );
+
+        $total       = $query->found_posts;
+        $total_pages = $query->max_num_pages;
+        $processed   = 0;
+
+        foreach ( $query->posts as $att_id ) {
+            $result = $this->calculator->calculate_for_attachment( absint( $att_id ) );
+            update_post_meta( absint( $att_id ), '_prodimg_seo_1972adm_quality_score', $result['score'] );
+            Prodimg_Seo_1972adm_Status_Taxonomy::set_status_for_attachment( absint( $att_id ), $result['band'] );
+            $processed++;
+        }
+
+        wp_send_json_success( array(
+            'done'        => $page >= $total_pages,
+            'processed'   => $processed,
+            'total'       => $total,
+            'page'        => $page,
+            'total_pages' => $total_pages,
+        ) );
     }
 }

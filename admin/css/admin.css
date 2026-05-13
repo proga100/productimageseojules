@@ -905,3 +905,59 @@ body.prodimg-seo-skin .wrap > h1 {
     vertical-align: middle;
     box-shadow: var(--prodimg-shadow-hairline);
 }
+
+/* =========================================================================
+ * 24. Score bar (per-image table, mirrors alt-audit score bar)
+ * ========================================================================= */
+.prodimg-score-bar {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.prodimg-score-bar__track {
+    width: 60px;
+    height: 8px;
+    background: var(--prodimg-border-strong);
+    border-radius: var(--prodimg-radius-pill);
+    overflow: hidden;
+}
+
+.prodimg-score-bar__fill {
+    height: 100%;
+    border-radius: var(--prodimg-radius-pill);
+    background: var(--prodimg-accent-green);
+    transition: width 0.3s ease;
+}
+
+.prodimg-score-bar__fill--missing    { background: var(--prodimg-border-strong); }
+.prodimg-score-bar__fill--weak       { background: var(--prodimg-accent-red); }
+.prodimg-score-bar__fill--good       { background: var(--prodimg-accent-orange); }
+.prodimg-score-bar__fill--excellent  { background: var(--prodimg-accent-green); }
+
+/* =========================================================================
+ * 25. Status badge (per-image, mirrors alt-audit status badges)
+ * ========================================================================= */
+.prodimg-status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: var(--prodimg-radius-pill);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.prodimg-status-badge--missing    { background: var(--prodimg-accent-red-bg);    color: var(--prodimg-accent-red); }
+.prodimg-status-badge--weak       { background: var(--prodimg-accent-orange-bg); color: var(--prodimg-accent-orange); }
+.prodimg-status-badge--good       { background: var(--prodimg-accent-green-bg);  color: var(--prodimg-accent-green); }
+.prodimg-status-badge--excellent  { background: var(--prodimg-accent-blue-bg);   color: var(--prodimg-accent-blue); }
+.prodimg-status-badge--decorative { background: rgba(0, 0, 0, 0.06);             color: #86868B; }
+
+/* Role badge variants */
+.prodimg-status-badge--role-featured  { background: var(--prodimg-accent-blue-bg);   color: var(--prodimg-accent-blue); }
+.prodimg-status-badge--role-gallery   { background: var(--prodimg-accent-green-bg);  color: var(--prodimg-accent-green); }
+.prodimg-status-badge--role-variation { background: var(--prodimg-accent-orange-bg); color: var(--prodimg-accent-orange); }
+
+/* Utility: muted secondary text */
+.prodimg-text-secondary { color: var(--prodimg-text-secondary); }
