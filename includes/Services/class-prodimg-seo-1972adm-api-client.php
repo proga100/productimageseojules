@@ -73,9 +73,9 @@ class Prodimg_Seo_1972adm_Api_Client {
         $context = '';
         $product = wc_get_product( $product_id );
         if ( $product ) {
-            $name = $product->get_name();
+            $name = sanitize_text_field( $product->get_name() );
             $cats = wp_get_post_terms( $product_id, 'product_cat', array( 'fields' => 'names' ) );
-            $cat  = ( ! is_wp_error( $cats ) && ! empty( $cats ) ) ? $cats[0] : '';
+            $cat  = ( ! is_wp_error( $cats ) && ! empty( $cats ) ) ? sanitize_text_field( $cats[0] ) : '';
             $context = sprintf( 'WooCommerce product: %s', $name );
             if ( $cat ) {
                 $context .= sprintf( ', category: %s', $cat );
@@ -165,6 +165,23 @@ class Prodimg_Seo_1972adm_Api_Client {
      * @param int    $retry_count Current retry count (internal).
      * @return array|WP_Error Decoded JSON response array or WP_Error.
      */
+    /**
+     * Safely decode a JSON response body.
+     *
+     * @param string $body Raw response body.
+     * @return array|null Decoded array, or null on parse failure.
+     */
+    private function try_decode_response_body( $body ) {
+        if ( '' === $body ) {
+            return null;
+        }
+        $decoded = json_decode( $body, true );
+        if ( JSON_ERROR_NONE !== json_last_error() || ! is_array( $decoded ) ) {
+            return null;
+        }
+        return $decoded;
+    }
+
     private function make_request( $endpoint, $body = array(), $method = 'POST', $retry_count = 0 ) {
         $url = trailingslashit( $this->api_url ) . $endpoint;
 
@@ -208,7 +225,7 @@ class Prodimg_Seo_1972adm_Api_Client {
                 return $this->make_request( $endpoint, $body, $method, $retry_count + 1 );
             }
 
-            $error_data = json_decode( $response_body, true );
+            $error_data = $this->try_decode_response_body( $response_body );
             $error_type = 429 === $response_code ? 'rate_limit' : 'server_error';
             $message    = 429 === $response_code
                 ? __( 'Rate limit exceeded. Please wait a few minutes and try again.', 'product-image-seo' )
@@ -216,13 +233,13 @@ class Prodimg_Seo_1972adm_Api_Client {
 
             return new WP_Error(
                 $error_type,
-                $error_data['message'] ?? $message,
+                ( null !== $error_data && isset( $error_data['message'] ) ) ? $error_data['message'] : $message,
                 array( 'status' => $response_code, 'retry_count' => $retry_count )
             );
         }
 
         if ( $response_code >= 400 ) {
-            $error_data = json_decode( $response_body, true );
+            $error_data = $this->try_decode_response_body( $response_body );
 
             $error_type    = 'api_error';
             $error_message = '';
@@ -235,12 +252,12 @@ class Prodimg_Seo_1972adm_Api_Client {
                 $error_message = __( 'API endpoint not found. Please update the plugin or check your API URL settings.', 'product-image-seo' );
             } elseif ( 422 === $response_code ) {
                 $error_type    = 'validation_error';
-                $error_message = $error_data['message'] ?? __( 'Invalid request data.', 'product-image-seo' );
+                $error_message = ( null !== $error_data && isset( $error_data['message'] ) ) ? $error_data['message'] : __( 'Invalid request data.', 'product-image-seo' );
             } elseif ( $response_code >= 500 ) {
                 $error_type    = 'server_error';
                 $error_message = __( 'Server error. The service may be experiencing issues. Please try again later.', 'product-image-seo' );
             } else {
-                $error_message = $error_data['message'] ?? __( 'API request failed.', 'product-image-seo' );
+                $error_message = ( null !== $error_data && isset( $error_data['message'] ) ) ? $error_data['message'] : __( 'API request failed.', 'product-image-seo' );
             }
 
             return new WP_Error(
@@ -250,7 +267,7 @@ class Prodimg_Seo_1972adm_Api_Client {
             );
         }
 
-        $data = json_decode( $response_body, true );
+        $data = $this->try_decode_response_body( $response_body );
 
         if ( null === $data ) {
             return new WP_Error( 'invalid_response', __( 'Invalid API response.', 'product-image-seo' ) );

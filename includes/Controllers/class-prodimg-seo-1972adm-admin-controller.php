@@ -63,6 +63,7 @@ class Prodimg_Seo_1972adm_Admin_Controller {
         $product_id = isset( $_POST['product_id'] ) ? absint( wp_unslash( $_POST['product_id'] ) ) : 0;
         if ( ! $product_id ) {
             wp_send_json_error( __( 'Invalid product ID.', 'product-image-seo' ) );
+            return;
         }
         $result = $this->calculator->calculate_for_product( $product_id );
         update_post_meta( $product_id, '_prodimg_seo_1972adm_score_local', $result['score'] );
@@ -214,6 +215,7 @@ class Prodimg_Seo_1972adm_Admin_Controller {
         $result = $this->api_client->test_connection();
         if ( is_wp_error( $result ) ) {
             wp_send_json_error( $result->get_error_message() );
+            return;
         }
         wp_send_json_success( __( 'Connection successful.', 'product-image-seo' ) );
     }
@@ -242,11 +244,13 @@ class Prodimg_Seo_1972adm_Admin_Controller {
 
         if ( ! $product_id ) {
             wp_send_json_error( __( 'Invalid parameters.', 'product-image-seo' ) );
+            return;
         }
 
         $product = wc_get_product( $product_id );
         if ( ! $product ) {
             wp_send_json_error( __( 'Product not found.', 'product-image-seo' ) );
+            return;
         }
 
         $suggestions = array();
@@ -305,6 +309,7 @@ class Prodimg_Seo_1972adm_Admin_Controller {
 
         if ( empty( $suggestions ) ) {
              wp_send_json_error( __( 'No images found or API failed.', 'product-image-seo' ) );
+             return;
         }
 
         wp_send_json_success( array( 'suggestions' => $suggestions ) );
@@ -327,6 +332,7 @@ class Prodimg_Seo_1972adm_Admin_Controller {
 
         if ( ! $product_id || empty( $alt_texts ) ) {
             wp_send_json_error( __( 'Invalid parameters.', 'product-image-seo' ) );
+            return;
         }
 
         foreach ( $alt_texts as $image_id => $alt ) {
@@ -380,6 +386,7 @@ class Prodimg_Seo_1972adm_Admin_Controller {
         foreach ( $query->posts as $att_id ) {
             $result = $this->calculator->calculate_for_attachment( absint( $att_id ) );
             update_post_meta( absint( $att_id ), '_prodimg_seo_1972adm_quality_score', $result['score'] );
+            update_post_meta( absint( $att_id ), '_prodimg_seo_1972adm_score_breakdown', wp_json_encode( $result ) );
             Prodimg_Seo_1972adm_Status_Taxonomy::set_status_for_attachment( absint( $att_id ), $result['band'] );
             $processed++;
         }

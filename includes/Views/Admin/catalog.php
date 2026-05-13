@@ -20,10 +20,11 @@ $prodimg_seo_active_chip  = isset( $_REQUEST['prodimg_status'] ) ? sanitize_key(
 $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : 'prodimg-seo-catalog';
 
 $prodimg_seo_chips = array(
-    ''             => __( 'All', 'product-image-seo' ),
-    'needs_review' => __( 'Missing alt', 'product-image-seo' ),
-    'partial'      => __( 'Weak', 'product-image-seo' ),
-    'optimized'    => __( 'Good', 'product-image-seo' ),
+    ''          => __( 'All', 'product-image-seo' ),
+    'missing'   => __( 'Missing alt', 'product-image-seo' ),
+    'weak'      => __( 'Weak', 'product-image-seo' ),
+    'good'      => __( 'Good', 'product-image-seo' ),
+    'excellent' => __( 'Excellent', 'product-image-seo' ),
 );
 ?>
 <div class="wrap prodimg-app">

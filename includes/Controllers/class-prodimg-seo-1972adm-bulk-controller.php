@@ -26,6 +26,7 @@ class Prodimg_Seo_1972adm_Bulk_Controller {
         check_ajax_referer( 'prodimg_seo_1972adm_admin_nonce', 'nonce' );
         if ( ! current_user_can( 'manage_woocommerce' ) ) {
             wp_send_json_error( __( 'Permission denied.', 'product-image-seo' ) );
+            return;
         }
 
         // Normally we'd take selected IDs or filter parameters, for now we assume 'generate for all missing' or receive IDs
@@ -51,11 +52,13 @@ class Prodimg_Seo_1972adm_Bulk_Controller {
 
         if ( empty( $product_ids ) ) {
             wp_send_json_error( __( 'No products to process.', 'product-image-seo' ) );
+            return;
         }
 
         $result = $this->processor->enqueue_batch( $product_ids );
         if ( is_wp_error( $result ) ) {
             wp_send_json_error( $result->get_error_message() );
+            return;
         }
 
         wp_send_json_success( __( 'Bulk process started.', 'product-image-seo' ) );
@@ -65,11 +68,13 @@ class Prodimg_Seo_1972adm_Bulk_Controller {
         check_ajax_referer( 'prodimg_seo_1972adm_admin_nonce', 'nonce' );
         if ( ! current_user_can( 'manage_woocommerce' ) ) {
             wp_send_json_error( __( 'Permission denied.', 'product-image-seo' ) );
+            return;
         }
 
         $progress = get_transient( 'prodimg_seo_1972adm_bulk_progress' );
         if ( ! $progress ) {
             wp_send_json_success( array( 'status' => 'idle' ) );
+            return;
         }
 
         wp_send_json_success( $progress );
