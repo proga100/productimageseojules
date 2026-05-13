@@ -109,7 +109,6 @@ class Prodimg_Seo_1972adm_Score_Calculator {
                 'signals'     => array(),
                 'explanation' => __( 'Image is marked as decorative.', 'product-image-seo' ),
             );
-            update_post_meta( $attachment_id, '_prodimg_seo_1972adm_quality_score', 0 );
             return $result;
         }
 
@@ -121,7 +120,6 @@ class Prodimg_Seo_1972adm_Score_Calculator {
                 'signals'     => array(),
                 'explanation' => __( 'Alt text is missing. Add descriptive alt text to improve SEO and accessibility.', 'product-image-seo' ),
             );
-            update_post_meta( $attachment_id, '_prodimg_seo_1972adm_quality_score', 0 );
             return $result;
         }
 
@@ -155,8 +153,6 @@ class Prodimg_Seo_1972adm_Score_Calculator {
             'signals'     => $signals,
             'explanation' => $explanation,
         );
-
-        update_post_meta( $attachment_id, '_prodimg_seo_1972adm_quality_score', $final_score );
 
         return $result;
     }
@@ -232,9 +228,6 @@ class Prodimg_Seo_1972adm_Score_Calculator {
         }
 
         $avg_score = (int) round( array_sum( $scores ) / count( $scores ) );
-
-        // Write legacy postmeta on product.
-        update_post_meta( $product_id, '_prodimg_seo_1972adm_score_local', $avg_score );
 
         return array(
             'score'   => $avg_score,

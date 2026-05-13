@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+// Template included via Admin_Controller render methods; $this is bound to that controller and exposes $this->statistics.
 $prodimg_seo_stats = $this->statistics->get_stats();
 
 $prodimg_seo_avg_score   = isset( $prodimg_seo_stats['avg_score'] ) ? intval( $prodimg_seo_stats['avg_score'] ) : 0;

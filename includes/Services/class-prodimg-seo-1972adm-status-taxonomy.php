@@ -100,7 +100,7 @@ class Prodimg_Seo_1972adm_Status_Taxonomy {
     public static function set_status( $product_id, $status ) {
         $product_id = absint( $product_id );
         $status     = sanitize_key( $status );
-        if ( ! in_array( $status, self::TERMS, true ) ) {
+        if ( ! in_array( $status, self::LEGACY_TERMS, true ) ) {
             return new WP_Error( 'invalid_status', __( 'Invalid status.', 'product-image-seo' ) );
         }
         return wp_set_object_terms( $product_id, $status, self::TAXONOMY, false );

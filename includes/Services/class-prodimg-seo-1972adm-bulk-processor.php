@@ -99,11 +99,17 @@ class Prodimg_Seo_1972adm_Bulk_Processor {
         if ( ! is_wp_error( $result ) && ! empty( $result['alt_text'] ) ) {
             update_post_meta( $image_id, '_wp_attachment_image_alt', sanitize_text_field( $result['alt_text'] ) );
 
+            // Per-attachment local quality score (image-level) — calculator returns data; we persist.
+            $attachment_score = $this->calculator->calculate_for_attachment( $image_id, 'product' );
+            update_post_meta( $image_id, '_prodimg_seo_1972adm_quality_score', $attachment_score['score'] );
+            Prodimg_Seo_1972adm_Status_Taxonomy::set_status_for_attachment( $image_id, $attachment_score['band'] );
+
             $prodimg_seo_score = $this->calculator->calculate_for_product( $product_id );
             update_post_meta( $product_id, '_prodimg_seo_1972adm_score_local', $prodimg_seo_score['score'] );
             update_post_meta( $product_id, '_prodimg_seo_1972adm_score_breakdown', wp_json_encode( $prodimg_seo_score ) );
 
             if ( isset( $result['quality_score'] ) ) {
+                // Legacy: product-level remote score from the API. Per-attachment local score lives in _prodimg_seo_1972adm_quality_score (see Score_Calculator).
                 update_post_meta( $product_id, '_prodimg_seo_1972adm_score', absint( $result['quality_score'] ) );
             }
             update_post_meta( $product_id, '_prodimg_seo_1972adm_processed_at', time() );

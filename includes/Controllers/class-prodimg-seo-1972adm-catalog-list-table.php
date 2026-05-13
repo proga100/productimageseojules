@@ -317,10 +317,10 @@ class Prodimg_Seo_1972adm_Catalog_List_Table extends WP_List_Table {
      */
     public function process_bulk_action() {
         if ( 'recalc' === $this->current_action() ) {
+            check_admin_referer( 'bulk-' . $this->_args['plural'] );
             if ( ! current_user_can( 'manage_woocommerce' ) ) {
                 return;
             }
-            check_admin_referer( 'bulk-' . $this->_args['plural'] );
 
             // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- nonce checked via check_admin_referer above.
             $attachment_ids = isset( $_REQUEST['attachment_ids'] ) ? array_map( 'absint', (array) wp_unslash( $_REQUEST['attachment_ids'] ) ) : array();
@@ -337,10 +337,10 @@ class Prodimg_Seo_1972adm_Catalog_List_Table extends WP_List_Table {
         }
 
         if ( 'generate' === $this->current_action() ) {
+            check_admin_referer( 'bulk-' . $this->_args['plural'] );
             if ( ! current_user_can( 'manage_woocommerce' ) ) {
                 return;
             }
-            check_admin_referer( 'bulk-' . $this->_args['plural'] );
             echo '<div class="notice notice-info is-dismissible"><p>' . esc_html__( 'Bulk generation is handled via the Bulk Fix page.', 'product-image-seo' ) . '</p></div>';
         }
     }
