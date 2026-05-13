@@ -90,6 +90,56 @@ jQuery(document).ready(function($) {
         scanPage(1);
     });
 
+    // Scan Images (per-image scoring)
+    $('#prodimg-seo-scan-images').on('click', function() {
+        var $btn      = $(this);
+        var $spinner  = $('#prodimg-scan-images-spinner');
+        var $progress = $('#prodimg-scan-images-progress');
+
+        $btn.prop('disabled', true);
+        $spinner.addClass('is-active');
+        $progress.text('');
+
+        var totalProcessed = 0;
+
+        function scanPage(page) {
+            $.post(prodimg_seo_1972adm_admin.ajax_url, {
+                action:    'prodimg_seo_1972adm_scan_all_images',
+                nonce:     prodimg_seo_1972adm_admin.nonce,
+                scan_page: page
+            }, function(response) {
+                if (response.success) {
+                    totalProcessed += response.data.processed;
+
+                    if (response.data.done) {
+                        $btn.prop('disabled', false);
+                        $spinner.removeClass('is-active');
+                        $progress.text('Done! Scanned ' + totalProcessed + ' images.');
+                        prodimgToast('Scan complete! ' + totalProcessed + ' images scanned.', 'success');
+                    } else {
+                        var pct = response.data.total_pages > 0
+                            ? Math.round((page / response.data.total_pages) * 100)
+                            : 0;
+                        $progress.text('Scanning... ' + pct + '%');
+                        scanPage(page + 1);
+                    }
+                } else {
+                    $btn.prop('disabled', false);
+                    $spinner.removeClass('is-active');
+                    $progress.text('Error: ' + response.data);
+                    prodimgToast('Scan error: ' + response.data, 'error');
+                }
+            }).fail(function() {
+                $btn.prop('disabled', false);
+                $spinner.removeClass('is-active');
+                $progress.text('Scan failed. Please try again.');
+                prodimgToast('Scan failed. Please try again.', 'error');
+            });
+        }
+
+        scanPage(1);
+    });
+
     // Single Generation Modal
     var currentProductId = 0;
 
