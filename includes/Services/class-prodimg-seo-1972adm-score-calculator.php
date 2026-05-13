@@ -586,8 +586,8 @@ class Prodimg_Seo_1972adm_Score_Calculator {
                     $issues[] = __( 'no descriptive words', 'product-image-seo' );
                 }
                 $issue_str = ! empty( $issues ) ? ' (' . implode( ', ', $issues ) . ')' : '';
-                /* translators: %1$d score, %2$s issue list */
-                return sprintf( __( 'Alt text needs improvement%s. Score: %d/100.', 'product-image-seo' ), $issue_str, $score );
+                /* translators: 1: issue list, 2: score value */
+                return sprintf( __( 'Alt text needs improvement%1$s. Score: %2$d/100.', 'product-image-seo' ), $issue_str, $score );
 
             case 'good':
                 /* translators: %d score value */
