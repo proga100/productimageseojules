@@ -14,12 +14,14 @@ class Prodimg_Seo_1972adm_Status_Taxonomy {
     const TAXONOMY = 'prodimg_seo_1972adm_status';
 
     /**
-     * Legacy product-level terms (kept for backward compatibility).
+     * Product-level terms: the legacy set plus 'excellent'
+     * (full coverage including variation images).
      */
-    const LEGACY_TERMS = array(
+    const PRODUCT_TERMS = array(
         'needs_review',  // missing or weak alt text on featured/gallery.
         'partial',       // some images optimized, some not.
-        'optimized',     // all images have good alt text.
+        'optimized',     // all featured/gallery images have alt text.
+        'excellent',     // optimized plus all variation images covered.
         'ignored',       // user marked as not relevant for SEO.
     );
 
@@ -94,13 +96,13 @@ class Prodimg_Seo_1972adm_Status_Taxonomy {
      * Set a product-level status term (legacy).
      *
      * @param int    $product_id Product post ID.
-     * @param string $status     Status slug (must be one of LEGACY_TERMS).
+     * @param string $status     Status slug (must be one of PRODUCT_TERMS).
      * @return array|WP_Error Result of wp_set_object_terms, or WP_Error.
      */
     public static function set_status( $product_id, $status ) {
         $product_id = absint( $product_id );
         $status     = sanitize_key( $status );
-        if ( ! in_array( $status, self::LEGACY_TERMS, true ) ) {
+        if ( ! in_array( $status, self::PRODUCT_TERMS, true ) ) {
             return new WP_Error( 'invalid_status', __( 'Invalid status.', 'product-image-seo' ) );
         }
         return wp_set_object_terms( $product_id, $status, self::TAXONOMY, false );
