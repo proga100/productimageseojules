@@ -49,20 +49,31 @@ class Prodimg_Seo_1972adm_Csv_Exporter {
             'status'
         ) );
 
-        $products = wc_get_products( array(
-            'limit'  => -1,
-            'status' => 'publish',
+        // Enumerate product IDs directly. wc_get_products() implicitly tax-filters
+        // on product_type and silently drops products lacking that term (common in
+        // legacy/imported data); a plain post query lists every published product.
+        $product_ids = get_posts( array(
+            'post_type'      => 'product',
+            'post_status'    => 'publish',
+            'fields'         => 'ids',
+            'posts_per_page' => -1,
+            'no_found_rows'  => true,
         ) );
 
-        foreach ( $products as $product ) {
+        foreach ( $product_ids as $product_id ) {
+            $product = wc_get_product( $product_id );
+            if ( ! $product ) {
+                continue;
+            }
+
             $pid = $product->get_id();
             $sku = $product->get_sku();
             $name = $product->get_name();
 
-            // Status and score
+            // Status, plus a product-level score used only as a per-image fallback.
             $terms = wp_get_post_terms( $pid, Prodimg_Seo_1972adm_Status_Taxonomy::TAXONOMY, array( 'fields' => 'names' ) );
             $status = ( ! is_wp_error( $terms ) && ! empty( $terms ) ) ? $terms[0] : '';
-            $score = get_post_meta( $pid, '_prodimg_seo_1972adm_score', true );
+            $score = get_post_meta( $pid, '_prodimg_seo_1972adm_score_local', true );
 
             // Featured Image
             $fid = $product->get_image_id();
@@ -95,9 +106,16 @@ class Prodimg_Seo_1972adm_Csv_Exporter {
         exit;
     }
 
-    private function write_row( $output, $pid, $sku, $name, $type, $image_id, $score, $status ) {
+    private function write_row( $output, $pid, $sku, $name, $type, $image_id, $fallback_score, $status ) {
         $url = wp_get_attachment_url( $image_id );
         $alt = get_post_meta( $image_id, '_wp_attachment_image_alt', true );
+
+        // Export is per-image, so prefer the attachment's own quality score.
+        // Fall back to the product-level local score when the image has none.
+        $score = get_post_meta( $image_id, '_prodimg_seo_1972adm_quality_score', true );
+        if ( ! is_numeric( $score ) ) {
+            $score = $fallback_score;
+        }
 
         fputcsv( $output, array(
             $pid,

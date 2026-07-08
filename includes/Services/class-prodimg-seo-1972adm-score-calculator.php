@@ -94,7 +94,7 @@ class Prodimg_Seo_1972adm_Score_Calculator {
      * @param array  $context_data  Optional context data (unused, reserved).
      * @return array { score, band, signals, explanation }
      */
-    public function calculate_for_attachment( $attachment_id, $context_type = 'product', $context_data = array() ) {
+    public function calculate_for_attachment( $attachment_id, $context_type = 'product', $context_data = array() ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- $context_data is reserved for future context-aware scoring per the documented method contract.
         $attachment_id = absint( $attachment_id );
 
         $alt_text = (string) get_post_meta( $attachment_id, '_wp_attachment_image_alt', true );
@@ -164,7 +164,7 @@ class Prodimg_Seo_1972adm_Score_Calculator {
      * returns averaged score, worst band, and aggregated signals.
      *
      * @param int $product_id WooCommerce product post ID.
-     * @return array { score, band, signals }
+     * @return array { score, band, signals, explanation }
      */
     public function calculate_for_product( $product_id ) {
         $product_id = absint( $product_id );
@@ -172,9 +172,10 @@ class Prodimg_Seo_1972adm_Score_Calculator {
 
         if ( ! $product ) {
             return array(
-                'score'   => 0,
-                'band'    => 'missing',
-                'signals' => array(),
+                'score'       => 0,
+                'band'        => 'missing',
+                'signals'     => array(),
+                'explanation' => __( 'Product not found.', 'product-image-seo' ),
             );
         }
 
@@ -203,9 +204,10 @@ class Prodimg_Seo_1972adm_Score_Calculator {
 
         if ( empty( $image_ids ) ) {
             return array(
-                'score'   => 0,
-                'band'    => 'missing',
-                'signals' => array(),
+                'score'       => 0,
+                'band'        => 'missing',
+                'signals'     => array(),
+                'explanation' => __( 'This product has no images to score.', 'product-image-seo' ),
             );
         }
 
@@ -230,10 +232,48 @@ class Prodimg_Seo_1972adm_Score_Calculator {
         $avg_score = (int) round( array_sum( $scores ) / count( $scores ) );
 
         return array(
-            'score'   => $avg_score,
-            'band'    => $worst_band,
-            'signals' => $all_signals,
+            'score'       => $avg_score,
+            'band'        => $worst_band,
+            'signals'     => $all_signals,
+            'explanation' => $this->generate_product_explanation( $worst_band, $avg_score ),
         );
+    }
+
+    /**
+     * Build a human-readable explanation for a product-level (rollup) score.
+     *
+     * Summarises the worst-image band across the product's images.
+     *
+     * @param string $worst_band Worst band across the product's images.
+     * @param int    $avg_score  Average image score 0–100.
+     * @return string Translated explanation.
+     */
+    private function generate_product_explanation( $worst_band, $avg_score ) {
+        switch ( $worst_band ) {
+            case 'missing':
+                /* translators: %d: average image score */
+                return sprintf( __( 'At least one product image is missing alt text. Average image score: %d/100.', 'product-image-seo' ), $avg_score );
+
+            case 'decorative':
+                /* translators: %d: average image score */
+                return sprintf( __( 'One or more product images are marked decorative. Average image score: %d/100.', 'product-image-seo' ), $avg_score );
+
+            case 'weak':
+                /* translators: %d: average image score */
+                return sprintf( __( 'At least one product image has weak alt text that needs improvement. Average image score: %d/100.', 'product-image-seo' ), $avg_score );
+
+            case 'good':
+                /* translators: %d: average image score */
+                return sprintf( __( 'Product images have good alt text. Average image score: %d/100.', 'product-image-seo' ), $avg_score );
+
+            case 'excellent':
+                /* translators: %d: average image score */
+                return sprintf( __( 'All product images have excellent alt text. Average image score: %d/100.', 'product-image-seo' ), $avg_score );
+
+            default:
+                /* translators: %d: average image score */
+                return sprintf( __( 'Average image score: %d/100.', 'product-image-seo' ), $avg_score );
+        }
     }
 
     /**
@@ -532,11 +572,13 @@ class Prodimg_Seo_1972adm_Score_Calculator {
      * Get band string from numeric score.
      *
      * Thresholds per plan: missing=0, weak=1-60, good=61-85, excellent=86+.
+     * Public so other services (e.g. Statistics) can bucket by the same band
+     * logic without duplicating the thresholds.
      *
      * @param int $score Numeric score 0–100.
      * @return string Band slug.
      */
-    private function get_band_from_score( $score ) {
+    public function get_band_from_score( $score ) {
         if ( 0 === $score ) {
             return 'missing';
         }
