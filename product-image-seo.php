@@ -5,7 +5,7 @@
  * Description:       AI alt text and catalog-wide image SEO audit for product catalogs. Per-product dashboard, bulk fix by category, Google Image Search readiness scoring, CSV audit reports. Requires an Alt Audit account (free tier available).
  * Version:           1.0.0
  * Requires at least: 6.0
- * Tested up to:      6.9
+ * Tested up to:      7.0
  * Requires PHP:      7.4
  * Requires Plugins:  woocommerce
  * Author:            Flance
