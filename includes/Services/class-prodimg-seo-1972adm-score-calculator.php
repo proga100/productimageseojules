@@ -94,7 +94,7 @@ class Prodimg_Seo_1972adm_Score_Calculator {
      * @param array  $context_data  Optional context data (unused, reserved).
      * @return array { score, band, signals, explanation }
      */
-    public function calculate_for_attachment( $attachment_id, $context_type = 'product', $context_data = array() ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- $context_data is reserved for future context-aware scoring per the documented method contract.
+    public function calculate_for_attachment( $attachment_id, $context_type = 'product', $context_data = array() ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- $context_data is reserved for future context-aware scoring per the documented method contract.
         $attachment_id = absint( $attachment_id );
 
         $alt_text = (string) get_post_meta( $attachment_id, '_wp_attachment_image_alt', true );

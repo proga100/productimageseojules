@@ -6,7 +6,7 @@
  */
 function prodimgToast( msg, type ) {
     type = type || 'success';
-    var $t = jQuery('<div class="prodimg-toast prodimg-toast--' + type + '">' + msg + '</div>');
+    var $t = jQuery('<div class="prodimg-toast prodimg-toast--' + type + '"></div>').text( msg );
     jQuery('body').append( $t );
     setTimeout(function() { $t.addClass('is-visible'); }, 10);
     setTimeout(function() {

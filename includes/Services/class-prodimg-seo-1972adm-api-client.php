@@ -61,7 +61,7 @@ class Prodimg_Seo_1972adm_Api_Client {
      * @param string $image_role featured | gallery | variation.
      * @return array { success, alt_text, quality_score } or WP_Error.
      */
-    public function generate_for_product( $product_id, $image_id, $image_role = 'featured' ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- $image_role is part of the documented public signature and reserved for role-aware prompting.
+    public function generate_for_product( $product_id, $image_id, $image_role = 'featured' ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- $image_role is part of the documented public signature and reserved for role-aware prompting.
         if ( empty( $this->api_key ) ) {
             return new WP_Error(
                 'missing_api_key',
