@@ -61,7 +61,7 @@ class Prodimg_Seo_1972adm_Api_Client {
      * @param string $image_role featured | gallery | variation.
      * @return array { success, alt_text, quality_score } or WP_Error.
      */
-    public function generate_for_product( $product_id, $image_id, $image_role = 'featured' ) {
+    public function generate_for_product( $product_id, $image_id, $image_role = 'featured' ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- $image_role is part of the documented public signature and reserved for role-aware prompting.
         if ( empty( $this->api_key ) ) {
             return new WP_Error(
                 'missing_api_key',
@@ -365,8 +365,26 @@ class Prodimg_Seo_1972adm_Api_Client {
             );
         }
 
-        // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents, WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Local file read and base64 encoding required for image data transmission to API.
-        $image_data = base64_encode( file_get_contents( $image_path ) );
+        // Read the local file via WP_Filesystem rather than raw file_get_contents.
+        global $wp_filesystem;
+        if ( ! ( $wp_filesystem instanceof WP_Filesystem_Base ) ) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+            WP_Filesystem();
+        }
+
+        $image_contents = ( $wp_filesystem instanceof WP_Filesystem_Base )
+            ? $wp_filesystem->get_contents( $image_path )
+            : false;
+
+        if ( false === $image_contents || '' === $image_contents ) {
+            return array(
+                'error'   => 'image_read_error',
+                'message' => __( 'Failed to read image file.', 'product-image-seo' ),
+            );
+        }
+
+        // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Base64 encoding required to transmit binary image data to the API.
+        $image_data = base64_encode( $image_contents );
         if ( ! $image_data ) {
             return array(
                 'error'   => 'image_read_error',

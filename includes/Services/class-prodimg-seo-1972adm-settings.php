@@ -19,13 +19,13 @@ class Prodimg_Seo_1972adm_Settings {
         $this->settings = get_option( self::OPTION_NAME, array() );
     }
 
-    public function get( $key, $default = null ) {
+    public function get( $key, $default_value = null ) {
         // Special case for API key, usually better to store it in a separate option or use the settings array
         if ( 'api_key' === $key ) {
-            return get_option( 'prodimg_seo_1972adm_api_key', $default );
+            return get_option( 'prodimg_seo_1972adm_api_key', $default_value );
         }
 
-        return isset( $this->settings[ $key ] ) ? $this->settings[ $key ] : $default;
+        return isset( $this->settings[ $key ] ) ? $this->settings[ $key ] : $default_value;
     }
 
     public function set( $key, $value ) {

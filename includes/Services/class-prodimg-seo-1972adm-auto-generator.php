@@ -26,7 +26,7 @@ class Prodimg_Seo_1972adm_Auto_Generator {
         add_action( 'woocommerce_update_product', array( $this, 'auto_generate' ), 10, 2 );
     }
 
-    public function auto_generate( $product_id, $product ) {
+    public function auto_generate( $product_id, $product ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- $product is provided by the woocommerce_new_product / woocommerce_update_product hook signature.
         // Check if auto-generate is enabled
         $auto_generate = $this->settings->get( 'auto_generate', 'no' );
         if ( 'yes' !== $auto_generate ) {
