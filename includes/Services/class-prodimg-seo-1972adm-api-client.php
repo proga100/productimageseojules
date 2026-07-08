@@ -69,23 +69,30 @@ class Prodimg_Seo_1972adm_Api_Client {
             );
         }
 
-        // Build context string.
-        $context = '';
+        // Build structured context from product data (the API validates context as an array).
+        $context = array(
+            'site_name' => get_bloginfo( 'name' ),
+        );
         $product = wc_get_product( $product_id );
         if ( $product ) {
-            $name = sanitize_text_field( $product->get_name() );
-            $cats = wp_get_post_terms( $product_id, 'product_cat', array( 'fields' => 'names' ) );
-            $cat  = ( ! is_wp_error( $cats ) && ! empty( $cats ) ) ? sanitize_text_field( $cats[0] ) : '';
-            $context = sprintf( 'WooCommerce product: %s', $name );
-            if ( $cat ) {
-                $context .= sprintf( ', category: %s', $cat );
+            $context['page_title'] = sanitize_text_field( $product->get_name() );
+            $permalink             = get_permalink( $product_id );
+            if ( $permalink ) {
+                $context['page_url'] = $permalink;
             }
-            $context = substr( $context, 0, 200 );
+            $cats = wp_get_post_terms( $product_id, 'product_cat', array( 'fields' => 'names' ) );
+            if ( ! is_wp_error( $cats ) && ! empty( $cats ) ) {
+                $context['categories'] = array_map( 'sanitize_text_field', $cats );
+            }
+        }
+        $caption = wp_get_attachment_caption( $image_id );
+        if ( $caption ) {
+            $context['image_caption'] = sanitize_text_field( $caption );
         }
 
-        $style      = $this->settings->get( 'alt_style', 'seo_balanced' );
+        $style      = $this->map_style( $this->settings->get( 'alt_style', 'seo_balanced' ) );
         $max_length = absint( $this->settings->get( 'max_length', 125 ) );
-        $length     = (string) $max_length;
+        $length     = $this->map_length( $max_length );
 
         $image_url = wp_get_attachment_url( $image_id );
         $is_public = $this->is_image_publicly_accessible( $image_url );
@@ -135,6 +142,47 @@ class Prodimg_Seo_1972adm_Api_Client {
             'alt_text'      => $alt_text,
             'quality_score' => $quality_score,
         );
+    }
+
+    /**
+     * Map a plugin alt-style setting to the API's style vocabulary.
+     *
+     * The API only accepts descriptive|technical|creative|brief; the plugin's
+     * settings expose SEO-oriented labels that must be translated.
+     *
+     * @param string $style Plugin style setting value.
+     * @return string Valid API style.
+     */
+    private function map_style( $style ) {
+        $map = array(
+            'seo_focused'           => 'descriptive',
+            'seo_balanced'          => 'descriptive',
+            'accessibility_focused' => 'brief',
+            'descriptive'           => 'descriptive',
+            'technical'             => 'technical',
+            'creative'              => 'creative',
+            'brief'                 => 'brief',
+        );
+        return isset( $map[ $style ] ) ? $map[ $style ] : 'descriptive';
+    }
+
+    /**
+     * Map a max character length to the API's length vocabulary.
+     *
+     * The API only accepts short|medium|long; the exact character cap is
+     * still sent separately via max_chars.
+     *
+     * @param int $max_length Maximum alt text length in characters.
+     * @return string Valid API length.
+     */
+    private function map_length( $max_length ) {
+        if ( $max_length <= 80 ) {
+            return 'short';
+        }
+        if ( $max_length <= 150 ) {
+            return 'medium';
+        }
+        return 'long';
     }
 
     /**
@@ -323,7 +371,7 @@ class Prodimg_Seo_1972adm_Api_Client {
      *
      * @param string $image_url  Public image URL.
      * @param string $style      Generation style.
-     * @param string $context    Context string.
+     * @param array  $context    Structured context data.
      * @param string $length     Length as string.
      * @param int    $max_length Max character length.
      * @return array Request body.
@@ -351,7 +399,7 @@ class Prodimg_Seo_1972adm_Api_Client {
      *
      * @param int    $attachment_id Attachment post ID.
      * @param string $style         Generation style.
-     * @param string $context       Context string.
+     * @param array  $context       Structured context data.
      * @param string $length        Length as string.
      * @param int    $max_length    Max character length.
      * @return array Request body or error array.

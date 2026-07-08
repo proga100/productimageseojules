@@ -30,8 +30,12 @@ define( 'PRODIMG_SEO_1972ADM_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PRODIMG_SEO_1972ADM_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'PRODIMG_SEO_1972ADM_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 define( 'PRODIMG_SEO_1972ADM_TEXT_DOMAIN', 'product-image-seo' );
-define( 'PRODIMG_SEO_1972ADM_API_BASE_URL', 'https://altaudit.com/api/v1' );
-define( 'PRODIMG_SEO_1972ADM_API_TIMEOUT', 40 );
+if ( ! defined( 'PRODIMG_SEO_1972ADM_API_BASE_URL' ) ) {
+    define( 'PRODIMG_SEO_1972ADM_API_BASE_URL', 'https://altaudit.com/api/v1' );
+}
+if ( ! defined( 'PRODIMG_SEO_1972ADM_API_TIMEOUT' ) ) {
+    define( 'PRODIMG_SEO_1972ADM_API_TIMEOUT', 40 );
+}
 define( 'PRODIMG_SEO_1972ADM_INCLUDES_DIR', PRODIMG_SEO_1972ADM_PLUGIN_DIR . 'includes/' );
 define( 'PRODIMG_SEO_1972ADM_ASSETS_URL', PRODIMG_SEO_1972ADM_PLUGIN_URL . 'assets/' );
 
