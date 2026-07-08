@@ -19,14 +19,20 @@ class Prodimg_Seo_1972adm_Product_Scanner {
 
     public function scan_all( $page = 1 ) {
         $limit = 50;
-        $products = wc_get_products( array(
-            'limit'    => $limit,
-            'page'     => $page,
-            'status'   => 'publish',
-            'paginate' => true,
+        $page  = max( 1, absint( $page ) );
+
+        // Enumerate product IDs directly. wc_get_products() implicitly tax-filters
+        // on product_type and silently drops products lacking that term (common in
+        // legacy/imported data); a plain post query paginates every published product.
+        $query = new WP_Query( array(
+            'post_type'      => 'product',
+            'post_status'    => 'publish',
+            'fields'         => 'ids',
+            'posts_per_page' => $limit,
+            'paged'          => $page,
         ) );
 
-        if ( empty( $products->products ) ) {
+        if ( empty( $query->posts ) ) {
             return array(
                 'scanned' => 0,
                 'total_pages' => 0,
@@ -35,8 +41,13 @@ class Prodimg_Seo_1972adm_Product_Scanner {
             );
         }
 
-        $scanned = 0;
-        foreach ( $products->products as $product ) {
+        $total_pages = (int) $query->max_num_pages;
+        $scanned     = 0;
+        foreach ( $query->posts as $product_id ) {
+            $product = wc_get_product( $product_id );
+            if ( ! $product ) {
+                continue;
+            }
             $this->calculator->calculate( $product );
             update_post_meta( $product->get_id(), '_prodimg_seo_1972adm_last_scanned', time() );
             $scanned++;
@@ -44,9 +55,9 @@ class Prodimg_Seo_1972adm_Product_Scanner {
 
         return array(
             'scanned' => $scanned,
-            'total_pages' => $products->max_num_pages,
+            'total_pages' => $total_pages,
             'current_page' => $page,
-            'done' => $page >= $products->max_num_pages,
+            'done' => $page >= $total_pages,
         );
     }
 }

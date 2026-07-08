@@ -482,9 +482,12 @@ body.prodimg-seo-skin .wrap > h1 {
     border-left: 1px solid var(--prodimg-bg-surface);
 }
 
-.prodimg-progress__segment--good { background: var(--prodimg-accent-green); }
-.prodimg-progress__segment--ok   { background: var(--prodimg-accent-orange); }
-.prodimg-progress__segment--poor { background: var(--prodimg-accent-red); }
+/* Distribution segments — colours mirror the per-image status badges (5 bands). */
+.prodimg-progress__segment--missing    { background: var(--prodimg-accent-red); }
+.prodimg-progress__segment--weak       { background: var(--prodimg-accent-orange); }
+.prodimg-progress__segment--good       { background: var(--prodimg-accent-green); }
+.prodimg-progress__segment--excellent  { background: var(--prodimg-accent-blue); }
+.prodimg-progress__segment--decorative { background: var(--prodimg-text-secondary); }
 
 .prodimg-progress__legend {
     display: flex;
@@ -504,9 +507,11 @@ body.prodimg-seo-skin .wrap > h1 {
     margin-right: 5px;
     vertical-align: middle;
 }
-.prodimg-legend-dot--good { background: var(--prodimg-accent-green); }
-.prodimg-legend-dot--ok   { background: var(--prodimg-accent-orange); }
-.prodimg-legend-dot--poor { background: var(--prodimg-accent-red); }
+.prodimg-legend-dot--missing    { background: var(--prodimg-accent-red); }
+.prodimg-legend-dot--weak       { background: var(--prodimg-accent-orange); }
+.prodimg-legend-dot--good       { background: var(--prodimg-accent-green); }
+.prodimg-legend-dot--excellent  { background: var(--prodimg-accent-blue); }
+.prodimg-legend-dot--decorative { background: var(--prodimg-text-secondary); }
 
 /* =========================================================================
  * 15. Tabs as segmented control

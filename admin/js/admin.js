@@ -140,46 +140,192 @@ jQuery(document).ready(function($) {
         scanPage(1);
     });
 
-    // Single Generation Modal
-    var currentProductId = 0;
+    // Single-image / single-product generation modal.
+    var prodimgI18n = (prodimg_seo_1972adm_admin && prodimg_seo_1972adm_admin.i18n) || {};
 
-    $('.prodimg-seo-generate-single').on('click', function(e) {
-        e.preventDefault();
-        var $btn = $(this);
-        currentProductId = $btn.data('product-id');
+    // Modal context — tracks whether we are generating for a whole product or a
+    // single attachment row (so we can update that row in place after saving).
+    var prodimgModalCtx = { mode: 'product', productId: 0, attachmentId: 0, $row: null, $btn: null };
+
+    function prodimgEscHtml(str) {
+        return $('<div>').text(str === null || typeof str === 'undefined' ? '' : String(str)).html();
+    }
+
+    function prodimgEscAttr(str) {
+        return prodimgEscHtml(str).replace(/"/g, '&quot;');
+    }
+
+    function prodimgBandLabel(band) {
+        var bands = prodimgI18n.bands || {};
+        return bands[band] || band;
+    }
+
+    function prodimgRenderStatusBadge(band) {
+        return '<span class="prodimg-status-badge prodimg-status-badge--' + prodimgEscAttr(band) + '">'
+            + prodimgEscHtml(prodimgBandLabel(band)) + '</span>';
+    }
+
+    function prodimgRenderScoreBar(score, band) {
+        if (score === '' || score === null || typeof score === 'undefined') {
+            return '<span class="prodimg-text-secondary">—</span>';
+        }
+        score = parseInt(score, 10) || 0;
+        var fillBand = (band === 'missing' || band === 'weak' || band === 'good' || band === 'excellent')
+            ? band
+            : (score >= 86 ? 'excellent' : (score >= 61 ? 'good' : (score > 0 ? 'weak' : 'missing')));
+        return '<div class="prodimg-score-bar"><div class="prodimg-score-bar__track">'
+            + '<div class="prodimg-score-bar__fill prodimg-score-bar__fill--' + prodimgEscAttr(fillBand) + '" style="width:' + score + '%;"></div>'
+            + '</div><span>' + score + '</span></div>';
+    }
+
+    // Update a catalog list-table row (status badge, score bar, alt text) in place.
+    function prodimgUpdateRow($row, data) {
+        if (!$row || !$row.length) { return; }
+        if (typeof data.band !== 'undefined') {
+            $row.find('td.column-status').html(prodimgRenderStatusBadge(data.band));
+        }
+        if (typeof data.score !== 'undefined') {
+            var $scoreCell = $row.find('td.column-quality_score');
+            $scoreCell.html(prodimgRenderScoreBar(data.score, data.band));
+            if (data.explanation) {
+                $scoreCell.attr('title', data.explanation);
+            }
+        }
+        if (typeof data.alt_text !== 'undefined') {
+            var alt = $.trim(data.alt_text);
+            var $altCell = $row.find('td.column-alt_text');
+            if (alt === '') {
+                $altCell.html('<em class="prodimg-text-secondary">' + prodimgEscHtml(prodimgI18n.noAltText) + '</em>');
+            } else {
+                var display = alt.length > 100 ? alt.substring(0, 97) + '…' : alt;
+                $altCell.html('<span title="' + prodimgEscAttr(alt) + '">' + prodimgEscHtml(display) + '</span>');
+            }
+        }
+    }
+
+    function prodimgRenderSuggestions(suggestions) {
+        var html = '<table class="wp-list-table widefat fixed striped">';
+        html += '<thead><tr><th style="width:100px;">' + prodimgEscHtml(prodimgI18n.image)
+            + '</th><th>' + prodimgEscHtml(prodimgI18n.roleScore)
+            + '</th><th>' + prodimgEscHtml(prodimgI18n.suggestedAlt) + '</th></tr></thead><tbody>';
+
+        $.each(suggestions, function(i, item) {
+            html += '<tr>';
+            html += '<td><img src="' + prodimgEscAttr(item.url) + '" alt="" style="max-width:100px; height:auto;" /></td>';
+            html += '<td><strong>' + prodimgEscHtml(item.role) + '</strong><br>'
+                + prodimgEscHtml(prodimgI18n.scoreLabel) + ': ' + prodimgEscHtml(item.score) + '</td>';
+            html += '<td><textarea style="width:100%; height:60px;" class="prodimg-seo-alt-input" data-image-id="'
+                + prodimgEscAttr(item.image_id) + '">' + prodimgEscHtml(item.alt_text) + '</textarea></td>';
+            html += '</tr>';
+        });
+
+        html += '</tbody></table>';
+        return html;
+    }
+
+    function prodimgCloseModal() {
+        $('#prodimg-seo-modal-overlay').fadeOut();
+        if (prodimgModalCtx.$btn && prodimgModalCtx.$btn.length) {
+            prodimgModalCtx.$btn.prop('disabled', false).text(prodimgModalCtx.btnLabel);
+        }
+    }
+
+    // Open the modal and request suggestions for the given payload/context.
+    function prodimgOpenGenerate(payload, ctx) {
+        prodimgModalCtx = ctx;
 
         $('#prodimg-seo-modal-overlay').fadeIn();
-        $('#prodimg-seo-modal-content').html('<p>Loading suggestions...</p>');
+        $('#prodimg-seo-modal-content').html('<p>' + prodimgEscHtml(prodimgI18n.loading) + '</p>');
         $('#prodimg-seo-modal-save').hide();
 
-        $.post(prodimg_seo_1972adm_admin.ajax_url, {
-            action: 'prodimg_seo_1972adm_generate_single',
-            nonce: prodimg_seo_1972adm_admin.nonce,
-            product_id: currentProductId
-        }, function(response) {
+        $.post(prodimg_seo_1972adm_admin.ajax_url, payload, function(response) {
+            if (ctx.$btn && ctx.$btn.length) {
+                ctx.$btn.prop('disabled', false).text(ctx.btnLabel);
+            }
             if (response.success) {
-                var html = '<table class="wp-list-table widefat fixed striped">';
-                html += '<thead><tr><th style="width:100px;">Image</th><th>Role / Score</th><th>Suggested Alt Text (Edit below)</th></tr></thead><tbody>';
-
-                $.each(response.data.suggestions, function(i, item) {
-                    html += '<tr>';
-                    html += '<td><img src="' + item.url + '" style="max-width:100px; height:auto;" /></td>';
-                    html += '<td><strong>' + item.role + '</strong><br>Score: ' + item.score + '</td>';
-                    html += '<td><textarea style="width:100%; height:60px;" class="prodimg-seo-alt-input" data-image-id="' + item.image_id + '">' + item.alt_text + '</textarea></td>';
-                    html += '</tr>';
-                });
-
-                html += '</tbody></table>';
-                $('#prodimg-seo-modal-content').html(html);
+                if (response.data && typeof response.data.product_id !== 'undefined') {
+                    prodimgModalCtx.productId = response.data.product_id;
+                }
+                $('#prodimg-seo-modal-content').html(prodimgRenderSuggestions(response.data.suggestions));
                 $('#prodimg-seo-modal-save').show();
             } else {
-                $('#prodimg-seo-modal-content').html('<p class="prodimg-error-msg">Error: ' + response.data + '</p>');
+                $('#prodimg-seo-modal-content').html('<p class="prodimg-error-msg">'
+                    + prodimgEscHtml(prodimgI18n.error) + ' ' + prodimgEscHtml(response.data) + '</p>');
             }
+        }).fail(function() {
+            if (ctx.$btn && ctx.$btn.length) {
+                ctx.$btn.prop('disabled', false).text(ctx.btnLabel);
+            }
+            $('#prodimg-seo-modal-content').html('<p class="prodimg-error-msg">' + prodimgEscHtml(prodimgI18n.error) + '</p>');
+        });
+    }
+
+    // Product-level generate (kept for back-compat with any product-scoped button).
+    $(document).on('click', '.prodimg-seo-generate-single', function(e) {
+        e.preventDefault();
+        var $btn = $(this);
+        var pid  = $btn.data('product-id');
+        prodimgOpenGenerate(
+            {
+                action: 'prodimg_seo_1972adm_generate_single',
+                nonce: prodimg_seo_1972adm_admin.nonce,
+                product_id: pid
+            },
+            { mode: 'product', productId: pid, attachmentId: 0, $row: $btn.closest('tr'), $btn: null, btnLabel: '' }
+        );
+    });
+
+    // Per-image generate (catalog list-table row action + actions column).
+    $(document).on('click', '.prodimg-seo-generate-attachment', function(e) {
+        e.preventDefault();
+        var $btn  = $(this);
+        var aid   = $btn.data('attachment-id');
+        var label = $btn.text();
+        $btn.prop('disabled', true).text(prodimgI18n.generating);
+        prodimgOpenGenerate(
+            {
+                action: 'prodimg_seo_1972adm_generate_single',
+                nonce: prodimg_seo_1972adm_admin.nonce,
+                attachment_id: aid
+            },
+            { mode: 'attachment', productId: 0, attachmentId: aid, $row: $btn.closest('tr'), $btn: $btn, btnLabel: label }
+        );
+    });
+
+    // Per-image recalculate score.
+    $(document).on('click', '.prodimg-seo-recalc-attachment', function(e) {
+        e.preventDefault();
+        var $btn  = $(this);
+        var aid   = $btn.data('attachment-id');
+        var $row  = $btn.closest('tr');
+        var label = $btn.text();
+
+        $btn.prop('disabled', true).text(prodimgI18n.recalculating);
+
+        $.post(prodimg_seo_1972adm_admin.ajax_url, {
+            action: 'prodimg_seo_1972adm_recalc_score',
+            nonce: prodimg_seo_1972adm_admin.nonce,
+            attachment_id: aid
+        }, function(response) {
+            $btn.prop('disabled', false).text(label);
+            if (response.success) {
+                prodimgUpdateRow($row, {
+                    score: response.data.score,
+                    band: response.data.band,
+                    explanation: response.data.explanation
+                });
+                prodimgToast(prodimgI18n.scoreUpdated, 'success');
+            } else {
+                prodimgToast(prodimgI18n.error + ' ' + response.data, 'error');
+            }
+        }).fail(function() {
+            $btn.prop('disabled', false).text(label);
+            prodimgToast(prodimgI18n.error, 'error');
         });
     });
 
     $('#prodimg-seo-modal-close').on('click', function() {
-        $('#prodimg-seo-modal-overlay').fadeOut();
+        prodimgCloseModal();
     });
 
     $('#prodimg-seo-modal-save').on('click', function() {
@@ -190,23 +336,35 @@ jQuery(document).ready(function($) {
             altTexts[$(this).data('image-id')] = $(this).val();
         });
 
-        $btn.prop('disabled', true).text('Saving...');
+        $btn.prop('disabled', true).text(prodimgI18n.saving);
 
         $.post(prodimg_seo_1972adm_admin.ajax_url, {
             action: 'prodimg_seo_1972adm_save_single',
             nonce: prodimg_seo_1972adm_admin.nonce,
-            product_id: currentProductId,
+            product_id: prodimgModalCtx.productId || 0,
             alt_texts: altTexts
         }, function(response) {
-            $btn.prop('disabled', false).text('Save Approved Alt Text');
+            $btn.prop('disabled', false).text(prodimgI18n.save);
             if (response.success) {
-                prodimgToast('Saved successfully.', 'success');
+                prodimgToast(prodimgI18n.saved, 'success');
                 $('#prodimg-seo-modal-overlay').fadeOut();
-                // Reload to update list table status (defer elimination to v3).
-                location.reload();
+
+                if (prodimgModalCtx.mode === 'attachment' && prodimgModalCtx.$row) {
+                    // Update the single row in place — no full reload.
+                    var saved = (response.data && response.data.saved) ? response.data.saved : {};
+                    var rowData = saved[prodimgModalCtx.attachmentId] || {};
+                    prodimgUpdateRow(prodimgModalCtx.$row, {
+                        score: rowData.score,
+                        band: rowData.band,
+                        explanation: rowData.explanation,
+                        alt_text: altTexts[prodimgModalCtx.attachmentId]
+                    });
+                } else {
+                    // Product-level save affects many rows — reload for accuracy.
+                    location.reload();
+                }
             } else {
-                prodimgToast('Error saving: ' + response.data, 'error');
-                alert('Error saving: ' + response.data);
+                prodimgToast(prodimgI18n.saveError + ' ' + response.data, 'error');
             }
         });
     });

@@ -455,8 +455,8 @@ class Prodimg_Seo_1972adm_Catalog_List_Table extends WP_List_Table {
         // Step 2: _thumbnail_id postmeta.
         $products = get_posts( array(
             'post_type'      => 'product',
-            'meta_key'       => '_thumbnail_id', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-            'meta_value'     => $att_id, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+            'meta_key'       => '_thumbnail_id', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Resolving the parent product for one attachment row; bounded by numberposts=1 and memoized per-request in $this->product_cache.
+            'meta_value'     => $att_id, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Resolving the parent product for one attachment row; bounded by numberposts=1 and memoized per-request in $this->product_cache.
             'numberposts'    => 1,
             'post_status'    => 'any',
             'fields'         => 'ids',
@@ -471,7 +471,7 @@ class Prodimg_Seo_1972adm_Catalog_List_Table extends WP_List_Table {
         // Step 3: _product_image_gallery LIKE search.
         global $wpdb;
         $like_value  = '%' . $wpdb->esc_like( (string) $att_id ) . '%';
-        $product_id  = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        $product_id  = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Gallery membership needs a serialized-postmeta LIKE scan not expressible via WP_Query; result (hits and misses) is memoized per-request in $this->product_cache, so each attachment row queries at most once.
             $wpdb->prepare(
                 "SELECT post_id FROM {$wpdb->postmeta}
                  WHERE meta_key = '_product_image_gallery'

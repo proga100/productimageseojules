@@ -36,16 +36,23 @@ class Prodimg_Seo_1972adm_Statistics {
                 'ignored'      => 0,
             ),
             'by_band'        => array(
-                'good' => 0,
-                'ok'   => 0,
-                'poor' => 0,
+                'missing'    => 0,
+                'weak'       => 0,
+                'good'       => 0,
+                'excellent'  => 0,
+                'decorative' => 0,
             ),
         );
 
-        $products = wc_get_products( array(
-            'limit'  => -1,
-            'status' => 'publish',
-            'return' => 'ids',
+        // Enumerate product IDs directly. wc_get_products() implicitly tax-filters
+        // on product_type and silently drops products lacking that term (common in
+        // legacy/imported data); a plain post query counts every published product.
+        $products = get_posts( array(
+            'post_type'      => 'product',
+            'post_status'    => 'publish',
+            'fields'         => 'ids',
+            'posts_per_page' => -1,
+            'no_found_rows'  => true,
         ) );
 
         $stats['total_products'] = count( $products );
@@ -79,12 +86,23 @@ class Prodimg_Seo_1972adm_Statistics {
                 if ( $score_int < 50 ) {
                     $stats['weak_alt']++;
                 }
-                if ( $score_int >= 80 ) {
-                    $stats['by_band']['good']++;
-                } elseif ( $score_int >= 50 ) {
-                    $stats['by_band']['ok']++;
-                } else {
-                    $stats['by_band']['poor']++;
+
+                // Bucket by the shared calculator band vocabulary so the Audit
+                // Report distribution matches the per-image row badges. Prefer the
+                // stored rollup band (worst image); fall back to band-from-score.
+                $band      = '';
+                $breakdown = get_post_meta( $pid, '_prodimg_seo_1972adm_score_breakdown', true );
+                if ( $breakdown ) {
+                    $breakdown_data = json_decode( $breakdown, true );
+                    if ( is_array( $breakdown_data ) && ! empty( $breakdown_data['band'] ) ) {
+                        $band = sanitize_key( $breakdown_data['band'] );
+                    }
+                }
+                if ( '' === $band || ! isset( $stats['by_band'][ $band ] ) ) {
+                    $band = $this->calculator->get_band_from_score( $score_int );
+                }
+                if ( isset( $stats['by_band'][ $band ] ) ) {
+                    $stats['by_band'][ $band ]++;
                 }
             }
 

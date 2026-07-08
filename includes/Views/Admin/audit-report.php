@@ -23,14 +23,29 @@ $prodimg_seo_breakdown = isset( $prodimg_seo_stats['breakdown'] ) ? $prodimg_seo
 );
 
 $prodimg_seo_band = isset( $prodimg_seo_stats['by_band'] ) ? $prodimg_seo_stats['by_band'] : array(
-    'good' => 0,
-    'ok'   => 0,
-    'poor' => 0,
+    'missing'    => 0,
+    'weak'       => 0,
+    'good'       => 0,
+    'excellent'  => 0,
+    'decorative' => 0,
 );
-$prodimg_seo_band_good = isset( $prodimg_seo_band['good'] ) ? intval( $prodimg_seo_band['good'] ) : 0;
-$prodimg_seo_band_ok   = isset( $prodimg_seo_band['ok'] ) ? intval( $prodimg_seo_band['ok'] ) : 0;
-$prodimg_seo_band_poor = isset( $prodimg_seo_band['poor'] ) ? intval( $prodimg_seo_band['poor'] ) : 0;
-$prodimg_seo_band_sum  = $prodimg_seo_band_good + $prodimg_seo_band_ok + $prodimg_seo_band_poor;
+
+// Distribution buckets: labels + counts keyed by the shared band vocabulary so
+// they match the per-image row badges elsewhere in the plugin.
+$prodimg_seo_band_labels = array(
+    'missing'    => __( 'Missing', 'product-image-seo' ),
+    'weak'       => __( 'Weak', 'product-image-seo' ),
+    'good'       => __( 'Good', 'product-image-seo' ),
+    'excellent'  => __( 'Excellent', 'product-image-seo' ),
+    'decorative' => __( 'Decorative', 'product-image-seo' ),
+);
+
+$prodimg_seo_band_counts = array();
+$prodimg_seo_band_sum    = 0;
+foreach ( $prodimg_seo_band_labels as $prodimg_seo_band_key => $prodimg_seo_band_label ) {
+    $prodimg_seo_band_counts[ $prodimg_seo_band_key ] = isset( $prodimg_seo_band[ $prodimg_seo_band_key ] ) ? intval( $prodimg_seo_band[ $prodimg_seo_band_key ] ) : 0;
+    $prodimg_seo_band_sum += $prodimg_seo_band_counts[ $prodimg_seo_band_key ];
+}
 
 $prodimg_seo_pct = function ( $part, $total ) {
     return $total > 0 ? round( ( $part / $total ) * 100, 1 ) : 0;
@@ -135,14 +150,14 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
     <div class="prodimg-card">
         <h2 class="prodimg-card__title"><?php esc_html_e( 'Score distribution', 'product-image-seo' ); ?></h2>
         <div class="prodimg-progress prodimg-progress--stacked" role="img" aria-label="<?php esc_attr_e( 'Score distribution bar', 'product-image-seo' ); ?>">
-            <div class="prodimg-progress__segment prodimg-progress__segment--good" style="width: <?php echo esc_attr( $prodimg_seo_pct( $prodimg_seo_band_good, $prodimg_seo_band_sum ) ); ?>%;"></div>
-            <div class="prodimg-progress__segment prodimg-progress__segment--ok"   style="width: <?php echo esc_attr( $prodimg_seo_pct( $prodimg_seo_band_ok, $prodimg_seo_band_sum ) ); ?>%;"></div>
-            <div class="prodimg-progress__segment prodimg-progress__segment--poor" style="width: <?php echo esc_attr( $prodimg_seo_pct( $prodimg_seo_band_poor, $prodimg_seo_band_sum ) ); ?>%;"></div>
+            <?php foreach ( $prodimg_seo_band_counts as $prodimg_seo_band_key => $prodimg_seo_band_count ) : ?>
+                <div class="prodimg-progress__segment prodimg-progress__segment--<?php echo esc_attr( $prodimg_seo_band_key ); ?>" style="width: <?php echo esc_attr( $prodimg_seo_pct( $prodimg_seo_band_count, $prodimg_seo_band_sum ) ); ?>%;"></div>
+            <?php endforeach; ?>
         </div>
         <div class="prodimg-progress__legend">
-            <span><span class="prodimg-legend-dot prodimg-legend-dot--good"></span><?php esc_html_e( 'Good', 'product-image-seo' ); ?> (<?php echo esc_html( $prodimg_seo_band_good ); ?>)</span>
-            <span><span class="prodimg-legend-dot prodimg-legend-dot--ok"></span><?php esc_html_e( 'OK', 'product-image-seo' ); ?> (<?php echo esc_html( $prodimg_seo_band_ok ); ?>)</span>
-            <span><span class="prodimg-legend-dot prodimg-legend-dot--poor"></span><?php esc_html_e( 'Poor', 'product-image-seo' ); ?> (<?php echo esc_html( $prodimg_seo_band_poor ); ?>)</span>
+            <?php foreach ( $prodimg_seo_band_counts as $prodimg_seo_band_key => $prodimg_seo_band_count ) : ?>
+                <span><span class="prodimg-legend-dot prodimg-legend-dot--<?php echo esc_attr( $prodimg_seo_band_key ); ?>"></span><?php echo esc_html( $prodimg_seo_band_labels[ $prodimg_seo_band_key ] ); ?> (<?php echo esc_html( $prodimg_seo_band_count ); ?>)</span>
+            <?php endforeach; ?>
         </div>
     </div>
 

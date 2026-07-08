@@ -60,6 +60,19 @@ class Prodimg_Seo_1972adm_Admin_Controller {
             wp_send_json_error( __( 'Permission denied.', 'product-image-seo' ) );
             return;
         }
+
+        // Per-image recalc (catalog list-table row/actions button).
+        $attachment_id = isset( $_POST['attachment_id'] ) ? absint( wp_unslash( $_POST['attachment_id'] ) ) : 0;
+        if ( $attachment_id ) {
+            $result = $this->calculator->calculate_for_attachment( $attachment_id );
+            update_post_meta( $attachment_id, '_prodimg_seo_1972adm_quality_score', $result['score'] );
+            update_post_meta( $attachment_id, '_prodimg_seo_1972adm_score_breakdown', wp_json_encode( $result ) );
+            Prodimg_Seo_1972adm_Status_Taxonomy::set_status_for_attachment( $attachment_id, $result['band'] );
+            wp_send_json_success( $result );
+            return;
+        }
+
+        // Product-level recalc (worst-image rollup).
         $product_id = isset( $_POST['product_id'] ) ? absint( wp_unslash( $_POST['product_id'] ) ) : 0;
         if ( ! $product_id ) {
             wp_send_json_error( __( 'Invalid product ID.', 'product-image-seo' ) );
@@ -154,6 +167,31 @@ class Prodimg_Seo_1972adm_Admin_Controller {
             array(
                 'ajax_url' => admin_url( 'admin-ajax.php' ),
                 'nonce'    => wp_create_nonce( 'prodimg_seo_1972adm_admin_nonce' ),
+                'i18n'     => array(
+                    'generate'      => __( 'Generate', 'product-image-seo' ),
+                    'generating'    => __( 'Generating…', 'product-image-seo' ),
+                    'recalc'        => __( 'Recalc Score', 'product-image-seo' ),
+                    'recalculating' => __( 'Recalculating…', 'product-image-seo' ),
+                    'loading'       => __( 'Loading suggestions…', 'product-image-seo' ),
+                    'saving'        => __( 'Saving…', 'product-image-seo' ),
+                    'save'          => __( 'Save Approved Alt Text', 'product-image-seo' ),
+                    'saved'         => __( 'Saved successfully.', 'product-image-seo' ),
+                    'saveError'     => __( 'Error saving:', 'product-image-seo' ),
+                    'error'         => __( 'Error:', 'product-image-seo' ),
+                    'scoreUpdated'  => __( 'Score updated.', 'product-image-seo' ),
+                    'noAltText'     => __( '(no alt text)', 'product-image-seo' ),
+                    'image'         => __( 'Image', 'product-image-seo' ),
+                    'roleScore'     => __( 'Role / Score', 'product-image-seo' ),
+                    'scoreLabel'    => __( 'Score', 'product-image-seo' ),
+                    'suggestedAlt'  => __( 'Suggested Alt Text (edit below)', 'product-image-seo' ),
+                    'bands'         => array(
+                        'missing'    => __( 'Missing', 'product-image-seo' ),
+                        'weak'       => __( 'Weak', 'product-image-seo' ),
+                        'good'       => __( 'Good', 'product-image-seo' ),
+                        'excellent'  => __( 'Excellent', 'product-image-seo' ),
+                        'decorative' => __( 'Decorative', 'product-image-seo' ),
+                    ),
+                ),
             )
         );
     }
@@ -237,6 +275,35 @@ class Prodimg_Seo_1972adm_Admin_Controller {
         check_ajax_referer( 'prodimg_seo_1972adm_admin_nonce', 'nonce' );
         if ( ! current_user_can( 'manage_woocommerce' ) ) {
             wp_send_json_error( __( 'Permission denied.', 'product-image-seo' ) );
+            return;
+        }
+
+        // Per-image generate (catalog list-table row/actions button): generate for
+        // one attachment, using its parent product as context.
+        $attachment_id = isset( $_POST['attachment_id'] ) ? absint( wp_unslash( $_POST['attachment_id'] ) ) : 0;
+        if ( $attachment_id ) {
+            $context            = $this->resolve_attachment_context( $attachment_id );
+            $context_product_id = $context['product_id'];
+            $role               = $context['role'];
+
+            $result = $this->api_client->generate_for_product( $context_product_id, $attachment_id, $role );
+            if ( is_wp_error( $result ) ) {
+                wp_send_json_error( $result->get_error_message() );
+                return;
+            }
+
+            $suggestion = array(
+                'image_id' => $attachment_id,
+                'role'     => $role,
+                'url'      => wp_get_attachment_url( $attachment_id ),
+                'alt_text' => $result['alt_text'] ?? '',
+                'score'    => $result['quality_score'] ?? 0,
+            );
+
+            wp_send_json_success( array(
+                'suggestions' => array( $suggestion ),
+                'product_id'  => $context_product_id,
+            ) );
             return;
         }
 
@@ -330,26 +397,103 @@ class Prodimg_Seo_1972adm_Admin_Controller {
             $alt_texts[ absint( $alt_image_id ) ] = sanitize_text_field( $alt_value );
         }
 
-        if ( ! $product_id || empty( $alt_texts ) ) {
+        if ( empty( $alt_texts ) ) {
             wp_send_json_error( __( 'Invalid parameters.', 'product-image-seo' ) );
             return;
         }
 
+        $saved = array();
         foreach ( $alt_texts as $image_id => $alt ) {
-            if ( $image_id ) {
-                update_post_meta( $image_id, '_wp_attachment_image_alt', $alt );
+            if ( ! $image_id ) {
+                continue;
+            }
+            update_post_meta( $image_id, '_wp_attachment_image_alt', $alt );
+
+            // Refresh the per-image quality score + status so catalog rows stay
+            // accurate and the caller can update the row in place without a reload.
+            $attachment_score = $this->calculator->calculate_for_attachment( $image_id );
+            update_post_meta( $image_id, '_prodimg_seo_1972adm_quality_score', $attachment_score['score'] );
+            update_post_meta( $image_id, '_prodimg_seo_1972adm_score_breakdown', wp_json_encode( $attachment_score ) );
+            Prodimg_Seo_1972adm_Status_Taxonomy::set_status_for_attachment( $image_id, $attachment_score['band'] );
+
+            $saved[ $image_id ] = array(
+                'score'       => $attachment_score['score'],
+                'band'        => $attachment_score['band'],
+                'explanation' => $attachment_score['explanation'],
+            );
+        }
+
+        if ( $product_id ) {
+            update_post_meta( $product_id, '_prodimg_seo_1972adm_processed_at', time() );
+
+            // Recompute coverage + status taxonomy for this product after alt text save.
+            $product = wc_get_product( $product_id );
+            if ( $product ) {
+                $this->coverage_calculator->calculate( $product );
             }
         }
 
-        update_post_meta( $product_id, '_prodimg_seo_1972adm_processed_at', time() );
+        wp_send_json_success( array(
+            'message' => __( 'Saved successfully.', 'product-image-seo' ),
+            'saved'   => $saved,
+        ) );
+    }
 
-        // Recompute coverage + status taxonomy for this product after alt text save.
-        $product = wc_get_product( $product_id );
-        if ( $product ) {
-            $this->coverage_calculator->calculate( $product );
+    /**
+     * Resolve the parent product ID and image role for an attachment.
+     *
+     * Best-effort context for single-image generation: prefer a product whose
+     * featured image is this attachment, otherwise a product post_parent. Role
+     * falls back to any stored role meta, then to 'featured'.
+     *
+     * @param int $attachment_id Attachment post ID.
+     * @return array { product_id:int, role:string }
+     */
+    private function resolve_attachment_context( $attachment_id ) {
+        $attachment_id = absint( $attachment_id );
+        $product_id    = 0;
+
+        $role = get_post_meta( $attachment_id, '_prodimg_seo_1972adm_role', true );
+        $role = $role ? sanitize_key( $role ) : '';
+
+        // Featured image: a product whose _thumbnail_id points at this attachment.
+        $featured_owner = get_posts( array(
+            'post_type'      => 'product',
+            'post_status'    => 'any',
+            'fields'         => 'ids',
+            'numberposts'    => 1,
+            'no_found_rows'  => true,
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- one-off single-image context lookup, bounded by numberposts=1.
+            'meta_key'       => '_thumbnail_id',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- one-off single-image context lookup, bounded by numberposts=1.
+            'meta_value'     => (string) $attachment_id,
+        ) );
+        if ( ! empty( $featured_owner ) ) {
+            $product_id = absint( $featured_owner[0] );
+            if ( '' === $role ) {
+                $role = 'featured';
+            }
         }
 
-        wp_send_json_success( __( 'Saved successfully.', 'product-image-seo' ) );
+        // Otherwise fall back to a product post_parent (image uploaded to a product).
+        if ( ! $product_id ) {
+            $parent_id = wp_get_post_parent_id( $attachment_id );
+            if ( $parent_id && 'product' === get_post_type( $parent_id ) ) {
+                $product_id = absint( $parent_id );
+                if ( '' === $role ) {
+                    $role = 'gallery';
+                }
+            }
+        }
+
+        if ( '' === $role ) {
+            $role = 'featured';
+        }
+
+        return array(
+            'product_id' => $product_id,
+            'role'       => $role,
+        );
     }
 
     /**

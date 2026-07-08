@@ -90,9 +90,9 @@ $prodimg_seo_chips = array(
 
 <!-- Modal for Single Product Generation -->
 <div id="prodimg-seo-modal-overlay" class="prodimg-modal-overlay">
-    <div id="prodimg-seo-modal" class="prodimg-modal">
+    <div id="prodimg-seo-modal" class="prodimg-modal" role="dialog" aria-modal="true" aria-labelledby="prodimg-seo-modal-title">
         <button id="prodimg-seo-modal-close" class="prodimg-modal__close" aria-label="<?php esc_attr_e( 'Close', 'product-image-seo' ); ?>">&times;</button>
-        <h2><?php esc_html_e( 'Review Alt Text Suggestions', 'product-image-seo' ); ?></h2>
+        <h2 id="prodimg-seo-modal-title"><?php esc_html_e( 'Review Alt Text Suggestions', 'product-image-seo' ); ?></h2>
         <div id="prodimg-seo-modal-content">
             <p><?php esc_html_e( 'Loading...', 'product-image-seo' ); ?></p>
         </div>
