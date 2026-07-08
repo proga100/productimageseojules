@@ -33,21 +33,24 @@ class Prodimg_Seo_1972adm_Bulk_Controller {
         $product_ids = isset( $_POST['product_ids'] ) ? array_map( 'absint', (array) wp_unslash( $_POST['product_ids'] ) ) : array();
 
         if ( empty( $product_ids ) ) {
-            // fallback: get all products needing review
-            $args = array(
-                'limit'  => -1,
-                'status' => 'publish',
-                'return' => 'ids',
+            // Fallback: every product needing review. Enumerate IDs with a plain
+            // post query — wc_get_products() implicitly tax-filters on product_type
+            // and silently drops products lacking that term (legacy/imported data).
+            $product_ids = get_posts( array(
+                'post_type'      => 'product',
+                'post_status'    => 'publish',
+                'fields'         => 'ids',
+                'posts_per_page' => -1,
+                'no_found_rows'  => true,
                 // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- fallback query when no explicit IDs; bounded by status taxonomy.
-                'tax_query' => array(
+                'tax_query'      => array(
                     array(
                         'taxonomy' => Prodimg_Seo_1972adm_Status_Taxonomy::TAXONOMY,
                         'field'    => 'slug',
                         'terms'    => array( 'needs_review', 'partial' ),
                     ),
                 ),
-            );
-            $product_ids = wc_get_products( $args );
+            ) );
         }
 
         if ( empty( $product_ids ) ) {
