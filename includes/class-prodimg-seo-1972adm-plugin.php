@@ -59,7 +59,6 @@ class Prodimg_Seo_1972adm_Plugin {
         require_once PRODIMG_SEO_1972ADM_INCLUDES_DIR . 'Services/class-prodimg-seo-1972adm-settings.php';
         require_once PRODIMG_SEO_1972ADM_INCLUDES_DIR . 'Services/class-prodimg-seo-1972adm-status-taxonomy.php';
         require_once PRODIMG_SEO_1972ADM_INCLUDES_DIR . 'Services/class-prodimg-seo-1972adm-api-client.php';
-        require_once PRODIMG_SEO_1972ADM_INCLUDES_DIR . 'Services/class-prodimg-seo-1972adm-product-context.php';
         require_once PRODIMG_SEO_1972ADM_INCLUDES_DIR . 'Services/class-prodimg-seo-1972adm-product-scanner.php';
         require_once PRODIMG_SEO_1972ADM_INCLUDES_DIR . 'Services/class-prodimg-seo-1972adm-coverage-calculator.php';
         require_once PRODIMG_SEO_1972ADM_INCLUDES_DIR . 'Services/class-prodimg-seo-1972adm-bulk-processor.php';

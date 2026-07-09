@@ -51,9 +51,6 @@ class Prodimg_Seo_1972adm_Container {
             case 'Prodimg_Seo_1972adm_Api_Client':
                 return new Prodimg_Seo_1972adm_Api_Client( $this->get( 'Prodimg_Seo_1972adm_Settings' ) );
 
-            case 'Prodimg_Seo_1972adm_Product_Context':
-                return new Prodimg_Seo_1972adm_Product_Context( $this->get( 'Prodimg_Seo_1972adm_Settings' ) );
-
             case 'Prodimg_Seo_1972adm_Coverage_Calculator':
                 return new Prodimg_Seo_1972adm_Coverage_Calculator();
 

@@ -18,6 +18,7 @@ $prodimg_seo_include_category = $this->settings->get( 'include_category', 'yes' 
 $prodimg_seo_include_sku      = $this->settings->get( 'include_sku', 'yes' );
 $prodimg_seo_include_price    = $this->settings->get( 'include_price', 'no' );
 $prodimg_seo_max_length       = $this->settings->get( 'max_length', 125 );
+$prodimg_seo_theme            = $this->settings->get( 'theme', 'auto' );
 $prodimg_seo_delete_data      = get_option( 'prodimg_seo_1972adm_delete_data_on_uninstall', false );
 
 // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only page slug for active nav state.
@@ -162,6 +163,17 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
 
         <section role="tabpanel" id="panel-advanced" aria-labelledby="tab-advanced" class="prodimg-card" hidden>
             <table class="form-table">
+                <tr>
+                    <th scope="row"><label for="prodimg-theme"><?php esc_html_e( 'Admin theme', 'product-image-seo' ); ?></label></th>
+                    <td>
+                        <select name="theme" id="prodimg-theme">
+                            <option value="auto" <?php selected( $prodimg_seo_theme, 'auto' ); ?>><?php esc_html_e( 'Auto (follow system)', 'product-image-seo' ); ?></option>
+                            <option value="light" <?php selected( $prodimg_seo_theme, 'light' ); ?>><?php esc_html_e( 'Light', 'product-image-seo' ); ?></option>
+                            <option value="dark" <?php selected( $prodimg_seo_theme, 'dark' ); ?>><?php esc_html_e( 'Dark', 'product-image-seo' ); ?></option>
+                        </select>
+                        <p class="description"><?php esc_html_e( 'Color scheme for the plugin pages. Auto follows your operating system preference.', 'product-image-seo' ); ?></p>
+                    </td>
+                </tr>
                 <tr>
                     <th scope="row"><?php esc_html_e( 'Delete data on uninstall', 'product-image-seo' ); ?></th>
                     <td>

@@ -67,6 +67,8 @@ jQuery(document).ready(function($) {
                         var doneMsg = 'Scan complete! Scanned ' + totalScanned + ' products.';
                         $result.text(doneMsg).removeClass('is-success is-error').addClass('is-success');
                         prodimgToast(doneMsg, 'success');
+                        // Refresh so cards/charts reflect the new scan data.
+                        setTimeout(function() { location.reload(); }, 1200);
                     } else {
                         var pct = Math.round((page / response.data.total_pages) * 100);
                         $result.text('Scanning... ' + pct + '% (' + page + '/' + response.data.total_pages + ')');
@@ -445,6 +447,130 @@ jQuery(document).ready(function($) {
             $btn.prop('disabled', false).text(label);
             prodimgToast(prodimgI18n.error, 'error');
         });
+    });
+
+    // --- Catalog bulk actions (Generate / Recalculate) -----------------------
+    // Run client-side, one image at a time, so every row updates in place and
+    // failures don't abort the batch.
+
+    function prodimgRunBulk(action, ids) {
+        var total   = ids.length;
+        var done    = 0;
+        var ok      = 0;
+        var failed  = 0;
+        var $apply  = $('#doaction, #doaction2');
+        var origVal = $apply.first().val();
+
+        function progress() {
+            $apply.prop('disabled', true).val(
+                prodimgI18n.bulkProgress.replace('%1$s', done).replace('%2$s', total)
+            );
+        }
+
+        function finish() {
+            $apply.prop('disabled', false).val(origVal);
+            var tpl = ('generate' === action) ? prodimgI18n.bulkGenerateDone : prodimgI18n.bulkRecalcDone;
+            prodimgToast(tpl.replace('%1$s', ok).replace('%2$s', failed), failed ? 'info' : 'success');
+        }
+
+        function step() {
+            if (!ids.length) { finish(); return; }
+            var id = ids.shift();
+            done++;
+            progress();
+            var $row = $('input[name="attachment_ids[]"][value="' + id + '"]').closest('tr');
+
+            if ('recalc' === action) {
+                $.post(prodimg_seo_1972adm_admin.ajax_url, {
+                    action: 'prodimg_seo_1972adm_recalc_score',
+                    nonce: prodimg_seo_1972adm_admin.nonce,
+                    attachment_id: id
+                }, function(response) {
+                    if (response.success) {
+                        ok++;
+                        prodimgUpdateRow($row, {
+                            score: response.data.score,
+                            band: response.data.band,
+                            explanation: response.data.explanation
+                        });
+                        prodimgFlashRow($row);
+                        $row.find('input[name="attachment_ids[]"]').prop('checked', false);
+                    } else {
+                        failed++;
+                    }
+                    step();
+                }).fail(function() { failed++; step(); });
+                return;
+            }
+
+            // generate: fetch the AI suggestion, then apply it right away.
+            $.post(prodimg_seo_1972adm_admin.ajax_url, {
+                action: 'prodimg_seo_1972adm_generate_single',
+                nonce: prodimg_seo_1972adm_admin.nonce,
+                attachment_id: id
+            }, function(response) {
+                var suggestion = (response.success && response.data && response.data.suggestions && response.data.suggestions.length)
+                    ? response.data.suggestions[0]
+                    : null;
+                if (!suggestion || !suggestion.alt_text) {
+                    failed++;
+                    step();
+                    return;
+                }
+                var altTexts = {};
+                altTexts[id] = suggestion.alt_text;
+                $.post(prodimg_seo_1972adm_admin.ajax_url, {
+                    action: 'prodimg_seo_1972adm_save_single',
+                    nonce: prodimg_seo_1972adm_admin.nonce,
+                    product_id: response.data.product_id || 0,
+                    alt_texts: altTexts
+                }, function(saveResponse) {
+                    if (saveResponse.success) {
+                        ok++;
+                        var saved   = (saveResponse.data && saveResponse.data.saved) ? saveResponse.data.saved : {};
+                        var rowData = saved[id] || {};
+                        prodimgUpdateRow($row, {
+                            score: rowData.score,
+                            band: rowData.band,
+                            explanation: rowData.explanation,
+                            alt_text: suggestion.alt_text
+                        });
+                        prodimgFlashRow($row);
+                        $row.find('input[name="attachment_ids[]"]').prop('checked', false);
+                    } else {
+                        failed++;
+                    }
+                    step();
+                }).fail(function() { failed++; step(); });
+            }).fail(function() { failed++; step(); });
+        }
+
+        step();
+    }
+
+    $(document).on('submit', 'form', function(e) {
+        var $form = $(this);
+        if (!$form.find('input[name="attachment_ids[]"]').length) {
+            return;
+        }
+        var action = $form.find('select[name="action"]').val();
+        if (!action || '-1' === action) {
+            action = $form.find('select[name="action2"]').val();
+        }
+        if ('generate' !== action && 'recalc' !== action) {
+            return;
+        }
+        e.preventDefault();
+
+        var ids = $form.find('input[name="attachment_ids[]"]:checked').map(function() {
+            return parseInt($(this).val(), 10);
+        }).get();
+
+        if (!ids.length) {
+            prodimgToast(prodimgI18n.bulkNoSelection, 'info');
+            return;
+        }
+        prodimgRunBulk(action, ids);
     });
 
     $('#prodimg-seo-modal-close').on('click', function() {

@@ -37,6 +37,7 @@ class Prodimg_Seo_1972adm_Admin_Controller {
     public function init_hooks() {
         add_action( 'admin_menu', array( $this, 'admin_menu' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+        add_filter( 'admin_body_class', array( $this, 'admin_body_class' ) );
         add_action( 'wp_ajax_prodimg_seo_1972adm_test_connection', array( $this, 'ajax_test_connection' ) );
         add_action( 'wp_ajax_prodimg_seo_1972adm_scan_catalog', array( $this, 'ajax_scan_catalog' ) );
         add_action( 'wp_ajax_prodimg_seo_1972adm_generate_single', array( $this, 'ajax_generate_single' ) );
@@ -194,6 +195,13 @@ class Prodimg_Seo_1972adm_Admin_Controller {
                     'retry'         => __( 'Try Again', 'product-image-seo' ),
                     'regenerate'    => __( 'Regenerate', 'product-image-seo' ),
                     'regenerating'  => __( 'Regenerating…', 'product-image-seo' ),
+                    /* translators: 1: current item number, 2: total items */
+                    'bulkProgress'     => __( 'Processing %1$s of %2$s…', 'product-image-seo' ),
+                    /* translators: 1: saved count, 2: failed count */
+                    'bulkGenerateDone' => __( 'Bulk generate finished: %1$s saved, %2$s failed.', 'product-image-seo' ),
+                    /* translators: 1: recalculated count, 2: failed count */
+                    'bulkRecalcDone'   => __( 'Recalculated %1$s scores, %2$s failed.', 'product-image-seo' ),
+                    'bulkNoSelection'  => __( 'Select at least one image first.', 'product-image-seo' ),
                     'bands'         => array(
                         'missing'    => __( 'Missing', 'product-image-seo' ),
                         'weak'       => __( 'Weak', 'product-image-seo' ),
@@ -227,6 +235,31 @@ class Prodimg_Seo_1972adm_Admin_Controller {
         require_once PRODIMG_SEO_1972ADM_INCLUDES_DIR . 'Views/Admin/audit-report.php';
     }
 
+    /**
+     * Force the plugin theme on our admin pages when the user picked one.
+     *
+     * "auto" leaves the CSS to follow prefers-color-scheme; "light"/"dark"
+     * add a body class the stylesheet uses to override the OS preference.
+     *
+     * @param string $classes Space-separated admin body classes.
+     * @return string
+     */
+    public function admin_body_class( $classes ) {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only page slug used to scope a body class.
+        $page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
+        if ( 0 !== strpos( $page, 'prodimg-seo-' ) ) {
+            return $classes;
+        }
+
+        $theme = $this->settings->get( 'theme', 'auto' );
+        if ( 'dark' === $theme ) {
+            $classes .= ' prodimg-theme-dark';
+        } elseif ( 'light' === $theme ) {
+            $classes .= ' prodimg-theme-light';
+        }
+        return $classes;
+    }
+
     public function render_settings_page() {
         if ( isset( $_POST['prodimg_seo_1972adm_save_settings'] ) ) {
             if ( ! isset( $_POST['prodimg_seo_1972adm_nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['prodimg_seo_1972adm_nonce'] ), 'prodimg_seo_1972adm_save_settings' ) ) {
@@ -246,6 +279,9 @@ class Prodimg_Seo_1972adm_Admin_Controller {
                 'include_sku' => sanitize_text_field( wp_unslash( $_POST['include_sku'] ?? 'no' ) ),
                 'include_price' => sanitize_text_field( wp_unslash( $_POST['include_price'] ?? 'no' ) ),
                 'max_length' => absint( wp_unslash( $_POST['max_length'] ?? 125 ) ),
+                'theme' => in_array( sanitize_key( wp_unslash( $_POST['theme'] ?? 'auto' ) ), array( 'auto', 'light', 'dark' ), true )
+                    ? sanitize_key( wp_unslash( $_POST['theme'] ?? 'auto' ) )
+                    : 'auto',
             );
             $this->settings->update_all( $new_settings );
 

@@ -61,8 +61,9 @@
 /* =========================================================================
  * 2. Dark-mode override — CSS-only, no UI toggle in v2
  * ========================================================================= */
+/* Auto: follow the OS unless the user forced Light in Settings → Advanced. */
 @media (prefers-color-scheme: dark) {
-    .prodimg-app {
+    body:not(.prodimg-theme-light) .prodimg-app {
         --prodimg-bg-page:      #1C1C1E;
         --prodimg-bg-surface:   #2C2C2E;
         --prodimg-bg-elevated:  #3A3A3C;
@@ -74,6 +75,20 @@
         --prodimg-text-tertiary:   #6C6C70;
         --prodimg-shadow-card:     0 0 0 0.5px rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.5);
     }
+}
+
+/* Forced Dark from Settings → Advanced, regardless of the OS preference. */
+body.prodimg-theme-dark .prodimg-app {
+    --prodimg-bg-page:      #1C1C1E;
+    --prodimg-bg-surface:   #2C2C2E;
+    --prodimg-bg-elevated:  #3A3A3C;
+    --prodimg-bg-vibrancy:  rgba(28, 28, 30, 0.72);
+    --prodimg-border-hairline: rgba(255, 255, 255, 0.08);
+    --prodimg-border-strong:   rgba(255, 255, 255, 0.14);
+    --prodimg-text-primary:    #F5F5F7;
+    --prodimg-text-secondary:  #98989D;
+    --prodimg-text-tertiary:   #6C6C70;
+    --prodimg-shadow-card:     0 0 0 0.5px rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
 /* =========================================================================
@@ -343,54 +358,6 @@ body.prodimg-seo-skin .wrap > h1 {
 }
 
 /* =========================================================================
- * 11. Signal row (score breakdown panel)
- * ========================================================================= */
-.prodimg-signal-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 6px 0;
-    font-size: 13px;
-}
-
-.prodimg-signal-row__label {
-    flex: 0 0 160px;
-    color: var(--prodimg-text-primary);
-}
-
-.prodimg-signal-row__bar {
-    flex: 1;
-    height: 4px;
-    background: var(--prodimg-border-hairline);
-    border-radius: var(--prodimg-radius-pill);
-    overflow: hidden;
-}
-
-.prodimg-signal-row__bar-fill {
-    height: 100%;
-    background: var(--prodimg-accent-blue);
-    transition: width 0.4s ease;
-}
-
-.prodimg-signal-row__bar-fill--good { background: var(--prodimg-accent-green); }
-.prodimg-signal-row__bar-fill--ok   { background: var(--prodimg-accent-orange); }
-.prodimg-signal-row__bar-fill--poor { background: var(--prodimg-accent-red); }
-
-.prodimg-signal-row__weight {
-    flex: 0 0 80px;
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-    color: var(--prodimg-text-secondary);
-    font-size: 11px;
-    font-weight: 500;
-    background: var(--prodimg-bg-elevated);
-    border-radius: var(--prodimg-radius-pill);
-    padding: 2px 8px;
-    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
-    box-shadow: var(--prodimg-shadow-hairline);
-}
-
-/* =========================================================================
  * 12. SVG score gauge
  * ========================================================================= */
 .prodimg-score-gauge {
@@ -437,26 +404,6 @@ body.prodimg-seo-skin .wrap > h1 {
     fill: var(--prodimg-text-secondary);
     font-family: var(--prodimg-font);
 }
-
-/* =========================================================================
- * 13. Score pill
- * ========================================================================= */
-.prodimg-score-pill {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: var(--prodimg-radius-pill);
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 1.6;
-    background: var(--prodimg-bg-elevated);
-    color: var(--prodimg-text-secondary);
-    box-shadow: var(--prodimg-shadow-hairline);
-}
-
-.prodimg-score-pill--good    { background: var(--prodimg-accent-green-bg); color: #1a7c3a; }
-.prodimg-score-pill--ok      { background: var(--prodimg-accent-orange-bg); color: #8a5000; }
-.prodimg-score-pill--poor    { background: var(--prodimg-accent-red-bg); color: #c0291f; }
-.prodimg-score-pill--unknown { background: var(--prodimg-bg-elevated); color: var(--prodimg-text-secondary); }
 
 /* =========================================================================
  * 14. Progress bar (linear + stacked) + legend dots
@@ -1229,9 +1176,13 @@ tr.prodimg-row-flash > td {
 
 /* Softer shimmer on dark surfaces */
 @media (prefers-color-scheme: dark) {
-    .prodimg-skeleton::after {
+    body:not(.prodimg-theme-light) .prodimg-skeleton::after {
         background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.10), transparent);
     }
+}
+
+body.prodimg-theme-dark .prodimg-skeleton::after {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.10), transparent);
 }
 
 /* =========================================================================
@@ -1265,4 +1216,25 @@ tr.prodimg-row-flash > td {
 /* Give form tables inside cards a little breathing room from the card edge. */
 .prodimg-card .form-table th {
     padding-left: 8px;
+}
+
+/* Low-coverage hint under the score distribution chart. */
+.prodimg-coverage-hint {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--prodimg-border-hairline);
+}
+
+.prodimg-coverage-hint p {
+    margin: 0;
+    color: var(--prodimg-text-secondary);
+}
+
+.prodimg-coverage-hint .spinner {
+    float: none;
+    margin: 0;
 }

@@ -15,7 +15,7 @@ $prodimg_seo_stats = $this->statistics->get_stats();
 $prodimg_seo_avg_score   = isset( $prodimg_seo_stats['avg_score'] ) ? intval( $prodimg_seo_stats['avg_score'] ) : 0;
 $prodimg_seo_total       = isset( $prodimg_seo_stats['total_products'] ) ? intval( $prodimg_seo_stats['total_products'] ) : 0;
 $prodimg_seo_missing     = isset( $prodimg_seo_stats['missing_alt'] ) ? intval( $prodimg_seo_stats['missing_alt'] ) : 0;
-$prodimg_seo_weak        = isset( $prodimg_seo_stats['weak_alt'] ) ? intval( $prodimg_seo_stats['weak_alt'] ) : 0;
+$prodimg_seo_weak        = isset( $prodimg_seo_stats['by_band']['weak'] ) ? intval( $prodimg_seo_stats['by_band']['weak'] ) : 0;
 $prodimg_seo_breakdown   = isset( $prodimg_seo_stats['breakdown'] ) ? $prodimg_seo_stats['breakdown'] : array(
     'featured'   => 0,
     'gallery'    => 0,
@@ -132,8 +132,8 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
             <div class="prodimg-card">
                 <h2 class="prodimg-card__title"><?php esc_html_e( 'Weak alt text', 'product-image-seo' ); ?></h2>
                 <p class="prodimg-card__value"><?php echo esc_html( $prodimg_seo_weak ); ?></p>
-                <p class="prodimg-card__footnote"><?php esc_html_e( 'Could be improved', 'product-image-seo' ); ?></p>
-                <a class="prodimg-card__cta" href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-catalog' ) ); ?>">
+                <p class="prodimg-card__footnote"><?php esc_html_e( 'Images that could be improved', 'product-image-seo' ); ?></p>
+                <a class="prodimg-card__cta" href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-catalog&prodimg_status=weak' ) ); ?>">
                     <?php esc_html_e( 'Review →', 'product-image-seo' ); ?>
                 </a>
             </div>

@@ -15,7 +15,7 @@ $prodimg_seo_stats = $this->statistics->get_stats();
 $prodimg_seo_avg_score = isset( $prodimg_seo_stats['avg_score'] ) ? intval( $prodimg_seo_stats['avg_score'] ) : 0;
 $prodimg_seo_total     = isset( $prodimg_seo_stats['total_products'] ) ? intval( $prodimg_seo_stats['total_products'] ) : 0;
 $prodimg_seo_missing   = isset( $prodimg_seo_stats['missing_alt'] ) ? intval( $prodimg_seo_stats['missing_alt'] ) : 0;
-$prodimg_seo_weak      = isset( $prodimg_seo_stats['weak_alt'] ) ? intval( $prodimg_seo_stats['weak_alt'] ) : 0;
+$prodimg_seo_weak      = isset( $prodimg_seo_stats['by_band']['weak'] ) ? intval( $prodimg_seo_stats['by_band']['weak'] ) : 0;
 $prodimg_seo_breakdown = isset( $prodimg_seo_stats['breakdown'] ) ? $prodimg_seo_stats['breakdown'] : array(
     'featured'   => 0,
     'gallery'    => 0,
@@ -124,7 +124,7 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
         <div class="prodimg-card">
             <h2 class="prodimg-card__title"><?php esc_html_e( 'Weak alt text', 'product-image-seo' ); ?></h2>
             <p class="prodimg-card__value"><?php echo esc_html( $prodimg_seo_weak ); ?></p>
-            <p class="prodimg-card__footnote"><?php esc_html_e( 'Could be improved', 'product-image-seo' ); ?></p>
+            <p class="prodimg-card__footnote"><?php esc_html_e( 'Images that could be improved', 'product-image-seo' ); ?></p>
         </div>
 
     </div>
@@ -165,6 +165,23 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
             printf( esc_html__( 'Distribution across %d scored products.', 'product-image-seo' ), intval( $prodimg_seo_band_sum ) );
             ?>
         </p>
+        <?php if ( $prodimg_seo_band_sum < $prodimg_seo_total ) : ?>
+            <div class="prodimg-coverage-hint">
+                <p>
+                    <?php
+                    printf(
+                        /* translators: 1: scored products, 2: total products */
+                        esc_html__( 'Only %1$d of %2$d products have been scored. Run an audit to include the rest.', 'product-image-seo' ),
+                        intval( $prodimg_seo_band_sum ),
+                        intval( $prodimg_seo_total )
+                    );
+                    ?>
+                </p>
+                <button type="button" class="button" id="prodimg-seo-scan-catalog"><?php esc_html_e( 'Run Audit', 'product-image-seo' ); ?></button>
+                <span class="spinner" id="prodimg-seo-scan-spinner"></span>
+                <span id="prodimg-seo-scan-result"></span>
+            </div>
+        <?php endif; ?>
     </div>
 
 </div>
