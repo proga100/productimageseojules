@@ -53,10 +53,6 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
                class="prodimg-segnav__item<?php echo ( 'prodimg-seo-dashboard' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
                 <?php esc_html_e( 'Dashboard', 'product-image-seo' ); ?>
             </a>
-            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-report' ) ); ?>"
-               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-report' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
-                <?php esc_html_e( 'Audit', 'product-image-seo' ); ?>
-            </a>
             <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-catalog' ) ); ?>"
                class="prodimg-segnav__item<?php echo ( 'prodimg-seo-catalog' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
                 <?php esc_html_e( 'Product Images', 'product-image-seo' ); ?>
@@ -64,6 +60,10 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
             <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-bulk' ) ); ?>"
                class="prodimg-segnav__item<?php echo ( 'prodimg-seo-bulk' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
                 <?php esc_html_e( 'Bulk Fix', 'product-image-seo' ); ?>
+            </a>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-report' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-report' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Audit Report', 'product-image-seo' ); ?>
             </a>
             <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-settings' ) ); ?>"
                class="prodimg-segnav__item<?php echo ( 'prodimg-seo-settings' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
@@ -133,7 +133,7 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
                 <h2 class="prodimg-card__title"><?php esc_html_e( 'Weak alt text', 'product-image-seo' ); ?></h2>
                 <p class="prodimg-card__value"><?php echo esc_html( $prodimg_seo_weak ); ?></p>
                 <p class="prodimg-card__footnote"><?php esc_html_e( 'Could be improved', 'product-image-seo' ); ?></p>
-                <a class="prodimg-card__cta" href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-catalog&prodimg_status=partial' ) ); ?>">
+                <a class="prodimg-card__cta" href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-catalog' ) ); ?>">
                     <?php esc_html_e( 'Review →', 'product-image-seo' ); ?>
                 </a>
             </div>
@@ -161,8 +161,8 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
 
         <div class="prodimg-quick-actions">
             <a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-catalog' ) ); ?>">
-                <span class="dashicons dashicons-search"></span>
-                <?php esc_html_e( 'Run Catalog Audit', 'product-image-seo' ); ?>
+                <span class="dashicons dashicons-format-gallery"></span>
+                <?php esc_html_e( 'View Product Images', 'product-image-seo' ); ?>
             </a>
             <a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-bulk' ) ); ?>">
                 <span class="dashicons dashicons-update"></span>

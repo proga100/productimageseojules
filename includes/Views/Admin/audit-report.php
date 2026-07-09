@@ -74,10 +74,6 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
                class="prodimg-segnav__item<?php echo ( 'prodimg-seo-dashboard' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
                 <?php esc_html_e( 'Dashboard', 'product-image-seo' ); ?>
             </a>
-            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-report' ) ); ?>"
-               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-report' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
-                <?php esc_html_e( 'Audit', 'product-image-seo' ); ?>
-            </a>
             <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-catalog' ) ); ?>"
                class="prodimg-segnav__item<?php echo ( 'prodimg-seo-catalog' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
                 <?php esc_html_e( 'Product Images', 'product-image-seo' ); ?>
@@ -85,6 +81,10 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
             <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-bulk' ) ); ?>"
                class="prodimg-segnav__item<?php echo ( 'prodimg-seo-bulk' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
                 <?php esc_html_e( 'Bulk Fix', 'product-image-seo' ); ?>
+            </a>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-report' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-report' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Audit Report', 'product-image-seo' ); ?>
             </a>
             <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-settings' ) ); ?>"
                class="prodimg-segnav__item<?php echo ( 'prodimg-seo-settings' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
@@ -159,6 +159,12 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
                 <span><span class="prodimg-legend-dot prodimg-legend-dot--<?php echo esc_attr( $prodimg_seo_band_key ); ?>"></span><?php echo esc_html( $prodimg_seo_band_labels[ $prodimg_seo_band_key ] ); ?> (<?php echo esc_html( $prodimg_seo_band_count ); ?>)</span>
             <?php endforeach; ?>
         </div>
+        <p class="prodimg-card__footnote">
+            <?php
+            /* translators: %d number of products that have a score */
+            printf( esc_html__( 'Distribution across %d scored products.', 'product-image-seo' ), intval( $prodimg_seo_band_sum ) );
+            ?>
+        </p>
     </div>
 
 </div>

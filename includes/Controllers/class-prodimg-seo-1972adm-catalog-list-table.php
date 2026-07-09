@@ -150,6 +150,20 @@ class Prodimg_Seo_1972adm_Catalog_List_Table extends WP_List_Table {
         $role = get_post_meta( $item->ID, '_prodimg_seo_1972adm_role', true );
         $role = $role ? sanitize_key( $role ) : '';
 
+        // No stored role — derive it from the resolved parent product (row-cached).
+        if ( '' === $role ) {
+            $product = $this->resolve_product_for_attachment( $item->ID );
+            if ( $product ) {
+                if ( 'product_variation' === $product->post_type ) {
+                    $role = 'variation';
+                } elseif ( (int) get_post_meta( $product->ID, '_thumbnail_id', true ) === (int) $item->ID ) {
+                    $role = 'featured';
+                } else {
+                    $role = 'gallery';
+                }
+            }
+        }
+
         $labels = array(
             'featured'  => __( 'Featured', 'product-image-seo' ),
             'gallery'   => __( 'Gallery', 'product-image-seo' ),
@@ -248,13 +262,14 @@ class Prodimg_Seo_1972adm_Catalog_List_Table extends WP_List_Table {
      */
     protected function column_actions( $item ) {
         $att_id = $item->ID;
-        return '<button type="button" class="button prodimg-seo-generate-attachment" data-attachment-id="' . esc_attr( (string) $att_id ) . '">'
+        return '<div class="prodimg-actions-group">'
+            . '<button type="button" class="button button-small prodimg-seo-generate-attachment" data-attachment-id="' . esc_attr( (string) $att_id ) . '">'
             . esc_html__( 'Generate', 'product-image-seo' )
             . '</button>'
-            . ' '
-            . '<button type="button" class="button prodimg-seo-recalc-attachment" data-attachment-id="' . esc_attr( (string) $att_id ) . '">'
+            . '<button type="button" class="button button-small prodimg-seo-recalc-attachment" data-attachment-id="' . esc_attr( (string) $att_id ) . '">'
             . esc_html__( 'Recalc Score', 'product-image-seo' )
-            . '</button>';
+            . '</button>'
+            . '</div>';
     }
 
     /**

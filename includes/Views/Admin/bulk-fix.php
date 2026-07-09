@@ -26,10 +26,6 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
                class="prodimg-segnav__item<?php echo ( 'prodimg-seo-dashboard' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
                 <?php esc_html_e( 'Dashboard', 'product-image-seo' ); ?>
             </a>
-            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-report' ) ); ?>"
-               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-report' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
-                <?php esc_html_e( 'Audit', 'product-image-seo' ); ?>
-            </a>
             <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-catalog' ) ); ?>"
                class="prodimg-segnav__item<?php echo ( 'prodimg-seo-catalog' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
                 <?php esc_html_e( 'Product Images', 'product-image-seo' ); ?>
@@ -38,6 +34,10 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
                class="prodimg-segnav__item<?php echo ( 'prodimg-seo-bulk' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
                 <?php esc_html_e( 'Bulk Fix', 'product-image-seo' ); ?>
             </a>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-report' ) ); ?>"
+               class="prodimg-segnav__item<?php echo ( 'prodimg-seo-report' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
+                <?php esc_html_e( 'Audit Report', 'product-image-seo' ); ?>
+            </a>
             <a href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-settings' ) ); ?>"
                class="prodimg-segnav__item<?php echo ( 'prodimg-seo-settings' === $prodimg_seo_current_page ) ? ' is-active' : ''; ?>">
                 <?php esc_html_e( 'Settings', 'product-image-seo' ); ?>
@@ -45,8 +45,14 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
         </nav>
     </header>
 
+    <?php $prodimg_seo_bulk_pending = intval( $this->statistics->get_stats()['missing_alt'] ?? 0 ); ?>
     <div class="prodimg-card">
-        <p><?php esc_html_e( 'Generate alt text for all products needing review.', 'product-image-seo' ); ?></p>
+        <p class="prodimg-card__value"><?php echo esc_html( $prodimg_seo_bulk_pending ); ?></p>
+        <p class="prodimg-card__footnote"><?php esc_html_e( 'Products currently need alt text review.', 'product-image-seo' ); ?></p>
+
+        <p class="prodimg-bulk-description">
+            <?php esc_html_e( 'Bulk Fix generates AI alt text for every product needing review. It runs in the background, so you can leave this page while it works. Images that already have alt text are skipped unless overwriting is enabled in Settings. Each generated image uses one API credit.', 'product-image-seo' ); ?>
+        </p>
 
         <p>
             <button type="button" class="button button-primary" id="prodimg-seo-bulk-start">
