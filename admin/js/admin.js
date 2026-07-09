@@ -402,6 +402,7 @@ jQuery(document).ready(function($) {
     // Per-image generate (catalog list-table row action + actions column).
     $(document).on('click', '.prodimg-seo-generate-attachment', function(e) {
         e.preventDefault();
+        if (prodimgBulkActive) { return; }
         var $btn  = $(this);
         var aid   = $btn.data('attachment-id');
         var label = $btn.text();
@@ -419,6 +420,7 @@ jQuery(document).ready(function($) {
     // Per-image recalculate score.
     $(document).on('click', '.prodimg-seo-recalc-attachment', function(e) {
         e.preventDefault();
+        if (prodimgBulkActive) { return; }
         var $btn  = $(this);
         var aid   = $btn.data('attachment-id');
         var $row  = $btn.closest('tr');
@@ -451,34 +453,88 @@ jQuery(document).ready(function($) {
 
     // --- Catalog bulk actions (Generate / Recalculate) -----------------------
     // Run client-side, one image at a time, so every row updates in place and
-    // failures don't abort the batch.
+    // failures don't abort the batch. A sticky banner above the table shows
+    // live progress and lets the user cancel between items.
+
+    var prodimgBulkActive = false;
+
+    function prodimgBulkBanner(title, total) {
+        var html = '<div class="prodimg-bulkrun" role="status" aria-live="polite">'
+            + '<span class="prodimg-spinner" aria-hidden="true"></span>'
+            + '<div class="prodimg-bulkrun__body">'
+            + '<strong class="prodimg-bulkrun__title">' + prodimgEscHtml(title) + '</strong>'
+            + '<div class="prodimg-progress"><div class="prodimg-progress__bar" style="width:0%;"></div></div>'
+            + '<span class="prodimg-bulkrun__meta">'
+            + prodimgEscHtml(prodimgI18n.bulkMeta.replace('%1$s', 0).replace('%2$s', total).replace('%3$s', 0).replace('%4$s', 0))
+            + '</span>'
+            + '</div>'
+            + '<button type="button" class="button prodimg-bulkrun__cancel">' + prodimgEscHtml(prodimgI18n.cancel) + '</button>'
+            + '</div>';
+        var $banner = $(html);
+        $('form').has('input[name="attachment_ids[]"]').first().before($banner);
+        if ($banner.get(0).scrollIntoView) {
+            $banner.get(0).scrollIntoView({ block: 'nearest' });
+        }
+        return $banner;
+    }
 
     function prodimgRunBulk(action, ids) {
-        var total   = ids.length;
-        var done    = 0;
-        var ok      = 0;
-        var failed  = 0;
-        var $apply  = $('#doaction, #doaction2');
-        var origVal = $apply.first().val();
+        var total     = ids.length;
+        var done      = 0;
+        var ok        = 0;
+        var failed    = 0;
+        var cancelled = false;
+        var $apply    = $('#doaction, #doaction2');
+        var origVal   = $apply.first().val();
+
+        prodimgBulkActive = true;
+        var title   = ('generate' === action) ? prodimgI18n.bulkGenTitle : prodimgI18n.bulkRecalcTitle;
+        var $banner = prodimgBulkBanner(title, total);
+        $banner.find('.prodimg-bulkrun__cancel').on('click', function() {
+            cancelled = true;
+            $(this).prop('disabled', true);
+        });
 
         function progress() {
             $apply.prop('disabled', true).val(
                 prodimgI18n.bulkProgress.replace('%1$s', done).replace('%2$s', total)
             );
+            $banner.find('.prodimg-progress__bar').css('width', Math.round((done / total) * 100) + '%');
+            $banner.find('.prodimg-bulkrun__meta').text(
+                prodimgI18n.bulkMeta.replace('%1$s', done).replace('%2$s', total).replace('%3$s', ok).replace('%4$s', failed)
+            );
         }
 
         function finish() {
+            prodimgBulkActive = false;
             $apply.prop('disabled', false).val(origVal);
-            var tpl = ('generate' === action) ? prodimgI18n.bulkGenerateDone : prodimgI18n.bulkRecalcDone;
-            prodimgToast(tpl.replace('%1$s', ok).replace('%2$s', failed), failed ? 'info' : 'success');
+            var tpl     = ('generate' === action) ? prodimgI18n.bulkGenerateDone : prodimgI18n.bulkRecalcDone;
+            var summary = cancelled
+                ? prodimgI18n.bulkCancelled + ' ' + tpl.replace('%1$s', ok).replace('%2$s', failed)
+                : tpl.replace('%1$s', ok).replace('%2$s', failed);
+            $banner.find('.prodimg-spinner').remove();
+            $banner.find('.prodimg-bulkrun__title').text(summary);
+            $banner.find('.prodimg-bulkrun__meta').text('');
+            $banner.find('.prodimg-bulkrun__cancel')
+                .prop('disabled', false)
+                .text(prodimgI18n.close)
+                .off('click')
+                .on('click', function() { $banner.remove(); });
+            prodimgToast(summary, (failed || cancelled) ? 'info' : 'success');
         }
 
         function step() {
-            if (!ids.length) { finish(); return; }
+            if (!ids.length || cancelled) { progress(); finish(); return; }
             var id = ids.shift();
             done++;
             progress();
             var $row = $('input[name="attachment_ids[]"][value="' + id + '"]').closest('tr');
+            $row.addClass('prodimg-row-busy');
+
+            function next() {
+                $row.removeClass('prodimg-row-busy');
+                step();
+            }
 
             if ('recalc' === action) {
                 $.post(prodimg_seo_1972adm_admin.ajax_url, {
@@ -498,8 +554,8 @@ jQuery(document).ready(function($) {
                     } else {
                         failed++;
                     }
-                    step();
-                }).fail(function() { failed++; step(); });
+                    next();
+                }).fail(function() { failed++; next(); });
                 return;
             }
 
@@ -514,7 +570,7 @@ jQuery(document).ready(function($) {
                     : null;
                 if (!suggestion || !suggestion.alt_text) {
                     failed++;
-                    step();
+                    next();
                     return;
                 }
                 var altTexts = {};
@@ -540,9 +596,9 @@ jQuery(document).ready(function($) {
                     } else {
                         failed++;
                     }
-                    step();
-                }).fail(function() { failed++; step(); });
-            }).fail(function() { failed++; step(); });
+                    next();
+                }).fail(function() { failed++; next(); });
+            }).fail(function() { failed++; next(); });
         }
 
         step();

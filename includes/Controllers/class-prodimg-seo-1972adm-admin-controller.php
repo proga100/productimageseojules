@@ -202,6 +202,13 @@ class Prodimg_Seo_1972adm_Admin_Controller {
                     /* translators: 1: recalculated count, 2: failed count */
                     'bulkRecalcDone'   => __( 'Recalculated %1$s scores, %2$s failed.', 'product-image-seo' ),
                     'bulkNoSelection'  => __( 'Select at least one image first.', 'product-image-seo' ),
+                    'bulkGenTitle'     => __( 'Generating alt text with AI…', 'product-image-seo' ),
+                    'bulkRecalcTitle'  => __( 'Recalculating scores…', 'product-image-seo' ),
+                    /* translators: 1: processed count, 2: total, 3: succeeded, 4: failed */
+                    'bulkMeta'         => __( '%1$s of %2$s processed · %3$s ok · %4$s failed', 'product-image-seo' ),
+                    'cancel'           => __( 'Cancel', 'product-image-seo' ),
+                    'close'            => __( 'Close', 'product-image-seo' ),
+                    'bulkCancelled'    => __( 'Bulk run cancelled.', 'product-image-seo' ),
                     'bands'         => array(
                         'missing'    => __( 'Missing', 'product-image-seo' ),
                         'weak'       => __( 'Weak', 'product-image-seo' ),

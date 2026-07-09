@@ -1218,6 +1218,47 @@ body.prodimg-theme-dark .prodimg-skeleton::after {
     padding-left: 8px;
 }
 
+/* Sticky live-progress banner for catalog bulk runs */
+.prodimg-bulkrun {
+    position: sticky;
+    top: 42px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 12px 0;
+    padding: 12px 16px;
+    background: var(--prodimg-bg-surface);
+    border-radius: var(--prodimg-radius-lg);
+    box-shadow: var(--prodimg-shadow-card);
+}
+
+.prodimg-bulkrun__body {
+    flex: 1;
+    min-width: 0;
+}
+
+.prodimg-bulkrun__title {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 6px;
+    color: var(--prodimg-text-primary);
+}
+
+.prodimg-bulkrun__meta {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--prodimg-text-secondary);
+}
+
+/* Row currently being processed by a bulk run */
+tr.prodimg-row-busy > td {
+    background-color: var(--prodimg-accent-blue-bg);
+    transition: background-color 200ms ease;
+}
+
 /* Low-coverage hint under the score distribution chart. */
 .prodimg-coverage-hint {
     display: flex;
