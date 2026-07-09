@@ -6,7 +6,7 @@
  */
 function prodimgToast( msg, type ) {
     type = type || 'success';
-    var $t = jQuery('<div class="prodimg-toast prodimg-toast--' + type + '"></div>').text( msg );
+    var $t = jQuery('<div class="prodimg-toast prodimg-app prodimg-toast--' + type + '"></div>').text( msg );
     jQuery('body').append( $t );
     setTimeout(function() { $t.addClass('is-visible'); }, 10);
     setTimeout(function() {
@@ -203,40 +203,94 @@ jQuery(document).ready(function($) {
         }
     }
 
-    function prodimgRenderSuggestions(suggestions) {
-        var html = '<table class="wp-list-table widefat fixed striped">';
-        html += '<thead><tr><th style="width:100px;">' + prodimgEscHtml(prodimgI18n.image)
-            + '</th><th>' + prodimgEscHtml(prodimgI18n.roleScore)
-            + '</th><th>' + prodimgEscHtml(prodimgI18n.suggestedAlt) + '</th></tr></thead><tbody>';
-
-        $.each(suggestions, function(i, item) {
-            html += '<tr>';
-            html += '<td><img src="' + prodimgEscAttr(item.url) + '" alt="" style="max-width:100px; height:auto;" /></td>';
-            html += '<td><strong>' + prodimgEscHtml(item.role) + '</strong><br>'
-                + prodimgEscHtml(prodimgI18n.scoreLabel) + ': ' + prodimgEscHtml(item.score) + '</td>';
-            html += '<td><textarea style="width:100%; height:60px;" class="prodimg-seo-alt-input" data-image-id="'
-                + prodimgEscAttr(item.image_id) + '">' + prodimgEscHtml(item.alt_text) + '</textarea></td>';
-            html += '</tr>';
-        });
-
-        html += '</tbody></table>';
+    // Skeleton shown while the AI request is in flight.
+    function prodimgRenderSkeleton() {
+        var html = '<div class="prodimg-modal-status" role="status">'
+            + '<span class="prodimg-spinner" aria-hidden="true"></span>'
+            + '<span><strong>' + prodimgEscHtml(prodimgI18n.genStatus) + '</strong><br>'
+            + '<span class="prodimg-text-secondary">' + prodimgEscHtml(prodimgI18n.genHint) + '</span></span>'
+            + '</div>';
+        html += '<div class="prodimg-skeleton-card" aria-hidden="true">'
+            + '<div class="prodimg-skeleton prodimg-skeleton--thumb"></div>'
+            + '<div class="prodimg-skeleton-lines">'
+            + '<div class="prodimg-skeleton prodimg-skeleton--chip"></div>'
+            + '<div class="prodimg-skeleton prodimg-skeleton--line"></div>'
+            + '<div class="prodimg-skeleton prodimg-skeleton--line" style="width:70%;"></div>'
+            + '<div class="prodimg-skeleton prodimg-skeleton--block"></div>'
+            + '</div></div>';
         return html;
     }
 
+    function prodimgRenderError(message) {
+        return '<div class="prodimg-modal-error">'
+            + '<div class="prodimg-modal-error__icon" aria-hidden="true">!</div>'
+            + '<p class="prodimg-modal-error__msg">' + prodimgEscHtml(message) + '</p>'
+            + '<button type="button" class="button" id="prodimg-seo-modal-retry">' + prodimgEscHtml(prodimgI18n.retry) + '</button>'
+            + '</div>';
+    }
+
+    function prodimgRoleLabel(role) {
+        var roles = prodimgI18n.roles || {};
+        return roles[role] || role;
+    }
+
+    function prodimgRenderSuggestions(suggestions) {
+        var maxLen = parseInt(prodimg_seo_1972adm_admin.max_length, 10) || 125;
+        var html = '';
+        $.each(suggestions, function(i, item) {
+            var current   = $.trim(item.current_alt || '');
+            var suggested = String(item.alt_text || '');
+            var fieldId   = 'prodimg-alt-input-' + prodimgEscAttr(item.image_id);
+            html += '<div class="prodimg-suggestion-card">';
+            html += '<div class="prodimg-suggestion-card__media"><img src="' + prodimgEscAttr(item.url) + '" alt="" /></div>';
+            html += '<div class="prodimg-suggestion-card__body">';
+            html += '<div class="prodimg-suggestion-card__meta">'
+                + '<span class="prodimg-status-badge prodimg-status-badge--role-' + prodimgEscAttr(item.role) + '">'
+                + prodimgEscHtml(prodimgRoleLabel(item.role)) + '</span>'
+                + '<span class="prodimg-suggestion-card__score">' + prodimgEscHtml(prodimgI18n.aiScore)
+                + ': <strong>' + prodimgEscHtml(item.score) + '</strong></span>'
+                + '</div>';
+            html += '<div class="prodimg-suggestion-card__current">'
+                + '<span class="prodimg-suggestion-card__label">' + prodimgEscHtml(prodimgI18n.currentAlt) + '</span>'
+                + (current === ''
+                    ? '<em class="prodimg-text-secondary">' + prodimgEscHtml(prodimgI18n.noneLabel) + '</em>'
+                    : '<span class="prodimg-suggestion-card__current-text">' + prodimgEscHtml(current) + '</span>')
+                + '</div>';
+            html += '<label class="prodimg-suggestion-card__label" for="' + fieldId + '">'
+                + prodimgEscHtml(prodimgI18n.suggestedAlt) + '</label>';
+            html += '<textarea id="' + fieldId + '" class="prodimg-seo-alt-input" rows="3" data-image-id="'
+                + prodimgEscAttr(item.image_id) + '">' + prodimgEscHtml(suggested) + '</textarea>';
+            html += '<div class="prodimg-char-counter" data-max="' + maxLen + '"><span>'
+                + suggested.length + '</span>&thinsp;/&thinsp;' + maxLen + '</div>';
+            html += '</div></div>';
+        });
+        return html;
+    }
+
+    // Brief green flash so the eye lands on the row that just changed.
+    function prodimgFlashRow($row) {
+        if (!$row || !$row.length) { return; }
+        $row.addClass('prodimg-row-flash');
+        setTimeout(function() { $row.removeClass('prodimg-row-flash'); }, 1600);
+    }
+
     function prodimgCloseModal() {
-        $('#prodimg-seo-modal-overlay').fadeOut();
+        $('#prodimg-seo-modal-overlay').fadeOut(150);
         if (prodimgModalCtx.$btn && prodimgModalCtx.$btn.length) {
             prodimgModalCtx.$btn.prop('disabled', false).text(prodimgModalCtx.btnLabel);
+            prodimgModalCtx.$btn.trigger('focus');
         }
     }
 
     // Open the modal and request suggestions for the given payload/context.
     function prodimgOpenGenerate(payload, ctx) {
         prodimgModalCtx = ctx;
+        prodimgModalCtx.payload = payload;
 
-        $('#prodimg-seo-modal-overlay').fadeIn();
-        $('#prodimg-seo-modal-content').html('<p>' + prodimgEscHtml(prodimgI18n.loading) + '</p>');
+        $('#prodimg-seo-modal-overlay').fadeIn(150);
+        $('#prodimg-seo-modal-content').html(prodimgRenderSkeleton());
         $('#prodimg-seo-modal-save').hide();
+        $('#prodimg-seo-modal-regenerate').hide();
 
         $.post(prodimg_seo_1972adm_admin.ajax_url, payload, function(response) {
             if (ctx.$btn && ctx.$btn.length) {
@@ -248,17 +302,85 @@ jQuery(document).ready(function($) {
                 }
                 $('#prodimg-seo-modal-content').html(prodimgRenderSuggestions(response.data.suggestions));
                 $('#prodimg-seo-modal-save').show();
+                $('#prodimg-seo-modal-regenerate').show().prop('disabled', false).text(prodimgI18n.regenerate);
+                var $first = $('#prodimg-seo-modal-content .prodimg-seo-alt-input').first();
+                if ($first.length) {
+                    var el = $first.get(0);
+                    $first.trigger('focus');
+                    el.setSelectionRange(el.value.length, el.value.length);
+                }
             } else {
-                $('#prodimg-seo-modal-content').html('<p class="prodimg-error-msg">'
-                    + prodimgEscHtml(prodimgI18n.error) + ' ' + prodimgEscHtml(response.data) + '</p>');
+                var msg = (typeof response.data === 'string' && response.data !== '')
+                    ? response.data
+                    : prodimgI18n.genFailed;
+                $('#prodimg-seo-modal-content').html(prodimgRenderError(msg));
+                prodimgToast(msg, 'error');
             }
         }).fail(function() {
             if (ctx.$btn && ctx.$btn.length) {
                 ctx.$btn.prop('disabled', false).text(ctx.btnLabel);
             }
-            $('#prodimg-seo-modal-content').html('<p class="prodimg-error-msg">' + prodimgEscHtml(prodimgI18n.error) + '</p>');
+            $('#prodimg-seo-modal-content').html(prodimgRenderError(prodimgI18n.genFailed));
+            prodimgToast(prodimgI18n.genFailed, 'error');
         });
     }
+
+    // Live character counter under each suggestion textarea.
+    $(document).on('input', '.prodimg-seo-alt-input', function() {
+        var $ta = $(this);
+        var $counter = $ta.closest('.prodimg-suggestion-card__body').find('.prodimg-char-counter');
+        if (!$counter.length) { return; }
+        var max = parseInt($counter.data('max'), 10) || 125;
+        var len = $ta.val().length;
+        $counter.find('span').text(len);
+        $counter.toggleClass('is-warn', len > max * 0.9 && len <= max);
+        $counter.toggleClass('is-over', len > max);
+    });
+
+    // Retry after a failed generation (button lives inside the error state).
+    $(document).on('click', '#prodimg-seo-modal-retry', function() {
+        if (prodimgModalCtx.payload) {
+            prodimgOpenGenerate(prodimgModalCtx.payload, prodimgModalCtx);
+        }
+    });
+
+    // Regenerate suggestions for the same target.
+    $('#prodimg-seo-modal-regenerate').on('click', function() {
+        if (prodimgModalCtx.payload) {
+            $(this).prop('disabled', true).text(prodimgI18n.regenerating);
+            prodimgOpenGenerate(prodimgModalCtx.payload, prodimgModalCtx);
+        }
+    });
+
+    // Close on overlay click (but not on clicks inside the dialog).
+    $('#prodimg-seo-modal-overlay').on('click', function(e) {
+        if (e.target === this) {
+            prodimgCloseModal();
+        }
+    });
+
+    // Close on Escape.
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape' && $('#prodimg-seo-modal-overlay').is(':visible')) {
+            prodimgCloseModal();
+        }
+    });
+
+    // Keep Tab focus inside the dialog while it is open.
+    $('#prodimg-seo-modal').on('keydown', function(e) {
+        if (e.key !== 'Tab') { return; }
+        var $focusable = $(this).find('button:visible, textarea:visible, a[href]:visible').filter(':not(:disabled)');
+        if (!$focusable.length) { return; }
+        var first = $focusable.get(0);
+        var last  = $focusable.get($focusable.length - 1);
+        if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+        }
+    });
 
     // Product-level generate (kept for back-compat with any product-scoped button).
     $(document).on('click', '.prodimg-seo-generate-single', function(e) {
@@ -314,6 +436,7 @@ jQuery(document).ready(function($) {
                     band: response.data.band,
                     explanation: response.data.explanation
                 });
+                prodimgFlashRow($row);
                 prodimgToast(prodimgI18n.scoreUpdated, 'success');
             } else {
                 prodimgToast(prodimgI18n.error + ' ' + response.data, 'error');
@@ -336,7 +459,7 @@ jQuery(document).ready(function($) {
             altTexts[$(this).data('image-id')] = $(this).val();
         });
 
-        $btn.prop('disabled', true).text(prodimgI18n.saving);
+        $btn.prop('disabled', true).addClass('prodimg-is-busy').text(prodimgI18n.saving);
 
         $.post(prodimg_seo_1972adm_admin.ajax_url, {
             action: 'prodimg_seo_1972adm_save_single',
@@ -344,10 +467,10 @@ jQuery(document).ready(function($) {
             product_id: prodimgModalCtx.productId || 0,
             alt_texts: altTexts
         }, function(response) {
-            $btn.prop('disabled', false).text(prodimgI18n.save);
+            $btn.prop('disabled', false).removeClass('prodimg-is-busy').text(prodimgI18n.save);
             if (response.success) {
                 prodimgToast(prodimgI18n.saved, 'success');
-                $('#prodimg-seo-modal-overlay').fadeOut();
+                prodimgCloseModal();
 
                 if (prodimgModalCtx.mode === 'attachment' && prodimgModalCtx.$row) {
                     // Update the single row in place — no full reload.
@@ -359,6 +482,7 @@ jQuery(document).ready(function($) {
                         explanation: rowData.explanation,
                         alt_text: altTexts[prodimgModalCtx.attachmentId]
                     });
+                    prodimgFlashRow(prodimgModalCtx.$row);
                 } else {
                     // Product-level save affects many rows — reload for accuracy.
                     location.reload();
@@ -366,6 +490,9 @@ jQuery(document).ready(function($) {
             } else {
                 prodimgToast(prodimgI18n.saveError + ' ' + response.data, 'error');
             }
+        }).fail(function() {
+            $btn.prop('disabled', false).removeClass('prodimg-is-busy').text(prodimgI18n.save);
+            prodimgToast(prodimgI18n.saveError + ' ' + prodimgI18n.genFailed, 'error');
         });
     });
 

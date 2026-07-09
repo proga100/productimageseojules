@@ -165,8 +165,9 @@ class Prodimg_Seo_1972adm_Admin_Controller {
             'prodimg-seo-1972adm-admin-js',
             'prodimg_seo_1972adm_admin',
             array(
-                'ajax_url' => admin_url( 'admin-ajax.php' ),
-                'nonce'    => wp_create_nonce( 'prodimg_seo_1972adm_admin_nonce' ),
+                'ajax_url'   => admin_url( 'admin-ajax.php' ),
+                'nonce'      => wp_create_nonce( 'prodimg_seo_1972adm_admin_nonce' ),
+                'max_length' => absint( $this->settings->get( 'max_length', 125 ) ),
                 'i18n'     => array(
                     'generate'      => __( 'Generate', 'product-image-seo' ),
                     'generating'    => __( 'Generating…', 'product-image-seo' ),
@@ -183,13 +184,27 @@ class Prodimg_Seo_1972adm_Admin_Controller {
                     'image'         => __( 'Image', 'product-image-seo' ),
                     'roleScore'     => __( 'Role / Score', 'product-image-seo' ),
                     'scoreLabel'    => __( 'Score', 'product-image-seo' ),
-                    'suggestedAlt'  => __( 'Suggested Alt Text (edit below)', 'product-image-seo' ),
+                    'suggestedAlt'  => __( 'Suggested alt text', 'product-image-seo' ),
+                    'currentAlt'    => __( 'Current alt text', 'product-image-seo' ),
+                    'noneLabel'     => __( '(none)', 'product-image-seo' ),
+                    'aiScore'       => __( 'AI score', 'product-image-seo' ),
+                    'genStatus'     => __( 'Generating alt text with AI…', 'product-image-seo' ),
+                    'genHint'       => __( 'This usually takes a few seconds.', 'product-image-seo' ),
+                    'genFailed'     => __( 'Generation failed.', 'product-image-seo' ),
+                    'retry'         => __( 'Try Again', 'product-image-seo' ),
+                    'regenerate'    => __( 'Regenerate', 'product-image-seo' ),
+                    'regenerating'  => __( 'Regenerating…', 'product-image-seo' ),
                     'bands'         => array(
                         'missing'    => __( 'Missing', 'product-image-seo' ),
                         'weak'       => __( 'Weak', 'product-image-seo' ),
                         'good'       => __( 'Good', 'product-image-seo' ),
                         'excellent'  => __( 'Excellent', 'product-image-seo' ),
                         'decorative' => __( 'Decorative', 'product-image-seo' ),
+                    ),
+                    'roles'         => array(
+                        'featured'  => __( 'Featured', 'product-image-seo' ),
+                        'gallery'   => __( 'Gallery', 'product-image-seo' ),
+                        'variation' => __( 'Variation', 'product-image-seo' ),
                     ),
                 ),
             )
@@ -293,11 +308,12 @@ class Prodimg_Seo_1972adm_Admin_Controller {
             }
 
             $suggestion = array(
-                'image_id' => $attachment_id,
-                'role'     => $role,
-                'url'      => wp_get_attachment_url( $attachment_id ),
-                'alt_text' => $result['alt_text'] ?? '',
-                'score'    => $result['quality_score'] ?? 0,
+                'image_id'    => $attachment_id,
+                'role'        => $role,
+                'url'         => wp_get_attachment_url( $attachment_id ),
+                'alt_text'    => $result['alt_text'] ?? '',
+                'current_alt' => (string) get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ),
+                'score'       => $result['quality_score'] ?? 0,
             );
 
             wp_send_json_success( array(
@@ -328,11 +344,12 @@ class Prodimg_Seo_1972adm_Admin_Controller {
             $result = $this->api_client->generate_for_product( $product_id, $featured_id, 'featured' );
             if ( ! is_wp_error( $result ) ) {
                 $suggestions[] = array(
-                    'image_id' => $featured_id,
-                    'role'     => 'featured',
-                    'url'      => wp_get_attachment_url( $featured_id ),
-                    'alt_text' => $result['alt_text'] ?? '',
-                    'score'    => $result['quality_score'] ?? 0,
+                    'image_id'    => $featured_id,
+                    'role'        => 'featured',
+                    'url'         => wp_get_attachment_url( $featured_id ),
+                    'alt_text'    => $result['alt_text'] ?? '',
+                    'current_alt' => (string) get_post_meta( $featured_id, '_wp_attachment_image_alt', true ),
+                    'score'       => $result['quality_score'] ?? 0,
                 );
             }
         }
@@ -343,11 +360,12 @@ class Prodimg_Seo_1972adm_Admin_Controller {
             $result = $this->api_client->generate_for_product( $product_id, $gid, 'gallery' );
             if ( ! is_wp_error( $result ) ) {
                 $suggestions[] = array(
-                    'image_id' => $gid,
-                    'role'     => 'gallery',
-                    'url'      => wp_get_attachment_url( $gid ),
-                    'alt_text' => $result['alt_text'] ?? '',
-                    'score'    => $result['quality_score'] ?? 0,
+                    'image_id'    => $gid,
+                    'role'        => 'gallery',
+                    'url'         => wp_get_attachment_url( $gid ),
+                    'alt_text'    => $result['alt_text'] ?? '',
+                    'current_alt' => (string) get_post_meta( $gid, '_wp_attachment_image_alt', true ),
+                    'score'       => $result['quality_score'] ?? 0,
                 );
             }
         }
@@ -362,11 +380,12 @@ class Prodimg_Seo_1972adm_Admin_Controller {
                         $result = $this->api_client->generate_for_product( $child_id, $vid, 'variation' );
                         if ( ! is_wp_error( $result ) ) {
                             $suggestions[] = array(
-                                'image_id' => $vid,
-                                'role'     => 'variation',
-                                'url'      => wp_get_attachment_url( $vid ),
-                                'alt_text' => $result['alt_text'] ?? '',
-                                'score'    => $result['quality_score'] ?? 0,
+                                'image_id'    => $vid,
+                                'role'        => 'variation',
+                                'url'         => wp_get_attachment_url( $vid ),
+                                'alt_text'    => $result['alt_text'] ?? '',
+                                'current_alt' => (string) get_post_meta( $vid, '_wp_attachment_image_alt', true ),
+                                'score'       => $result['quality_score'] ?? 0,
                             );
                         }
                     }

@@ -89,7 +89,7 @@ $prodimg_seo_chips = array(
 </div>
 
 <!-- Modal for Single Product Generation -->
-<div id="prodimg-seo-modal-overlay" class="prodimg-modal-overlay">
+<div id="prodimg-seo-modal-overlay" class="prodimg-modal-overlay prodimg-app">
     <div id="prodimg-seo-modal" class="prodimg-modal" role="dialog" aria-modal="true" aria-labelledby="prodimg-seo-modal-title">
         <button id="prodimg-seo-modal-close" class="prodimg-modal__close" aria-label="<?php esc_attr_e( 'Close', 'product-image-seo' ); ?>">&times;</button>
         <h2 id="prodimg-seo-modal-title"><?php esc_html_e( 'Review Alt Text Suggestions', 'product-image-seo' ); ?></h2>
@@ -97,6 +97,7 @@ $prodimg_seo_chips = array(
             <p><?php esc_html_e( 'Loading...', 'product-image-seo' ); ?></p>
         </div>
         <div class="prodimg-modal__footer">
+            <button class="button" id="prodimg-seo-modal-regenerate" style="display:none;"><?php esc_html_e( 'Regenerate', 'product-image-seo' ); ?></button>
             <button class="button button-primary" id="prodimg-seo-modal-save" style="display:none;"><?php esc_html_e( 'Save Approved Alt Text', 'product-image-seo' ); ?></button>
         </div>
     </div>
