@@ -59,40 +59,7 @@
 }
 
 /* =========================================================================
- * 2. Dark-mode override — CSS-only, no UI toggle in v2
- * ========================================================================= */
-/* Auto: follow the OS unless the user forced Light in Settings → Advanced. */
-@media (prefers-color-scheme: dark) {
-    body:not(.prodimg-theme-light) .prodimg-app {
-        --prodimg-bg-page:      #1C1C1E;
-        --prodimg-bg-surface:   #2C2C2E;
-        --prodimg-bg-elevated:  #3A3A3C;
-        --prodimg-bg-vibrancy:  rgba(28, 28, 30, 0.72);
-        --prodimg-border-hairline: rgba(255, 255, 255, 0.08);
-        --prodimg-border-strong:   rgba(255, 255, 255, 0.14);
-        --prodimg-text-primary:    #F5F5F7;
-        --prodimg-text-secondary:  #98989D;
-        --prodimg-text-tertiary:   #6C6C70;
-        --prodimg-shadow-card:     0 0 0 0.5px rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.5);
-    }
-}
-
-/* Forced Dark from Settings → Advanced, regardless of the OS preference. */
-body.prodimg-theme-dark .prodimg-app {
-    --prodimg-bg-page:      #1C1C1E;
-    --prodimg-bg-surface:   #2C2C2E;
-    --prodimg-bg-elevated:  #3A3A3C;
-    --prodimg-bg-vibrancy:  rgba(28, 28, 30, 0.72);
-    --prodimg-border-hairline: rgba(255, 255, 255, 0.08);
-    --prodimg-border-strong:   rgba(255, 255, 255, 0.14);
-    --prodimg-text-primary:    #F5F5F7;
-    --prodimg-text-secondary:  #98989D;
-    --prodimg-text-tertiary:   #6C6C70;
-    --prodimg-shadow-card:     0 0 0 0.5px rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.5);
-}
-
-/* =========================================================================
- * 3. Reduced-motion killswitch
+ * 2. Reduced-motion killswitch
  * ========================================================================= */
 @media (prefers-reduced-motion: reduce) {
     .prodimg-app * { transition: none !important; animation: none !important; }
@@ -1172,17 +1139,6 @@ body.prodimg-seo-skin .wrap > h1 {
 
 tr.prodimg-row-flash > td {
     animation: prodimg-row-flash 1.5s ease-out;
-}
-
-/* Softer shimmer on dark surfaces */
-@media (prefers-color-scheme: dark) {
-    body:not(.prodimg-theme-light) .prodimg-skeleton::after {
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.10), transparent);
-    }
-}
-
-body.prodimg-theme-dark .prodimg-skeleton::after {
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.10), transparent);
 }
 
 /* =========================================================================
