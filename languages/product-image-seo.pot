@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Product Image SEO — AI Alt Text & Image SEO Audit 1.0.0\n"
+"Project-Id-Version: Product Image SEO — AI Alt Text & Image SEO Audit 1.0.6\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/product-image-seo\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-10T20:19:05+00:00\n"
+"POT-Creation-Date: 2026-07-10T10:07:57+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: product-image-seo\n"
@@ -39,339 +39,932 @@ msgstr ""
 msgid "https://altaudit.com"
 msgstr ""
 
-#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:43
-msgid "Product Image SEO Dashboard"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:44
-msgid "Product Image SEO"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:52
-#: includes/Views/Admin/catalog.php:16
-msgid "Catalog Audit"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:53
-msgid "↳ Catalog"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:61
-#: includes/Views/Admin/bulk-fix.php:13
-msgid "Bulk Fix"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:62
-msgid "↳ Bulk Fix"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:70
-#: includes/Views/Admin/audit-report.php:15
-msgid "SEO Audit Report"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:71
-msgid "↳ Audit Report"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:79
-#: includes/Views/Admin/settings.php:24
-msgid "Product Image SEO Settings"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:80
-msgid "↳ Settings"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:136
-#: includes/Services/class-prodimg-seo-1972adm-csv-exporter.php:31
-msgid "Security check failed."
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:139
-#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:167
-#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:180
-#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:192
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:60
 #: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:270
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:306
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:321
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:334
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:449
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:572
 #: includes/Controllers/class-prodimg-seo-1972adm-bulk-controller.php:28
-#: includes/Controllers/class-prodimg-seo-1972adm-bulk-controller.php:66
+#: includes/Controllers/class-prodimg-seo-1972adm-bulk-controller.php:76
 #: includes/Services/class-prodimg-seo-1972adm-csv-exporter.php:27
 msgid "Permission denied."
 msgstr ""
 
-#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:158
-msgid "Settings saved."
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:79
+msgid "Invalid product ID."
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:91
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:92
+msgid "Product Image SEO"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:102
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:103
+#: includes/Views/Admin/audit-report.php:77
+#: includes/Views/Admin/bulk-fix.php:27
+#: includes/Views/Admin/catalog.php:48
+#: includes/Views/Admin/dashboard.php:43
+#: includes/Views/Admin/dashboard.php:56
+#: includes/Views/Admin/settings.php:37
+msgid "Dashboard"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:111
+#: includes/Views/Admin/catalog.php:35
+msgid "Product Image Audit"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:112
+#: includes/Views/Admin/audit-report.php:81
+#: includes/Views/Admin/bulk-fix.php:31
+#: includes/Views/Admin/catalog.php:52
+#: includes/Views/Admin/dashboard.php:60
+#: includes/Views/Admin/settings.php:41
+msgid "Product Images"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:120
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:121
+#: includes/Views/Admin/audit-report.php:85
+#: includes/Views/Admin/bulk-fix.php:20
+#: includes/Views/Admin/bulk-fix.php:35
+#: includes/Views/Admin/catalog.php:56
+#: includes/Views/Admin/dashboard.php:64
+#: includes/Views/Admin/dashboard.php:172
+#: includes/Views/Admin/settings.php:45
+msgid "Bulk Fix"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:129
+#: includes/Views/Admin/audit-report.php:66
+msgid "SEO Audit Report"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:130
+#: includes/Views/Admin/audit-report.php:89
+#: includes/Views/Admin/bulk-fix.php:39
+#: includes/Views/Admin/catalog.php:60
+#: includes/Views/Admin/dashboard.php:68
+#: includes/Views/Admin/settings.php:49
+msgid "Audit Report"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:138
+msgid "Product Image SEO Settings"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:139
+#: includes/Views/Admin/audit-report.php:93
+#: includes/Views/Admin/bulk-fix.php:43
+#: includes/Views/Admin/catalog.php:64
+#: includes/Views/Admin/dashboard.php:72
+#: includes/Views/Admin/settings.php:31
+#: includes/Views/Admin/settings.php:53
+msgid "Settings"
 msgstr ""
 
 #: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:174
-msgid "Connection successful."
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:119
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:267
+msgid "Generate"
 msgstr ""
 
-#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:198
-#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:277
-msgid "Invalid parameters."
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:175
+msgid "Generating…"
 msgstr ""
 
-#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:203
-msgid "Product not found."
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:176
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:120
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:270
+msgid "Recalc Score"
 msgstr ""
 
-#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:261
-msgid "No images found or API failed."
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:177
+msgid "Recalculating…"
 msgstr ""
 
-#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:293
-msgid "Saved successfully."
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:178
+msgid "Loading suggestions…"
 msgstr ""
 
-#: includes/Controllers/class-prodimg-seo-1972adm-bulk-controller.php:52
-msgid "No products to process."
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:179
+msgid "Saving…"
 msgstr ""
 
-#: includes/Controllers/class-prodimg-seo-1972adm-bulk-controller.php:60
-msgid "Bulk process started."
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:29
-msgid "Image"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:30
-msgid "Name"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:31
-#: includes/Views/Admin/settings.php:89
-msgid "SKU"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:32
-#: includes/Views/Admin/settings.php:93
-msgid "Price"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:33
-msgid "Coverage"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:34
-msgid "Status"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:35
-msgid "Actions"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:76
-msgid "Unknown"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:78
-#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:93
-msgid "Generate Alt Text"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:111
-msgid "All categories"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:123
-msgid "All statuses"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:131
-msgid "All stock statuses"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:132
-msgid "In stock"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:133
-msgid "Out of stock"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:134
-msgid "On backorder"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:137
-msgid "Filter"
-msgstr ""
-
-#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:158
-msgid "Bulk generation started. Please go to Bulk Fix to view progress."
-msgstr ""
-
-#: includes/Services/class-prodimg-seo-1972adm-api-client.php:33
-#: includes/Services/class-prodimg-seo-1972adm-api-client.php:78
-msgid "API key required."
-msgstr ""
-
-#: includes/Services/class-prodimg-seo-1972adm-api-client.php:69
-msgid "API request failed."
-msgstr ""
-
-#: includes/Services/class-prodimg-seo-1972adm-api-client.php:102
-msgid "API connection failed."
-msgstr ""
-
-#: includes/Services/class-prodimg-seo-1972adm-bulk-processor.php:28
-msgid "Action Scheduler is not available."
-msgstr ""
-
-#: includes/Services/class-prodimg-seo-1972adm-status-taxonomy.php:27
-#: includes/Services/class-prodimg-seo-1972adm-status-taxonomy.php:28
-msgid "Image SEO Status"
-msgstr ""
-
-#: includes/Services/class-prodimg-seo-1972adm-status-taxonomy.php:57
-msgid "Invalid status."
-msgstr ""
-
-#: includes/Views/Admin/audit-report.php:18
-msgid "Catalog Summary"
-msgstr ""
-
-#: includes/Views/Admin/audit-report.php:20
-msgid "Total Products:"
-msgstr ""
-
-#: includes/Views/Admin/audit-report.php:21
-msgid "Products Missing Alt Text:"
-msgstr ""
-
-#: includes/Views/Admin/audit-report.php:22
-msgid "Average Quality Score:"
-msgstr ""
-
-#: includes/Views/Admin/audit-report.php:23
-msgid "Products with Weak Alt Text:"
-msgstr ""
-
-#: includes/Views/Admin/audit-report.php:26
-msgid "Coverage Breakdown"
-msgstr ""
-
-#: includes/Views/Admin/audit-report.php:28
-msgid "Featured Images Covered:"
-msgstr ""
-
-#: includes/Views/Admin/audit-report.php:29
-msgid "Gallery Images Covered:"
-msgstr ""
-
-#: includes/Views/Admin/audit-report.php:30
-msgid "Variation Images Covered:"
-msgstr ""
-
-#: includes/Views/Admin/audit-report.php:35
-msgid "Download CSV Report"
-msgstr ""
-
-#: includes/Views/Admin/bulk-fix.php:14
-msgid "Generate alt text for all products needing review."
-msgstr ""
-
-#: includes/Views/Admin/bulk-fix.php:17
-msgid "Start Bulk Fix"
-msgstr ""
-
-#: includes/Views/Admin/catalog.php:27
-msgid "Review Alt Text Suggestions"
-msgstr ""
-
-#: includes/Views/Admin/catalog.php:29
-msgid "Loading..."
-msgstr ""
-
-#: includes/Views/Admin/catalog.php:32
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:180
+#: includes/Views/Admin/catalog.php:101
 msgid "Save Approved Alt Text"
 msgstr ""
 
-#: includes/Views/Admin/dashboard.php:13
-msgid "Welcome to your store's image SEO audit"
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:181
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:499
+msgid "Saved successfully."
 msgstr ""
 
-#: includes/Views/Admin/dashboard.php:14
-msgid "Scan your catalog and view overall stats here."
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:182
+msgid "Error saving:"
 msgstr ""
 
-#: includes/Views/Admin/dashboard.php:17
-msgid "Start Catalog Scan"
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:183
+msgid "Error:"
 msgstr ""
 
-#: includes/Views/Admin/settings.php:30
-msgid "API Key"
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:184
+msgid "Score updated."
 msgstr ""
 
-#: includes/Views/Admin/settings.php:33
-msgid "Test Connection"
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:185
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:192
+msgid "(no alt text)"
 msgstr ""
 
-#: includes/Views/Admin/settings.php:36
-msgid "Get your free API key at altaudit.com."
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:186
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:44
+msgid "Image"
 msgstr ""
 
-#: includes/Views/Admin/settings.php:41
-msgid "Auto-generate on save"
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:187
+msgid "Role / Score"
 msgstr ""
 
-#: includes/Views/Admin/settings.php:45
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:188
+#: includes/Views/Admin/audit-report.php:110
+#: includes/Views/Admin/dashboard.php:113
+msgid "Score"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:189
+msgid "Suggested alt text"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:190
+msgid "Current alt text"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:191
+msgid "(none)"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:192
+msgid "AI score"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:193
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:206
+msgid "Generating alt text with AI…"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:194
+msgid "This usually takes a few seconds."
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:195
+msgid "Generation failed."
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:196
+msgid "Try Again"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:197
+#: includes/Views/Admin/catalog.php:100
+msgid "Regenerate"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:198
+msgid "Regenerating…"
+msgstr ""
+
+#. translators: 1: current item number, 2: total items
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:200
+#, php-format
+msgid "Processing %1$s of %2$s…"
+msgstr ""
+
+#. translators: 1: saved count, 2: failed count
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:202
+#, php-format
+msgid "Bulk generate finished: %1$s saved, %2$s failed."
+msgstr ""
+
+#. translators: 1: recalculated count, 2: failed count
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:204
+#, php-format
+msgid "Recalculated %1$s scores, %2$s failed."
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:205
+msgid "Select at least one image first."
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:207
+msgid "Recalculating scores…"
+msgstr ""
+
+#. translators: 1: processed count, 2: total, 3: succeeded, 4: failed
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:209
+#, php-format
+msgid "%1$s of %2$s processed · %3$s ok · %4$s failed"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:210
+msgid "Cancel"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:211
+#: includes/Views/Admin/catalog.php:94
+msgid "Close"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:212
+msgid "Bulk run cancelled."
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:213
+msgid "Bulk fix finished."
+msgstr ""
+
+#. translators: %s number of alt texts generated
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:215
+#, php-format
+msgid "Generated alt text for %s images."
+msgstr ""
+
+#. translators: %s number of images skipped
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:217
+#, php-format
+msgid "Skipped %s images that already had alt text."
+msgstr ""
+
+#. translators: %s number of images that failed
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:219
+#, php-format
+msgid "%s images could not be generated."
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:220
+msgid "No images needed alt text."
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:221
+#: includes/Views/Admin/bulk-fix.php:104
+msgid "Queued — waiting for the background processor…"
+msgstr ""
+
+#. translators: 1: images done, 2: total images
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:223
+#, php-format
+msgid "Generating alt text… %1$s of %2$s images"
+msgstr ""
+
+#. translators: 1: generated, 2: skipped, 3: failed
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:225
+#, php-format
+msgid "%1$s generated · %2$s skipped · %3$s failed"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:226
+msgid "Completed!"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:227
+msgid "Starting…"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:228
+#: includes/Views/Admin/bulk-fix.php:95
+msgid "Start Bulk Fix"
+msgstr ""
+
+#. translators: %s number of images that will be regenerated
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:230
+#, php-format
+msgid "Overwrite is enabled: this will regenerate alt text for %s images and use one API credit per image. Continue?"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:232
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:209
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:215
+#: includes/Views/Admin/audit-report.php:36
+msgid "Missing"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:233
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:216
+#: includes/Views/Admin/audit-report.php:37
+#: includes/Views/Admin/catalog.php:25
+msgid "Weak"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:234
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:217
+#: includes/Views/Admin/audit-report.php:38
+#: includes/Views/Admin/catalog.php:26
+msgid "Good"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:235
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:218
+#: includes/Views/Admin/audit-report.php:39
+#: includes/Views/Admin/catalog.php:27
+msgid "Excellent"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:236
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:219
+#: includes/Views/Admin/audit-report.php:40
+msgid "Decorative"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:239
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:168
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:316
+msgid "Featured"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:240
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:169
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:317
+msgid "Gallery"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:241
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:170
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:318
+msgid "Variation"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:267
+#: includes/Services/class-prodimg-seo-1972adm-csv-exporter.php:31
+msgid "Security check failed."
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:297
+msgid "Settings saved."
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:315
+msgid "Connection successful."
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:371
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:462
+msgid "Invalid parameters."
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:377
+#: includes/Services/class-prodimg-seo-1972adm-score-calculator.php:247
+msgid "Product not found."
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-admin-controller.php:439
+msgid "No images found or API failed."
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-bulk-controller.php:44
+msgid "A bulk run is already in progress. Please wait for it to finish."
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-bulk-controller.php:60
+msgid "No product images need alt text."
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-bulk-controller.php:70
+msgid "Bulk process started."
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:45
+msgid "File Name"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:46
+msgid "Product"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:47
+msgid "Role"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:48
+msgid "Alt Text"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:49
+msgid "Status"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:50
+msgid "Quality Score"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:51
+msgid "Actions"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:73
+msgid "Generate Alt Text"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:74
+msgid "Recalculate Scores"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:118
+msgid "Edit"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:121
+msgid "View"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:136
+msgid "—"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:306
+msgid "All statuses"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:315
+msgid "All roles"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:321
+msgid "Search images…"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:323
+msgid "Filter"
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:350
+msgid "Scores recalculated."
+msgstr ""
+
+#: includes/Controllers/class-prodimg-seo-1972adm-catalog-list-table.php:359
+msgid "Bulk generation is handled via the Bulk Fix page."
+msgstr ""
+
+#: includes/Services/class-prodimg-seo-1972adm-api-client.php:68
+#: includes/Services/class-prodimg-seo-1972adm-api-client.php:195
+msgid "API key required."
+msgstr ""
+
+#: includes/Services/class-prodimg-seo-1972adm-api-client.php:121
+#: includes/Services/class-prodimg-seo-1972adm-api-client.php:308
+msgid "API request failed."
+msgstr ""
+
+#: includes/Services/class-prodimg-seo-1972adm-api-client.php:279
+msgid "Rate limit exceeded. Please wait a few minutes and try again."
+msgstr ""
+
+#: includes/Services/class-prodimg-seo-1972adm-api-client.php:280
+msgid "The Product Image SEO service is temporarily unavailable. Please try again later."
+msgstr ""
+
+#: includes/Services/class-prodimg-seo-1972adm-api-client.php:297
+msgid "Authentication failed. Please check your API key in plugin settings."
+msgstr ""
+
+#: includes/Services/class-prodimg-seo-1972adm-api-client.php:300
+msgid "API endpoint not found. Please update the plugin or check your API URL settings."
+msgstr ""
+
+#: includes/Services/class-prodimg-seo-1972adm-api-client.php:303
+msgid "Invalid request data."
+msgstr ""
+
+#: includes/Services/class-prodimg-seo-1972adm-api-client.php:306
+msgid "Server error. The service may be experiencing issues. Please try again later."
+msgstr ""
+
+#: includes/Services/class-prodimg-seo-1972adm-api-client.php:321
+msgid "Invalid API response."
+msgstr ""
+
+#: includes/Services/class-prodimg-seo-1972adm-api-client.php:412
+msgid "Image file not found."
+msgstr ""
+
+#: includes/Services/class-prodimg-seo-1972adm-api-client.php:430
+#: includes/Services/class-prodimg-seo-1972adm-api-client.php:439
+msgid "Failed to read image file."
+msgstr ""
+
+#: includes/Services/class-prodimg-seo-1972adm-bulk-processor.php:83
+msgid "Action Scheduler is not available."
+msgstr ""
+
+#: includes/Services/class-prodimg-seo-1972adm-score-calculator.php:110
+msgid "Image is marked as decorative."
+msgstr ""
+
+#: includes/Services/class-prodimg-seo-1972adm-score-calculator.php:121
+#: includes/Services/class-prodimg-seo-1972adm-score-calculator.php:653
+msgid "Alt text is missing. Add descriptive alt text to improve SEO and accessibility."
+msgstr ""
+
+#: includes/Services/class-prodimg-seo-1972adm-score-calculator.php:258
+msgid "This product has no images to score."
+msgstr ""
+
+#. translators: %d: average image score
+#: includes/Services/class-prodimg-seo-1972adm-score-calculator.php:303
+#, php-format
+msgid "At least one product image is missing alt text. Average image score: %d/100."
+msgstr ""
+
+#. translators: %d: average image score
+#: includes/Services/class-prodimg-seo-1972adm-score-calculator.php:307
+#, php-format
+msgid "One or more product images are marked decorative. Average image score: %d/100."
+msgstr ""
+
+#. translators: %d: average image score
+#: includes/Services/class-prodimg-seo-1972adm-score-calculator.php:311
+#, php-format
+msgid "At least one product image has weak alt text that needs improvement. Average image score: %d/100."
+msgstr ""
+
+#. translators: %d: average image score
+#: includes/Services/class-prodimg-seo-1972adm-score-calculator.php:315
+#, php-format
+msgid "Product images have good alt text. Average image score: %d/100."
+msgstr ""
+
+#. translators: %d: average image score
+#: includes/Services/class-prodimg-seo-1972adm-score-calculator.php:319
+#, php-format
+msgid "All product images have excellent alt text. Average image score: %d/100."
+msgstr ""
+
+#. translators: %d: average image score
+#: includes/Services/class-prodimg-seo-1972adm-score-calculator.php:323
+#, php-format
+msgid "Average image score: %d/100."
+msgstr ""
+
+#: includes/Services/class-prodimg-seo-1972adm-score-calculator.php:656
+msgid "Image is marked as decorative (empty alt text is intentional)."
+msgstr ""
+
+#: includes/Services/class-prodimg-seo-1972adm-score-calculator.php:661
+msgid "too short"
+msgstr ""
+
+#: includes/Services/class-prodimg-seo-1972adm-score-calculator.php:663
+msgid "too long"
+msgstr ""
+
+#: includes/Services/class-prodimg-seo-1972adm-score-calculator.php:666
+msgid "too few words"
+msgstr ""
+
+#: includes/Services/class-prodimg-seo-1972adm-score-calculator.php:669
+msgid "no descriptive words"
+msgstr ""
+
+#. translators: 1: issue list, 2: score value
+#: includes/Services/class-prodimg-seo-1972adm-score-calculator.php:673
+#, php-format
+msgid "Alt text needs improvement%1$s. Score: %2$d/100."
+msgstr ""
+
+#. translators: %d score value
+#: includes/Services/class-prodimg-seo-1972adm-score-calculator.php:677
+#, php-format
+msgid "Alt text is good. Score: %d/100. Consider adding more descriptive words for an excellent rating."
+msgstr ""
+
+#. translators: %d score value
+#: includes/Services/class-prodimg-seo-1972adm-score-calculator.php:681
+#, php-format
+msgid "Excellent alt text. Score: %d/100."
+msgstr ""
+
+#. translators: %d score value
+#: includes/Services/class-prodimg-seo-1972adm-score-calculator.php:685
+#, php-format
+msgid "Score: %d/100."
+msgstr ""
+
+#: includes/Services/class-prodimg-seo-1972adm-status-taxonomy.php:64
+#: includes/Services/class-prodimg-seo-1972adm-status-taxonomy.php:65
+msgid "Image SEO Status"
+msgstr ""
+
+#: includes/Services/class-prodimg-seo-1972adm-status-taxonomy.php:106
+msgid "Invalid status."
+msgstr ""
+
+#: includes/Services/class-prodimg-seo-1972adm-status-taxonomy.php:122
+msgid "Invalid image status."
+msgstr ""
+
+#: includes/Views/Admin/audit-report.php:70
+msgid "Download CSV Report"
+msgstr ""
+
+#: includes/Views/Admin/audit-report.php:74
+#: includes/Views/Admin/bulk-fix.php:24
+#: includes/Views/Admin/catalog.php:45
+#: includes/Views/Admin/dashboard.php:53
+#: includes/Views/Admin/settings.php:34
+msgid "Plugin sections"
+msgstr ""
+
+#: includes/Views/Admin/audit-report.php:101
+#: includes/Views/Admin/dashboard.php:104
+msgid "Average score"
+msgstr ""
+
+#. translators: %d score value
+#: includes/Views/Admin/audit-report.php:106
+#: includes/Views/Admin/dashboard.php:109
+#, php-format
+msgid "Score %d"
+msgstr ""
+
+#: includes/Views/Admin/audit-report.php:115
+msgid "Total products"
+msgstr ""
+
+#. translators: %d number of product images
+#: includes/Views/Admin/audit-report.php:121
+#, php-format
+msgid "%d product image in catalog"
+msgid_plural "%d product images in catalog"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Views/Admin/audit-report.php:127
+#: includes/Views/Admin/dashboard.php:126
+msgid "Missing alt text"
+msgstr ""
+
+#: includes/Views/Admin/audit-report.php:129
+#: includes/Views/Admin/dashboard.php:128
+msgid "Images needing alt text"
+msgstr ""
+
+#: includes/Views/Admin/audit-report.php:133
+#: includes/Views/Admin/dashboard.php:136
+msgid "Weak alt text"
+msgstr ""
+
+#: includes/Views/Admin/audit-report.php:135
+#: includes/Views/Admin/dashboard.php:138
+msgid "Images that could be improved"
+msgstr ""
+
+#: includes/Views/Admin/audit-report.php:141
+msgid "Coverage breakdown"
+msgstr ""
+
+#: includes/Views/Admin/audit-report.php:144
+msgid "Featured images covered"
+msgstr ""
+
+#: includes/Views/Admin/audit-report.php:148
+msgid "Gallery images covered"
+msgstr ""
+
+#: includes/Views/Admin/audit-report.php:152
+msgid "Variation images covered"
+msgstr ""
+
+#: includes/Views/Admin/audit-report.php:159
+msgid "Score distribution"
+msgstr ""
+
+#: includes/Views/Admin/audit-report.php:160
+msgid "Score distribution bar"
+msgstr ""
+
+#. translators: %d number of product images that have a score
+#: includes/Views/Admin/audit-report.php:173
+#, php-format
+msgid "Distribution across %d scored product image."
+msgid_plural "Distribution across %d scored product images."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Views/Admin/bulk-fix.php:21
+msgid "Generate alt text for every product image needing review"
+msgstr ""
+
+#: includes/Views/Admin/bulk-fix.php:62
+msgid "Product images missing alt text — the next run will generate these."
+msgstr ""
+
+#: includes/Views/Admin/bulk-fix.php:64
+msgid "Product images the next run will regenerate — overwrite is enabled, existing alt text will be replaced."
+msgstr ""
+
+#. translators: 1: opening link tag to settings, 2: closing link tag
+#: includes/Views/Admin/bulk-fix.php:74
+#, php-format
+msgid "Overwrite mode is ON. To only fill in missing alt text, enable \"Skip images with existing alt text\" in %1$sSettings → Auto-fix%2$s."
+msgstr ""
+
+#: includes/Views/Admin/bulk-fix.php:83
+msgid "Bulk Fix generates AI alt text for every product image needing review. It runs in the background, so you can leave this page while it works. Images that already have alt text are skipped unless overwriting is enabled in Settings. Each generated image uses one API credit."
+msgstr ""
+
+#: includes/Views/Admin/bulk-fix.php:93
+msgid "Nothing to fix — all images have alt text"
+msgstr ""
+
+#: includes/Views/Admin/bulk-fix.php:114
+msgid "Run summary"
+msgstr ""
+
+#: includes/Views/Admin/catalog.php:23
+msgid "All"
+msgstr ""
+
+#: includes/Views/Admin/catalog.php:24
+msgid "Missing alt"
+msgstr ""
+
+#: includes/Views/Admin/catalog.php:39
+msgid "Scan Images"
+msgstr ""
+
+#: includes/Views/Admin/catalog.php:69
+msgid "Filter products by status"
+msgstr ""
+
+#: includes/Views/Admin/catalog.php:95
+msgid "Review Alt Text Suggestions"
+msgstr ""
+
+#: includes/Views/Admin/catalog.php:97
+msgid "Loading..."
+msgstr ""
+
+#: includes/Views/Admin/dashboard.php:44
+msgid "Image SEO at a glance"
+msgstr ""
+
+#: includes/Views/Admin/dashboard.php:48
+msgid "Run Audit"
+msgstr ""
+
+#: includes/Views/Admin/dashboard.php:86
+msgid "Welcome to Product Image SEO"
+msgstr ""
+
+#: includes/Views/Admin/dashboard.php:89
+msgid "Once you have products in your catalog, run a scan to audit image alt text and surface SEO opportunities."
+msgstr ""
+
+#: includes/Views/Admin/dashboard.php:93
+msgid "Visit Settings"
+msgstr ""
+
+#. translators: %d total product images scored
+#: includes/Views/Admin/dashboard.php:119
+#, php-format
+msgid "Across %d product image."
+msgid_plural "Across %d product images."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/Views/Admin/dashboard.php:130
+msgid "Fix in bulk →"
+msgstr ""
+
+#: includes/Views/Admin/dashboard.php:140
+msgid "Review →"
+msgstr ""
+
+#: includes/Views/Admin/dashboard.php:146
+msgid "Coverage"
+msgstr ""
+
+#: includes/Views/Admin/dashboard.php:149
+msgid "Featured images"
+msgstr ""
+
+#: includes/Views/Admin/dashboard.php:153
+msgid "Gallery images"
+msgstr ""
+
+#: includes/Views/Admin/dashboard.php:157
+msgid "Variation images"
+msgstr ""
+
+#: includes/Views/Admin/dashboard.php:168
+msgid "View Product Images"
+msgstr ""
+
+#: includes/Views/Admin/dashboard.php:176
+msgid "Export CSV"
+msgstr ""
+
 #: includes/Views/Admin/settings.php:58
-#: includes/Views/Admin/settings.php:108
-msgid "Yes"
+msgid "Settings sections"
 msgstr ""
 
-#: includes/Views/Admin/settings.php:49
+#: includes/Views/Admin/settings.php:59
+msgid "API"
+msgstr ""
+
+#: includes/Views/Admin/settings.php:60
+msgid "Generation"
+msgstr ""
+
+#: includes/Views/Admin/settings.php:61
+msgid "Auto-fix"
+msgstr ""
+
 #: includes/Views/Admin/settings.php:62
-msgid "No"
-msgstr ""
-
-#: includes/Views/Admin/settings.php:54
-msgid "Skip images with existing alt text"
-msgstr ""
-
-#: includes/Views/Admin/settings.php:67
-msgid "Alt Text Style"
-msgstr ""
-
-#: includes/Views/Admin/settings.php:70
-msgid "SEO Focused"
+msgid "Advanced"
 msgstr ""
 
 #: includes/Views/Admin/settings.php:71
-msgid "Accessibility Focused"
+msgid "API Key"
 msgstr ""
 
-#: includes/Views/Admin/settings.php:72
-msgid "Balanced"
+#: includes/Views/Admin/settings.php:74
+msgid "Test Connection"
 msgstr ""
 
 #: includes/Views/Admin/settings.php:77
+msgid "Get your free API key at altaudit.com."
+msgstr ""
+
+#: includes/Views/Admin/settings.php:87
+msgid "Alt Text Style"
+msgstr ""
+
+#: includes/Views/Admin/settings.php:90
+msgid "SEO Focused"
+msgstr ""
+
+#: includes/Views/Admin/settings.php:91
+msgid "Accessibility Focused"
+msgstr ""
+
+#: includes/Views/Admin/settings.php:92
+msgid "Balanced"
+msgstr ""
+
+#: includes/Views/Admin/settings.php:97
 msgid "Include in Alt Text Context"
 msgstr ""
 
-#: includes/Views/Admin/settings.php:81
+#: includes/Views/Admin/settings.php:101
 msgid "Product Name"
 msgstr ""
 
-#: includes/Views/Admin/settings.php:85
+#: includes/Views/Admin/settings.php:105
 msgid "Category"
 msgstr ""
 
-#: includes/Views/Admin/settings.php:98
-msgid "Max Length"
-msgstr ""
-
-#: includes/Views/Admin/settings.php:104
-msgid "Delete data on uninstall"
+#: includes/Views/Admin/settings.php:109
+msgid "SKU"
 msgstr ""
 
 #: includes/Views/Admin/settings.php:113
+msgid "Price"
+msgstr ""
+
+#: includes/Views/Admin/settings.php:118
+msgid "Max Length"
+msgstr ""
+
+#: includes/Views/Admin/settings.php:129
+#: includes/Views/Admin/settings.php:140
+msgid "Auto-generate on save"
+msgstr ""
+
+#: includes/Views/Admin/settings.php:145
+#: includes/Views/Admin/settings.php:156
+msgid "Skip images with existing alt text"
+msgstr ""
+
+#: includes/Views/Admin/settings.php:166
+msgid "Delete data on uninstall"
+msgstr ""
+
+#: includes/Views/Admin/settings.php:170
+msgid "Yes"
+msgstr ""
+
+#: includes/Views/Admin/settings.php:172
+msgid "Permanently remove all plugin postmeta and options when the plugin is deleted."
+msgstr ""
+
+#: includes/Views/Admin/settings.php:178
 msgid "Save Settings"
 msgstr ""
 
-#: product-image-seo.php:53
+#: product-image-seo.php:63
 msgid "Product Image SEO requires WooCommerce to be installed and active."
 msgstr ""

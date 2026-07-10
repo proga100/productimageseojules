@@ -35,7 +35,7 @@ class Prodimg_Seo_1972adm_Bulk_Controller {
             $in_flight = as_get_scheduled_actions(
                 array(
                     'hook'     => 'prodimg_seo_1972adm_process_product_batch',
-                    'status'   => array( ActionScheduler_Store::STATUS_PENDING, ActionScheduler_Store::STATUS_RUNNING ),
+                    'status'   => array( 'pending', 'in-progress' ),
                     'per_page' => 1,
                 ),
                 'ids'
@@ -91,7 +91,7 @@ class Prodimg_Seo_1972adm_Bulk_Controller {
             $remaining = as_get_scheduled_actions(
                 array(
                     'hook'     => 'prodimg_seo_1972adm_process_product_batch',
-                    'status'   => array( ActionScheduler_Store::STATUS_PENDING, ActionScheduler_Store::STATUS_RUNNING ),
+                    'status'   => array( 'pending', 'in-progress' ),
                     'per_page' => 1,
                 ),
                 'ids'

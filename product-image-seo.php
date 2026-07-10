@@ -37,7 +37,6 @@ if ( ! defined( 'PRODIMG_SEO_1972ADM_API_TIMEOUT' ) ) {
     define( 'PRODIMG_SEO_1972ADM_API_TIMEOUT', 40 );
 }
 define( 'PRODIMG_SEO_1972ADM_INCLUDES_DIR', PRODIMG_SEO_1972ADM_PLUGIN_DIR . 'includes/' );
-define( 'PRODIMG_SEO_1972ADM_ASSETS_URL', PRODIMG_SEO_1972ADM_PLUGIN_URL . 'assets/' );
 
 // Bootstrap.
 require_once PRODIMG_SEO_1972ADM_INCLUDES_DIR . 'class-prodimg-seo-1972adm-plugin.php';

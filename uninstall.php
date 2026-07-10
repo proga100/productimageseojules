@@ -51,4 +51,3 @@ if ( $prodimg_seo_delete_data ) {
 }
 
 // Clear scheduled events.
-wp_clear_scheduled_hook( 'prodimg_seo_1972adm_daily_scan' );

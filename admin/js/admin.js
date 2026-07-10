@@ -23,7 +23,7 @@ jQuery(document).ready(function($) {
         var $result = $('#prodimg-seo-test-result');
 
         $spinner.addClass('is-active');
-        $result.text('').removeClass('is-success is-error');
+        $result.text('').removeClass('prodimg-is-success prodimg-is-error');
 
         $.post(prodimg_seo_1972adm_admin.ajax_url, {
             action: 'prodimg_seo_1972adm_test_connection',
@@ -31,10 +31,10 @@ jQuery(document).ready(function($) {
         }, function(response) {
             $spinner.removeClass('is-active');
             if (response.success) {
-                $result.text(response.data).removeClass('is-success is-error').addClass('is-success');
+                $result.text(response.data).removeClass('prodimg-is-success prodimg-is-error').addClass('prodimg-is-success');
                 prodimgToast(response.data, 'success');
             } else {
-                $result.text(response.data).removeClass('is-success is-error').addClass('is-error');
+                $result.text(response.data).removeClass('prodimg-is-success prodimg-is-error').addClass('prodimg-is-error');
                 prodimgToast(response.data, 'error');
             }
         });
@@ -48,7 +48,7 @@ jQuery(document).ready(function($) {
 
         $btn.prop('disabled', true);
         $spinner.addClass('is-active');
-        $result.text('Scanning catalog...').removeClass('is-success is-error');
+        $result.text('Scanning catalog...').removeClass('prodimg-is-success prodimg-is-error');
 
         var totalScanned = 0;
 
@@ -65,7 +65,7 @@ jQuery(document).ready(function($) {
                         $btn.prop('disabled', false);
                         $spinner.removeClass('is-active');
                         var doneMsg = 'Scan complete! Scanned ' + totalScanned + ' products.';
-                        $result.text(doneMsg).removeClass('is-success is-error').addClass('is-success');
+                        $result.text(doneMsg).removeClass('prodimg-is-success prodimg-is-error').addClass('prodimg-is-success');
                         prodimgToast(doneMsg, 'success');
                         // Refresh so cards/charts reflect the new scan data.
                         setTimeout(function() { location.reload(); }, 1200);
@@ -77,14 +77,14 @@ jQuery(document).ready(function($) {
                 } else {
                     $btn.prop('disabled', false);
                     $spinner.removeClass('is-active');
-                    $result.text('Error: ' + response.data).removeClass('is-success is-error').addClass('is-error');
+                    $result.text('Error: ' + response.data).removeClass('prodimg-is-success prodimg-is-error').addClass('prodimg-is-error');
                     prodimgToast('Error: ' + response.data, 'error');
                 }
             }).fail(function() {
                 $btn.prop('disabled', false);
                 $spinner.removeClass('is-active');
                 var errMsg = 'An error occurred during the scan. Please try again.';
-                $result.text(errMsg).removeClass('is-success is-error').addClass('is-error');
+                $result.text(errMsg).removeClass('prodimg-is-success prodimg-is-error').addClass('prodimg-is-error');
                 prodimgToast(errMsg, 'error');
             });
         }

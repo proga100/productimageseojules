@@ -25,8 +25,8 @@ And it exports a full image SEO audit report for your entire store.
 
 = Why product image SEO matters =
 
-Google Image Search drives over 20% of all Google traffic. For online
-stores, it is a massive source of buyer-intent traffic. But Google cannot
+Google Image Search is a major source of buyer-intent traffic for online
+stores. But Google cannot
 "see" your images — it reads alt text to understand what each image shows.
 Poorly written or missing alt text means your products are invisible to
 image search, invisible to Google Shopping, and increasingly invisible to
@@ -206,17 +206,18 @@ plugin's core functionality.
 
 == Changelog ==
 
-= 1.0.0 =
-* Initial release.
-* Product catalog dashboard with alt text status per product.
-* Single-product and bulk AI alt text generation.
+= 1.0.6 =
+* Initial public release.
+* Product image catalog with per-image alt text status and quality scores.
+* Single-image and bulk AI alt text generation with live progress.
+* Image-level dashboard: honest average score across all product images.
 * WooCommerce context awareness (title, category, attributes, SKU, tags, price).
-* Auto-generation on product save (optional).
-* CSV export of full image SEO audit.
-* Settings page with style and length controls.
+* Auto-generation on product save (optional, off by default).
+* CSV export of the full image SEO audit.
+* Settings page with generation style, length, and skip/overwrite controls.
 * Variation and gallery image support.
 
 == Upgrade Notice ==
 
-= 1.0.0 =
-Initial release. Install and scan your product catalog to boost image SEO.
+= 1.0.6 =
+Initial public release. Install and scan your product catalog to boost image SEO.
