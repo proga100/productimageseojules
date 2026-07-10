@@ -16,6 +16,8 @@ delete_option( 'prodimg_seo_1972adm_version' );
 
 // Delete transients.
 delete_transient( 'prodimg_seo_1972adm_scan_cache' );
+delete_transient( 'prodimg_seo_1972adm_stats_cache' );
+delete_transient( 'prodimg_seo_1972adm_bulk_progress' );
 
 // Delete postmeta only if user opted in.
 $prodimg_seo_delete_data = get_option( 'prodimg_seo_1972adm_delete_data_on_uninstall', false );

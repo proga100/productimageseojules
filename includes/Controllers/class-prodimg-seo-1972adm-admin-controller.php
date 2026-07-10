@@ -68,6 +68,7 @@ class Prodimg_Seo_1972adm_Admin_Controller {
             update_post_meta( $attachment_id, '_prodimg_seo_1972adm_quality_score', $result['score'] );
             update_post_meta( $attachment_id, '_prodimg_seo_1972adm_score_breakdown', wp_json_encode( $result ) );
             Prodimg_Seo_1972adm_Status_Taxonomy::set_status_for_attachment( $attachment_id, $result['band'] );
+            Prodimg_Seo_1972adm_Statistics::flush_cache();
             wp_send_json_success( $result );
             return;
         }
@@ -81,6 +82,7 @@ class Prodimg_Seo_1972adm_Admin_Controller {
         $result = $this->calculator->calculate_for_product( $product_id );
         update_post_meta( $product_id, '_prodimg_seo_1972adm_score_local', $result['score'] );
         update_post_meta( $product_id, '_prodimg_seo_1972adm_score_breakdown', wp_json_encode( $result ) );
+        Prodimg_Seo_1972adm_Statistics::flush_cache();
         wp_send_json_success( $result );
     }
 
@@ -466,6 +468,7 @@ class Prodimg_Seo_1972adm_Admin_Controller {
             }
         }
 
+        Prodimg_Seo_1972adm_Statistics::flush_cache();
         wp_send_json_success( array(
             'message' => __( 'Saved successfully.', 'product-image-seo' ),
             'saved'   => $saved,
@@ -568,6 +571,7 @@ class Prodimg_Seo_1972adm_Admin_Controller {
             $processed++;
         }
 
+        Prodimg_Seo_1972adm_Statistics::flush_cache();
         wp_send_json_success( array(
             'done'        => $page >= $total_pages,
             'processed'   => $processed,

@@ -51,5 +51,6 @@ class Prodimg_Seo_1972adm_Auto_Generator {
         $prodimg_seo_score = $this->calculator->calculate_for_product( $product_id );
         update_post_meta( $product_id, '_prodimg_seo_1972adm_score_local', $prodimg_seo_score['score'] );
         update_post_meta( $product_id, '_prodimg_seo_1972adm_score_breakdown', wp_json_encode( $prodimg_seo_score ) );
+        Prodimg_Seo_1972adm_Statistics::flush_cache();
     }
 }

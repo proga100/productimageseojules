@@ -112,8 +112,9 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
                 </svg>
                 <p class="prodimg-card__footnote">
                     <?php
-                    /* translators: %d total products */
-                    printf( esc_html__( 'Across %d products.', 'product-image-seo' ), intval( $prodimg_seo_total ) );
+                    $prodimg_seo_total_images = isset( $prodimg_seo_stats['total_images'] ) ? intval( $prodimg_seo_stats['total_images'] ) : 0;
+                    /* translators: %d total product images scored */
+                    printf( esc_html( _n( 'Across %d product image.', 'Across %d product images.', $prodimg_seo_total_images, 'product-image-seo' ) ), $prodimg_seo_total_images );
                     ?>
                 </p>
             </div>
@@ -122,7 +123,7 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
             <div class="prodimg-card">
                 <h2 class="prodimg-card__title"><?php esc_html_e( 'Missing alt text', 'product-image-seo' ); ?></h2>
                 <p class="prodimg-card__value"><?php echo esc_html( $prodimg_seo_missing ); ?></p>
-                <p class="prodimg-card__footnote"><?php esc_html_e( 'Products needing review', 'product-image-seo' ); ?></p>
+                <p class="prodimg-card__footnote"><?php esc_html_e( 'Images needing alt text', 'product-image-seo' ); ?></p>
                 <a class="prodimg-card__cta" href="<?php echo esc_url( admin_url( 'admin.php?page=prodimg-seo-bulk' ) ); ?>">
                     <?php esc_html_e( 'Fix in bulk →', 'product-image-seo' ); ?>
                 </a>

@@ -166,19 +166,14 @@ class Prodimg_Seo_1972adm_Score_Calculator {
      * @param int $product_id WooCommerce product post ID.
      * @return array { score, band, signals, explanation }
      */
-    public function calculate_for_product( $product_id ) {
-        $product_id = absint( $product_id );
-        $product    = $product_id ? wc_get_product( $product_id ) : null;
-
-        if ( ! $product ) {
-            return array(
-                'score'       => 0,
-                'band'        => 'missing',
-                'signals'     => array(),
-                'explanation' => __( 'Product not found.', 'product-image-seo' ),
-            );
-        }
-
+    /**
+     * Collect every image attachment ID that belongs to a product:
+     * featured, gallery, and (for variable products) variation images.
+     *
+     * @param WC_Product $product WooCommerce product object.
+     * @return int[] Attachment IDs (may contain duplicates across products; caller dedupes if needed).
+     */
+    public function get_product_image_ids( $product ) {
         $image_ids = array();
 
         $featured_id = $product->get_image_id();
@@ -201,6 +196,24 @@ class Prodimg_Seo_1972adm_Score_Calculator {
                 }
             }
         }
+
+        return $image_ids;
+    }
+
+    public function calculate_for_product( $product_id ) {
+        $product_id = absint( $product_id );
+        $product    = $product_id ? wc_get_product( $product_id ) : null;
+
+        if ( ! $product ) {
+            return array(
+                'score'       => 0,
+                'band'        => 'missing',
+                'signals'     => array(),
+                'explanation' => __( 'Product not found.', 'product-image-seo' ),
+            );
+        }
+
+        $image_ids = $this->get_product_image_ids( $product );
 
         if ( empty( $image_ids ) ) {
             return array(

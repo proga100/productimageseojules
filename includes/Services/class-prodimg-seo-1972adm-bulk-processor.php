@@ -117,6 +117,9 @@ class Prodimg_Seo_1972adm_Bulk_Processor {
     }
 
     private function update_progress() {
+        // A batch just wrote new alt text / scores — refresh the dashboard stats.
+        Prodimg_Seo_1972adm_Statistics::flush_cache();
+
         $progress = get_transient( 'prodimg_seo_1972adm_bulk_progress' );
         if ( is_array( $progress ) ) {
             $progress['completed_batches']++;

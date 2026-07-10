@@ -118,7 +118,7 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
         <div class="prodimg-card">
             <h2 class="prodimg-card__title"><?php esc_html_e( 'Missing alt text', 'product-image-seo' ); ?></h2>
             <p class="prodimg-card__value"><?php echo esc_html( $prodimg_seo_missing ); ?></p>
-            <p class="prodimg-card__footnote"><?php esc_html_e( 'Products needing review', 'product-image-seo' ); ?></p>
+            <p class="prodimg-card__footnote"><?php esc_html_e( 'Images needing alt text', 'product-image-seo' ); ?></p>
         </div>
 
         <div class="prodimg-card">

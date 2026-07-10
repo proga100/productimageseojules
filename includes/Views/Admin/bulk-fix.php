@@ -48,7 +48,7 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
     <?php $prodimg_seo_bulk_pending = intval( $this->statistics->get_stats()['missing_alt'] ?? 0 ); ?>
     <div class="prodimg-card">
         <p class="prodimg-card__value"><?php echo esc_html( $prodimg_seo_bulk_pending ); ?></p>
-        <p class="prodimg-card__footnote"><?php esc_html_e( 'Products currently need alt text review.', 'product-image-seo' ); ?></p>
+        <p class="prodimg-card__footnote"><?php esc_html_e( 'Product images currently missing alt text.', 'product-image-seo' ); ?></p>
 
         <p class="prodimg-bulk-description">
             <?php esc_html_e( 'Bulk Fix generates AI alt text for every product needing review. It runs in the background, so you can leave this page while it works. Images that already have alt text are skipped unless overwriting is enabled in Settings. Each generated image uses one API credit.', 'product-image-seo' ); ?>
