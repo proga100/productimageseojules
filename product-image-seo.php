@@ -3,7 +3,7 @@
  * Plugin Name:       Product Image SEO — AI Alt Text & Image SEO Audit
  * Plugin URI:        https://altaudit.com/product-image-seo
  * Description:       AI alt text and catalog-wide image SEO audit for product catalogs. Per-product dashboard, bulk fix by category, Google Image Search readiness scoring, CSV audit reports. Requires an Alt Audit account (free tier available).
- * Version:           1.0.1
+ * Version:           1.0.2
  * Requires at least: 6.0
  * Tested up to:      7.0
  * Requires PHP:      7.4
@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants.
-define( 'PRODIMG_SEO_1972ADM_VERSION', '1.0.1' );
+define( 'PRODIMG_SEO_1972ADM_VERSION', '1.0.2' );
 define( 'PRODIMG_SEO_1972ADM_PLUGIN_FILE', __FILE__ );
 define( 'PRODIMG_SEO_1972ADM_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PRODIMG_SEO_1972ADM_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

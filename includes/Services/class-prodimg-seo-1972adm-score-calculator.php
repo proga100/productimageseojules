@@ -158,15 +158,6 @@ class Prodimg_Seo_1972adm_Score_Calculator {
     }
 
     /**
-     * Backward-compatible thin wrapper: calculate for a product.
-     *
-     * Gets all images for a product, runs calculate_for_attachment on each,
-     * returns averaged score, worst band, and aggregated signals.
-     *
-     * @param int $product_id WooCommerce product post ID.
-     * @return array { score, band, signals, explanation }
-     */
-    /**
      * Collect every image attachment ID that belongs to a product:
      * featured, gallery, and (for variable products) variation images.
      *
@@ -200,6 +191,15 @@ class Prodimg_Seo_1972adm_Score_Calculator {
         return $image_ids;
     }
 
+    /**
+     * Calculate a product-level rollup score.
+     *
+     * Runs calculate_for_attachment on every product image, returning the
+     * averaged score, the worst band, and aggregated signals.
+     *
+     * @param int $product_id WooCommerce product post ID.
+     * @return array { score, band, signals, explanation }
+     */
     public function calculate_for_product( $product_id ) {
         $product_id = absint( $product_id );
         $product    = $product_id ? wc_get_product( $product_id ) : null;

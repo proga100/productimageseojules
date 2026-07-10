@@ -1217,24 +1217,3 @@ tr.prodimg-row-busy > td {
     background-color: var(--prodimg-accent-blue-bg);
     transition: background-color 200ms ease;
 }
-
-/* Low-coverage hint under the score distribution chart. */
-.prodimg-coverage-hint {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid var(--prodimg-border-hairline);
-}
-
-.prodimg-coverage-hint p {
-    margin: 0;
-    color: var(--prodimg-text-secondary);
-}
-
-.prodimg-coverage-hint .spinner {
-    float: none;
-    margin: 0;
-}

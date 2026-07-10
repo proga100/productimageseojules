@@ -91,8 +91,9 @@ class Prodimg_Seo_1972adm_Statistics {
 
         $stats['total_products'] = count( $products );
 
-        $total_score = 0;
-        $seen_images = array(); // Dedupe attachments shared across products.
+        $total_score     = 0;
+        $scoreable_images = 0; // Excludes decorative images from the average.
+        $seen_images     = array(); // Dedupe attachments shared across products.
 
         foreach ( $products as $pid ) {
             // Product-level status taxonomy (kept for by_status context).
@@ -134,7 +135,6 @@ class Prodimg_Seo_1972adm_Statistics {
 
                 list( $score_int, $band ) = $this->resolve_image_score( $att_id );
 
-                $total_score += $score_int;
                 $stats['total_images']++;
 
                 if ( isset( $stats['by_band'][ $band ] ) ) {
@@ -145,11 +145,21 @@ class Prodimg_Seo_1972adm_Statistics {
                 } elseif ( 'weak' === $band ) {
                     $stats['weak_alt']++;
                 }
+
+                // Decorative images intentionally have empty alt (correct
+                // accessibility practice), so they are not "scoreable" — excluding
+                // them from the average avoids penalizing a store for handling
+                // decorative images correctly. They still count in by_band and
+                // total_images.
+                if ( 'decorative' !== $band ) {
+                    $total_score += $score_int;
+                    $scoreable_images++;
+                }
             }
         }
 
-        if ( $stats['total_images'] > 0 ) {
-            $stats['avg_score'] = (int) round( $total_score / $stats['total_images'] );
+        if ( $scoreable_images > 0 ) {
+            $stats['avg_score'] = (int) round( $total_score / $scoreable_images );
         }
 
         set_transient( self::CACHE_KEY, $stats, 5 * MINUTE_IN_SECONDS );
