@@ -33,28 +33,14 @@ class Prodimg_Seo_1972adm_Bulk_Controller {
         $product_ids = isset( $_POST['product_ids'] ) ? array_map( 'absint', (array) wp_unslash( $_POST['product_ids'] ) ) : array();
 
         if ( empty( $product_ids ) ) {
-            // Fallback: every product needing review. Enumerate IDs with a plain
-            // post query — wc_get_products() implicitly tax-filters on product_type
-            // and silently drops products lacking that term (legacy/imported data).
-            $product_ids = get_posts( array(
-                'post_type'      => 'product',
-                'post_status'    => 'publish',
-                'fields'         => 'ids',
-                'posts_per_page' => -1,
-                'no_found_rows'  => true,
-                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- fallback query when no explicit IDs; bounded by status taxonomy.
-                'tax_query'      => array(
-                    array(
-                        'taxonomy' => Prodimg_Seo_1972adm_Status_Taxonomy::TAXONOMY,
-                        'field'    => 'slug',
-                        'terms'    => array( 'needs_review', 'partial' ),
-                    ),
-                ),
-            ) );
+            // Fallback: only products that actually have an image needing alt
+            // text (or, in overwrite mode, any product with images). This targets
+            // the images that need work instead of every "needs review" product.
+            $product_ids = $this->processor->get_target_product_ids();
         }
 
         if ( empty( $product_ids ) ) {
-            wp_send_json_error( __( 'No products to process.', 'product-image-seo' ) );
+            wp_send_json_error( __( 'No product images need alt text.', 'product-image-seo' ) );
             return;
         }
 

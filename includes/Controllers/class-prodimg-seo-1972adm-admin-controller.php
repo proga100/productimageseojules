@@ -210,6 +210,14 @@ class Prodimg_Seo_1972adm_Admin_Controller {
                     'cancel'           => __( 'Cancel', 'product-image-seo' ),
                     'close'            => __( 'Close', 'product-image-seo' ),
                     'bulkCancelled'    => __( 'Bulk run cancelled.', 'product-image-seo' ),
+                    'bulkFixDone'      => __( 'Bulk fix finished.', 'product-image-seo' ),
+                    /* translators: %s number of alt texts generated */
+                    'bulkFixGenerated' => __( 'Generated alt text for %s images.', 'product-image-seo' ),
+                    /* translators: %s number of images skipped */
+                    'bulkFixSkipped'   => __( 'Skipped %s images that already had alt text.', 'product-image-seo' ),
+                    /* translators: %s number of images that failed */
+                    'bulkFixFailed'    => __( '%s images could not be generated.', 'product-image-seo' ),
+                    'bulkFixNothing'   => __( 'No images needed alt text.', 'product-image-seo' ),
                     'bands'         => array(
                         'missing'    => __( 'Missing', 'product-image-seo' ),
                         'weak'       => __( 'Weak', 'product-image-seo' ),

@@ -168,16 +168,36 @@ class Prodimg_Seo_1972adm_Statistics {
     }
 
     /**
-     * Resolve an attachment's score + band. Prefer the stored per-image quality
-     * score (written by the scan / save / bulk paths); fall back to computing it
-     * on the fly, which returns 0 / 'missing' for empty alt text.
+     * Resolve an attachment's score + band.
+     *
+     * "Missing" is determined by the CURRENT alt text, not by a stored score —
+     * the stored `_prodimg_seo_1972adm_quality_score` can drift from reality when
+     * alt text is added or removed outside the plugin's own scoring paths (e.g.
+     * the WP Media Library, an import, or another plugin), which otherwise makes
+     * the dashboard report images as missing when they already have alt text.
+     *
+     * An image with no alt text is computed fresh (cheap — the calculator early
+     * returns for empty alt). An image with alt text uses the stored score when
+     * it is a sensible positive value, otherwise it is recomputed from the
+     * current alt text.
      *
      * @param int $att_id Attachment ID.
      * @return array{0:int,1:string} [ score, band ]
      */
     private function resolve_image_score( $att_id ) {
+        $alt = trim( (string) get_post_meta( $att_id, '_wp_attachment_image_alt', true ) );
+
+        // No alt text: authoritative — compute (returns missing, or decorative
+        // when the image is flagged decorative). Cheap for empty alt.
+        if ( '' === $alt ) {
+            $result = $this->calculator->calculate_for_attachment( $att_id, 'product' );
+            return array( (int) $result['score'], (string) $result['band'] );
+        }
+
+        // Alt text present: trust the stored score only when it is a sensible
+        // positive value; a 0 / 'missing' stored value is stale and recomputed.
         $stored = get_post_meta( $att_id, '_prodimg_seo_1972adm_quality_score', true );
-        if ( is_numeric( $stored ) ) {
+        if ( is_numeric( $stored ) && (int) $stored > 0 ) {
             $score_int = (int) $stored;
             $band      = '';
             $breakdown = get_post_meta( $att_id, '_prodimg_seo_1972adm_score_breakdown', true );
@@ -187,7 +207,7 @@ class Prodimg_Seo_1972adm_Statistics {
                     $band = sanitize_key( $breakdown_data['band'] );
                 }
             }
-            if ( '' === $band ) {
+            if ( '' === $band || 'missing' === $band ) {
                 $band = $this->calculator->get_band_from_score( $score_int );
             }
             return array( $score_int, $band );

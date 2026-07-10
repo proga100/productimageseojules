@@ -777,12 +777,32 @@ jQuery(function($) {
         }, 40);
     });
 
-    // Bulk-fix completion summary card
+    // Bulk-fix completion summary card — reports images actually processed
+    // (generated / skipped / failed), not products iterated.
     $(document).on('prodimg-seo:bulk-completed', function(e, data) {
-        var $body = $('#prodimg-seo-bulk-results-body');
-        var msg = 'Bulk fix finished. Processed ' + (data && data.total_products ? data.total_products : 'all') + ' products.';
-        $body.text(msg);
+        var i18n = (prodimg_seo_1972adm_admin && prodimg_seo_1972adm_admin.i18n) || {};
+        data = data || {};
+        var generated = parseInt(data.images_generated, 10) || 0;
+        var skipped   = parseInt(data.images_skipped, 10) || 0;
+        var failed    = parseInt(data.images_failed, 10) || 0;
+
+        var parts = [i18n.bulkFixDone || 'Bulk fix finished.'];
+        if (generated) {
+            parts.push((i18n.bulkFixGenerated || 'Generated alt text for %s images.').replace('%s', generated));
+        }
+        if (skipped) {
+            parts.push((i18n.bulkFixSkipped || 'Skipped %s images that already had alt text.').replace('%s', skipped));
+        }
+        if (failed) {
+            parts.push((i18n.bulkFixFailed || '%s images could not be generated.').replace('%s', failed));
+        }
+        if (!generated && !failed) {
+            parts.push(i18n.bulkFixNothing || 'No images needed alt text.');
+        }
+        var msg = parts.join(' ');
+
+        $('#prodimg-seo-bulk-results-body').text(msg);
         $('#prodimg-seo-bulk-results').removeAttr('hidden');
-        prodimgToast(msg, 'success');
+        prodimgToast(msg, failed ? 'info' : 'success');
     });
 });
