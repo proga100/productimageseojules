@@ -260,16 +260,24 @@ class Prodimg_Seo_1972adm_Admin_Controller {
                 wp_die( esc_html__( 'Permission denied.', 'product-image-seo' ) );
             }
 
+            // Checkboxes submit nothing when unchecked, so presence of the key —
+            // not its value — is the on/off signal. Reading with `?? 'yes'` made
+            // "skip existing" impossible to disable; `isset()` toggles reliably.
+            $prodimg_seo_style = sanitize_text_field( wp_unslash( $_POST['alt_style'] ?? 'seo_balanced' ) );
+            if ( ! in_array( $prodimg_seo_style, array( 'seo_focused', 'accessibility_focused', 'seo_balanced' ), true ) ) {
+                $prodimg_seo_style = 'seo_balanced';
+            }
+
             $new_settings = array(
-                'api_key' => sanitize_text_field( wp_unslash( $_POST['api_key'] ?? '' ) ),
-                'auto_generate' => sanitize_text_field( wp_unslash( $_POST['auto_generate'] ?? 'no' ) ),
-                'skip_existing' => sanitize_text_field( wp_unslash( $_POST['skip_existing'] ?? 'yes' ) ),
-                'alt_style' => sanitize_text_field( wp_unslash( $_POST['alt_style'] ?? 'seo_balanced' ) ),
-                'include_name' => sanitize_text_field( wp_unslash( $_POST['include_name'] ?? 'no' ) ),
-                'include_category' => sanitize_text_field( wp_unslash( $_POST['include_category'] ?? 'no' ) ),
-                'include_sku' => sanitize_text_field( wp_unslash( $_POST['include_sku'] ?? 'no' ) ),
-                'include_price' => sanitize_text_field( wp_unslash( $_POST['include_price'] ?? 'no' ) ),
-                'max_length' => absint( wp_unslash( $_POST['max_length'] ?? 125 ) ),
+                'api_key'          => sanitize_text_field( wp_unslash( $_POST['api_key'] ?? '' ) ),
+                'auto_generate'    => isset( $_POST['auto_generate'] ) ? 'yes' : 'no',
+                'skip_existing'    => isset( $_POST['skip_existing'] ) ? 'yes' : 'no',
+                'alt_style'        => $prodimg_seo_style,
+                'include_name'     => isset( $_POST['include_name'] ) ? 'yes' : 'no',
+                'include_category' => isset( $_POST['include_category'] ) ? 'yes' : 'no',
+                'include_sku'      => isset( $_POST['include_sku'] ) ? 'yes' : 'no',
+                'include_price'    => isset( $_POST['include_price'] ) ? 'yes' : 'no',
+                'max_length'       => min( 255, max( 50, absint( wp_unslash( $_POST['max_length'] ?? 125 ) ) ) ),
             );
             $this->settings->update_all( $new_settings );
 
