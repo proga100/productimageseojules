@@ -45,18 +45,56 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
         </nav>
     </header>
 
-    <?php $prodimg_seo_bulk_pending = intval( $this->statistics->get_stats()['missing_alt'] ?? 0 ); ?>
+    <?php
+    // Headline reflects what the NEXT RUN will actually do in the current mode,
+    // so "0 missing" can never sit above a button that regenerates 75 images.
+    $prodimg_seo_bulk_stats    = $this->statistics->get_stats();
+    $prodimg_seo_bulk_missing  = intval( $prodimg_seo_bulk_stats['missing_alt'] ?? 0 );
+    $prodimg_seo_bulk_total    = intval( $prodimg_seo_bulk_stats['total_images'] ?? 0 );
+    $prodimg_seo_bulk_skip     = 'yes' === $this->settings->get( 'skip_existing', 'yes' );
+    $prodimg_seo_bulk_workload = $prodimg_seo_bulk_skip ? $prodimg_seo_bulk_missing : $prodimg_seo_bulk_total;
+    ?>
     <div class="prodimg-card">
-        <p class="prodimg-card__value"><?php echo esc_html( $prodimg_seo_bulk_pending ); ?></p>
-        <p class="prodimg-card__footnote"><?php esc_html_e( 'Product images currently missing alt text.', 'product-image-seo' ); ?></p>
+        <p class="prodimg-card__value"><?php echo esc_html( $prodimg_seo_bulk_workload ); ?></p>
+        <p class="prodimg-card__footnote">
+            <?php
+            if ( $prodimg_seo_bulk_skip ) {
+                esc_html_e( 'Product images missing alt text — the next run will generate these.', 'product-image-seo' );
+            } else {
+                esc_html_e( 'Product images the next run will regenerate — overwrite is enabled, existing alt text will be replaced.', 'product-image-seo' );
+            }
+            ?>
+        </p>
+
+        <?php if ( ! $prodimg_seo_bulk_skip ) : ?>
+            <p class="prodimg-bulk-mode-warning">
+                <?php
+                printf(
+                    /* translators: 1: opening link tag to settings, 2: closing link tag */
+                    esc_html__( 'Overwrite mode is ON. To only fill in missing alt text, enable "Skip images with existing alt text" in %1$sSettings → Auto-fix%2$s.', 'product-image-seo' ),
+                    '<a href="' . esc_url( admin_url( 'admin.php?page=prodimg-seo-settings#tab-autofix' ) ) . '">',
+                    '</a>'
+                );
+                ?>
+            </p>
+        <?php endif; ?>
 
         <p class="prodimg-bulk-description">
             <?php esc_html_e( 'Bulk Fix generates AI alt text for every product image needing review. It runs in the background, so you can leave this page while it works. Images that already have alt text are skipped unless overwriting is enabled in Settings. Each generated image uses one API credit.', 'product-image-seo' ); ?>
         </p>
 
         <p>
-            <button type="button" class="button button-primary" id="prodimg-seo-bulk-start">
-                <?php esc_html_e( 'Start Bulk Fix', 'product-image-seo' ); ?>
+            <button type="button" class="button button-primary" id="prodimg-seo-bulk-start"
+                    data-mode="<?php echo esc_attr( $prodimg_seo_bulk_skip ? 'skip' : 'overwrite' ); ?>"
+                    data-workload="<?php echo esc_attr( $prodimg_seo_bulk_workload ); ?>"
+                    <?php disabled( 0 === $prodimg_seo_bulk_workload ); ?>>
+                <?php
+                if ( 0 === $prodimg_seo_bulk_workload ) {
+                    esc_html_e( 'Nothing to fix — all images have alt text', 'product-image-seo' );
+                } else {
+                    esc_html_e( 'Start Bulk Fix', 'product-image-seo' );
+                }
+                ?>
             </button>
         </p>
 

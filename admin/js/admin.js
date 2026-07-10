@@ -684,6 +684,18 @@ jQuery(document).ready(function($) {
         var $btn = $(this);
         var $container = $('#prodimg-seo-bulk-progress-container');
 
+        // Overwrite mode replaces existing alt text and bills one credit per
+        // image — make the user confirm the blast radius before starting.
+        if ('overwrite' === $btn.data('mode')) {
+            var workload = parseInt($btn.data('workload'), 10) || 0;
+            var confirmMsg = (prodimgI18n.bulkOverwriteConfirm ||
+                'Overwrite is enabled: this will regenerate alt text for %s images and use one API credit per image. Continue?')
+                .replace('%s', workload);
+            if (!window.confirm(confirmMsg)) {
+                return;
+            }
+        }
+
         $btn.prop('disabled', true).addClass('prodimg-is-busy').text(prodimgI18n.starting || 'Starting…');
 
         $.post(prodimg_seo_1972adm_admin.ajax_url, {

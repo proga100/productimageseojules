@@ -1218,6 +1218,20 @@ tr.prodimg-row-busy > td {
     transition: background-color 200ms ease;
 }
 
+/* Overwrite-mode warning on the Bulk Fix page */
+.prodimg-bulk-mode-warning {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: var(--prodimg-radius-md);
+    background: var(--prodimg-accent-orange-bg);
+    color: var(--prodimg-text-primary);
+    font-size: 13px;
+}
+
+.prodimg-bulk-mode-warning a {
+    color: var(--prodimg-accent-blue);
+}
+
 /* Bulk Fix page live status row (spinner + text above the progress bar) */
 .prodimg-bulkfix-status {
     display: flex;

@@ -226,6 +226,8 @@ class Prodimg_Seo_1972adm_Admin_Controller {
                     'bulkComplete'     => __( 'Completed!', 'product-image-seo' ),
                     'starting'         => __( 'Starting…', 'product-image-seo' ),
                     'startBulkFix'     => __( 'Start Bulk Fix', 'product-image-seo' ),
+                    /* translators: %s number of images that will be regenerated */
+                    'bulkOverwriteConfirm' => __( 'Overwrite is enabled: this will regenerate alt text for %s images and use one API credit per image. Continue?', 'product-image-seo' ),
                     'bands'         => array(
                         'missing'    => __( 'Missing', 'product-image-seo' ),
                         'weak'       => __( 'Weak', 'product-image-seo' ),
