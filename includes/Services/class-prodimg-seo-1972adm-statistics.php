@@ -16,6 +16,11 @@ class Prodimg_Seo_1972adm_Statistics {
      */
     const CACHE_KEY = 'prodimg_seo_1972adm_stats_cache';
 
+    /**
+     * Transient key for the catalog-wide product image ID list.
+     */
+    const IMAGE_IDS_CACHE_KEY = 'prodimg_seo_1972adm_product_image_ids';
+
     private $calculator;
 
     public function __construct( Prodimg_Seo_1972adm_Score_Calculator $calculator ) {
@@ -23,13 +28,35 @@ class Prodimg_Seo_1972adm_Statistics {
     }
 
     /**
-     * Delete the cached stats so the next read recomputes from current data.
-     * Call after any alt-text / score change.
+     * Delete the cached stats + product-image-ID list so the next read
+     * recomputes from current data. Call after any alt-text / score change or
+     * after a product's images change.
      *
      * @return void
      */
     public static function flush_cache() {
         delete_transient( self::CACHE_KEY );
+        delete_transient( self::IMAGE_IDS_CACHE_KEY );
+    }
+
+    /**
+     * The catalog-wide set of product image IDs, cached.
+     *
+     * Shared by the catalog table and the image scan so both operate on
+     * product images (featured/gallery/variation) rather than the whole
+     * media library.
+     *
+     * @param Prodimg_Seo_1972adm_Score_Calculator $calculator Calculator service.
+     * @return int[] Deduped product image attachment IDs.
+     */
+    public static function get_product_image_ids( Prodimg_Seo_1972adm_Score_Calculator $calculator ) {
+        $cached = get_transient( self::IMAGE_IDS_CACHE_KEY );
+        if ( is_array( $cached ) ) {
+            return $cached;
+        }
+        $ids = $calculator->get_all_product_image_ids();
+        set_transient( self::IMAGE_IDS_CACHE_KEY, $ids, 5 * MINUTE_IN_SECONDS );
+        return $ids;
     }
 
     /**

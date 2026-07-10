@@ -24,6 +24,14 @@ class Prodimg_Seo_1972adm_Auto_Generator {
     public function init_hooks() {
         add_action( 'woocommerce_new_product', array( $this, 'auto_generate' ), 10, 2 );
         add_action( 'woocommerce_update_product', array( $this, 'auto_generate' ), 10, 2 );
+
+        // Keep the catalog/scan/dashboard caches fresh when a product's images
+        // change (independent of the auto-generate setting). flush_cache() takes
+        // no args; the product ID passed by these hooks is harmlessly ignored.
+        add_action( 'woocommerce_new_product', array( 'Prodimg_Seo_1972adm_Statistics', 'flush_cache' ), 20 );
+        add_action( 'woocommerce_update_product', array( 'Prodimg_Seo_1972adm_Statistics', 'flush_cache' ), 20 );
+        add_action( 'woocommerce_delete_product', array( 'Prodimg_Seo_1972adm_Statistics', 'flush_cache' ) );
+        add_action( 'woocommerce_trash_product', array( 'Prodimg_Seo_1972adm_Statistics', 'flush_cache' ) );
     }
 
     public function auto_generate( $product_id, $product ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- $product is provided by the woocommerce_new_product / woocommerce_update_product hook signature.

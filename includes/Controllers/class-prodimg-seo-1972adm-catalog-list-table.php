@@ -387,10 +387,17 @@ class Prodimg_Seo_1972adm_Catalog_List_Table extends WP_List_Table {
         $search        = isset( $_REQUEST['s'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['s'] ) ) : '';
         // phpcs:enable WordPress.Security.NonceVerification.Recommended
 
+        // Scope to product images (featured/gallery/variation) only — this is the
+        // "Product Images" catalog, not the whole media library. array( 0 ) forces
+        // an empty result when the store has no product images (post__in => array()
+        // would otherwise be ignored by WP_Query and return everything).
+        $product_image_ids = Prodimg_Seo_1972adm_Statistics::get_product_image_ids( new Prodimg_Seo_1972adm_Score_Calculator() );
+
         $query_args = array(
             'post_type'      => 'attachment',
             'post_status'    => 'inherit',
             'post_mime_type' => 'image',
+            'post__in'       => ! empty( $product_image_ids ) ? $product_image_ids : array( 0 ),
             'posts_per_page' => $per_page,
             'paged'          => $paged,
             'orderby'        => 'date',

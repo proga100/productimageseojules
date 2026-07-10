@@ -558,10 +558,15 @@ class Prodimg_Seo_1972adm_Admin_Controller {
         $page     = isset( $_POST['scan_page'] ) ? absint( wp_unslash( $_POST['scan_page'] ) ) : 1;
         $per_page = 50;
 
+        // Scan product images only (featured/gallery/variation), not the whole
+        // media library. array( 0 ) forces an empty result when there are none.
+        $product_image_ids = Prodimg_Seo_1972adm_Statistics::get_product_image_ids( $this->calculator );
+
         $query = new WP_Query( array(
             'post_type'      => 'attachment',
             'post_status'    => 'inherit',
             'post_mime_type' => 'image',
+            'post__in'       => ! empty( $product_image_ids ) ? $product_image_ids : array( 0 ),
             'posts_per_page' => $per_page,
             'paged'          => $page,
             'fields'         => 'ids',

@@ -192,6 +192,41 @@ class Prodimg_Seo_1972adm_Score_Calculator {
     }
 
     /**
+     * Collect every product image attachment ID across the whole catalog,
+     * deduped. This is the authoritative set of "product images" — featured,
+     * gallery, and variation images of every published product — used to scope
+     * the catalog table, the image scan, and the dashboard stats to product
+     * images rather than the entire media library.
+     *
+     * @return int[] Deduped attachment IDs.
+     */
+    public function get_all_product_image_ids() {
+        $product_ids = get_posts( array(
+            'post_type'      => 'product',
+            'post_status'    => 'publish',
+            'fields'         => 'ids',
+            'posts_per_page' => -1,
+            'no_found_rows'  => true,
+        ) );
+
+        $image_ids = array();
+        foreach ( $product_ids as $pid ) {
+            $product = wc_get_product( $pid );
+            if ( ! $product ) {
+                continue;
+            }
+            foreach ( $this->get_product_image_ids( $product ) as $att_id ) {
+                $att_id = absint( $att_id );
+                if ( $att_id ) {
+                    $image_ids[ $att_id ] = true;
+                }
+            }
+        }
+
+        return array_keys( $image_ids );
+    }
+
+    /**
      * Calculate a product-level rollup score.
      *
      * Runs calculate_for_attachment on every product image, returning the
