@@ -18,7 +18,7 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
         <div class="prodimg-page-header__inner">
             <div class="prodimg-page-header__titleblock">
                 <h1 class="prodimg-page-header__title"><?php esc_html_e( 'Bulk Fix', 'product-image-seo' ); ?></h1>
-                <p class="prodimg-page-header__subtitle"><?php esc_html_e( 'Generate alt text for all products needing review', 'product-image-seo' ); ?></p>
+                <p class="prodimg-page-header__subtitle"><?php esc_html_e( 'Generate alt text for every product image needing review', 'product-image-seo' ); ?></p>
             </div>
         </div>
         <nav class="prodimg-segnav" aria-label="<?php esc_attr_e( 'Plugin sections', 'product-image-seo' ); ?>">
@@ -51,7 +51,7 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
         <p class="prodimg-card__footnote"><?php esc_html_e( 'Product images currently missing alt text.', 'product-image-seo' ); ?></p>
 
         <p class="prodimg-bulk-description">
-            <?php esc_html_e( 'Bulk Fix generates AI alt text for every product needing review. It runs in the background, so you can leave this page while it works. Images that already have alt text are skipped unless overwriting is enabled in Settings. Each generated image uses one API credit.', 'product-image-seo' ); ?>
+            <?php esc_html_e( 'Bulk Fix generates AI alt text for every product image needing review. It runs in the background, so you can leave this page while it works. Images that already have alt text are skipped unless overwriting is enabled in Settings. Each generated image uses one API credit.', 'product-image-seo' ); ?>
         </p>
 
         <p>

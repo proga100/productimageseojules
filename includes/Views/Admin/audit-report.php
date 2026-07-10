@@ -51,7 +51,9 @@ $prodimg_seo_pct = function ( $part, $total ) {
     return $total > 0 ? round( ( $part / $total ) * 100, 1 ) : 0;
 };
 
-$prodimg_seo_gauge_band = $prodimg_seo_avg_score >= 80 ? 'good' : ( $prodimg_seo_avg_score >= 50 ? 'ok' : 'poor' );
+// Gauge band uses the same thresholds/colors as the score bars and legend
+// (missing / weak / good / excellent) so one score reads the same everywhere.
+$prodimg_seo_gauge_band = $prodimg_seo_avg_score >= 86 ? 'excellent' : ( $prodimg_seo_avg_score >= 61 ? 'good' : ( $prodimg_seo_avg_score >= 1 ? 'weak' : 'missing' ) );
 
 // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only page slug for active nav state.
 $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : 'prodimg-seo-report';
@@ -112,7 +114,13 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
         <div class="prodimg-card">
             <h2 class="prodimg-card__title"><?php esc_html_e( 'Total products', 'product-image-seo' ); ?></h2>
             <p class="prodimg-card__value"><?php echo esc_html( $prodimg_seo_total ); ?></p>
-            <p class="prodimg-card__footnote"><?php esc_html_e( 'Indexed in audit', 'product-image-seo' ); ?></p>
+            <p class="prodimg-card__footnote">
+                <?php
+                $prodimg_seo_report_images = isset( $prodimg_seo_stats['total_images'] ) ? intval( $prodimg_seo_stats['total_images'] ) : 0;
+                /* translators: %d number of product images */
+                printf( esc_html( _n( '%d product image in catalog', '%d product images in catalog', $prodimg_seo_report_images, 'product-image-seo' ) ), absint( $prodimg_seo_report_images ) );
+                ?>
+            </p>
         </div>
 
         <div class="prodimg-card">
@@ -161,27 +169,10 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
         </div>
         <p class="prodimg-card__footnote">
             <?php
-            /* translators: %d number of products that have a score */
-            printf( esc_html__( 'Distribution across %d scored products.', 'product-image-seo' ), intval( $prodimg_seo_band_sum ) );
+            /* translators: %d number of product images that have a score */
+            printf( esc_html( _n( 'Distribution across %d scored product image.', 'Distribution across %d scored product images.', $prodimg_seo_band_sum, 'product-image-seo' ) ), absint( $prodimg_seo_band_sum ) );
             ?>
         </p>
-        <?php if ( $prodimg_seo_band_sum < $prodimg_seo_total ) : ?>
-            <div class="prodimg-coverage-hint">
-                <p>
-                    <?php
-                    printf(
-                        /* translators: 1: scored products, 2: total products */
-                        esc_html__( 'Only %1$d of %2$d products have been scored. Run an audit to include the rest.', 'product-image-seo' ),
-                        intval( $prodimg_seo_band_sum ),
-                        intval( $prodimg_seo_total )
-                    );
-                    ?>
-                </p>
-                <button type="button" class="button" id="prodimg-seo-scan-catalog"><?php esc_html_e( 'Run Audit', 'product-image-seo' ); ?></button>
-                <span class="spinner" id="prodimg-seo-scan-spinner"></span>
-                <span id="prodimg-seo-scan-result"></span>
-            </div>
-        <?php endif; ?>
     </div>
 
 </div>

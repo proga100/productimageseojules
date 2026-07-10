@@ -22,7 +22,9 @@ $prodimg_seo_breakdown   = isset( $prodimg_seo_stats['breakdown'] ) ? $prodimg_s
     'variations' => 0,
 );
 
-$prodimg_seo_gauge_band = $prodimg_seo_avg_score >= 80 ? 'good' : ( $prodimg_seo_avg_score >= 50 ? 'ok' : 'poor' );
+// Gauge band uses the same thresholds/colors as the score bars and legend
+// (missing / weak / good / excellent) so one score reads the same everywhere.
+$prodimg_seo_gauge_band = $prodimg_seo_avg_score >= 86 ? 'excellent' : ( $prodimg_seo_avg_score >= 61 ? 'good' : ( $prodimg_seo_avg_score >= 1 ? 'weak' : 'missing' ) );
 
 $prodimg_seo_csv_url = wp_nonce_url(
     admin_url( 'admin-ajax.php?action=prodimg_seo_1972adm_export_csv' ),
@@ -114,7 +116,7 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
                     <?php
                     $prodimg_seo_total_images = isset( $prodimg_seo_stats['total_images'] ) ? intval( $prodimg_seo_stats['total_images'] ) : 0;
                     /* translators: %d total product images scored */
-                    printf( esc_html( _n( 'Across %d product image.', 'Across %d product images.', $prodimg_seo_total_images, 'product-image-seo' ) ), $prodimg_seo_total_images );
+                    printf( esc_html( _n( 'Across %d product image.', 'Across %d product images.', $prodimg_seo_total_images, 'product-image-seo' ) ), absint( $prodimg_seo_total_images ) );
                     ?>
                 </p>
             </div>
@@ -144,15 +146,15 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
                 <h2 class="prodimg-card__title"><?php esc_html_e( 'Coverage', 'product-image-seo' ); ?></h2>
                 <ul class="prodimg-coverage-list">
                     <li>
-                        <span><?php esc_html_e( 'Featured', 'product-image-seo' ); ?></span>
+                        <span><?php esc_html_e( 'Featured images', 'product-image-seo' ); ?></span>
                         <strong><?php echo esc_html( intval( $prodimg_seo_breakdown['featured'] ?? 0 ) ); ?></strong>
                     </li>
                     <li>
-                        <span><?php esc_html_e( 'Gallery', 'product-image-seo' ); ?></span>
+                        <span><?php esc_html_e( 'Gallery images', 'product-image-seo' ); ?></span>
                         <strong><?php echo esc_html( intval( $prodimg_seo_breakdown['gallery'] ?? 0 ) ); ?></strong>
                     </li>
                     <li>
-                        <span><?php esc_html_e( 'Variations', 'product-image-seo' ); ?></span>
+                        <span><?php esc_html_e( 'Variation images', 'product-image-seo' ); ?></span>
                         <strong><?php echo esc_html( intval( $prodimg_seo_breakdown['variations'] ?? 0 ) ); ?></strong>
                     </li>
                 </ul>

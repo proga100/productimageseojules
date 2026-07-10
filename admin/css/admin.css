@@ -355,8 +355,11 @@ body.prodimg-seo-skin .wrap > h1 {
     transition: stroke-dashoffset 1.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.prodimg-score-gauge--ok   .prodimg-score-gauge__progress { stroke: var(--prodimg-accent-orange); }
-.prodimg-score-gauge--poor .prodimg-score-gauge__progress { stroke: var(--prodimg-accent-red); }
+/* Canonical band palette (matches score bars + legend): missing=grey, weak=orange, good=blue, excellent=green. */
+.prodimg-score-gauge--excellent .prodimg-score-gauge__progress { stroke: var(--prodimg-accent-green); }
+.prodimg-score-gauge--good      .prodimg-score-gauge__progress { stroke: var(--prodimg-accent-blue); }
+.prodimg-score-gauge--weak      .prodimg-score-gauge__progress { stroke: var(--prodimg-accent-orange); }
+.prodimg-score-gauge--missing   .prodimg-score-gauge__progress { stroke: var(--prodimg-border-strong); }
 
 .prodimg-score-gauge__value {
     font-size: 28px;
