@@ -684,20 +684,28 @@ jQuery(document).ready(function($) {
         var $btn = $(this);
         var $container = $('#prodimg-seo-bulk-progress-container');
 
-        $btn.prop('disabled', true).text('Starting...');
+        $btn.prop('disabled', true).addClass('prodimg-is-busy').text(prodimgI18n.starting || 'Starting…');
 
         $.post(prodimg_seo_1972adm_admin.ajax_url, {
             action: 'prodimg_seo_1972adm_bulk_start',
             nonce: prodimg_seo_1972adm_admin.nonce
         }, function(response) {
             if (response.success) {
-                $btn.hide();
-                $container.show();
+                $btn.hide().removeClass('prodimg-is-busy');
+                $('#prodimg-seo-bulk-results').attr('hidden', 'hidden');
+                $('#prodimg-seo-bulk-spinner').show();
+                $('#prodimg-seo-bulk-status-text').text(prodimgI18n.bulkQueued || 'Queued…');
+                $('#prodimg-seo-bulk-progress-bar').css('width', '0%');
+                $('#prodimg-seo-bulk-progress-text').text('');
+                $container.removeAttr('hidden').show();
                 bulkPollInterval = setInterval(pollBulkStatus, 2000);
             } else {
-                $btn.prop('disabled', false).text('Start Bulk Fix');
-                alert(response.data);
+                $btn.prop('disabled', false).removeClass('prodimg-is-busy').text(prodimgI18n.startBulkFix || 'Start Bulk Fix');
+                prodimgToast(response.data, 'error');
             }
+        }).fail(function() {
+            $btn.prop('disabled', false).removeClass('prodimg-is-busy').text(prodimgI18n.startBulkFix || 'Start Bulk Fix');
+            prodimgToast(prodimgI18n.genFailed || 'Request failed.', 'error');
         });
     });
 
@@ -706,21 +714,50 @@ jQuery(document).ready(function($) {
             action: 'prodimg_seo_1972adm_bulk_status',
             nonce: prodimg_seo_1972adm_admin.nonce
         }, function(response) {
-            if (response.success && response.data.status !== 'idle') {
-                var completed = response.data.completed_batches;
-                var total = response.data.total_batches;
-                var pct = total > 0 ? Math.round((completed / total) * 100) : 0;
-
-                $('#prodimg-seo-bulk-progress-bar').css('width', pct + '%');
-                $('#prodimg-seo-bulk-progress-text').text(pct + '%');
-
-                if (response.data.status === 'completed') {
-                    clearInterval(bulkPollInterval);
-                    $('#prodimg-seo-bulk-progress-text').text('Completed!');
-                    jQuery(document).trigger('prodimg-seo:bulk-completed', [response.data]);
-                }
-            } else {
+            if (!response.success || response.data.status === 'idle') {
                 clearInterval(bulkPollInterval);
+                return;
+            }
+
+            var d         = response.data;
+            var generated = parseInt(d.images_generated, 10) || 0;
+            var skipped   = parseInt(d.images_skipped, 10) || 0;
+            var failed    = parseInt(d.images_failed, 10) || 0;
+            var expected  = parseInt(d.total_images, 10) || 0;
+            // Progress over the real workload: skipped images are not part of
+            // total_images (they were excluded from the expected count).
+            var done = generated + failed;
+            var pct;
+            if (expected > 0) {
+                pct = Math.min(100, Math.round((done / expected) * 100));
+            } else {
+                pct = d.total_batches > 0 ? Math.round((d.completed_batches / d.total_batches) * 100) : 0;
+            }
+
+            $('#prodimg-seo-bulk-progress-bar').css('width', pct + '%');
+
+            if (done + skipped > 0 || d.completed_batches > 0) {
+                $('#prodimg-seo-bulk-status-text').text(
+                    (prodimgI18n.bulkRunningImgs || 'Generating alt text… %1$s of %2$s images')
+                        .replace('%1$s', Math.min(done, expected || done))
+                        .replace('%2$s', expected || '?')
+                );
+                $('#prodimg-seo-bulk-progress-text').text(
+                    (prodimgI18n.bulkCounts || '%1$s generated · %2$s skipped · %3$s failed')
+                        .replace('%1$s', generated).replace('%2$s', skipped).replace('%3$s', failed)
+                );
+            }
+
+            if (d.status === 'completed') {
+                clearInterval(bulkPollInterval);
+                $('#prodimg-seo-bulk-spinner').hide();
+                $('#prodimg-seo-bulk-progress-bar').css('width', '100%');
+                $('#prodimg-seo-bulk-status-text').text(prodimgI18n.bulkComplete || 'Completed!');
+                $('#prodimg-seo-bulk-start')
+                    .show()
+                    .prop('disabled', false)
+                    .text(prodimgI18n.startBulkFix || 'Start Bulk Fix');
+                jQuery(document).trigger('prodimg-seo:bulk-completed', [d]);
             }
         });
     }

@@ -218,6 +218,14 @@ class Prodimg_Seo_1972adm_Admin_Controller {
                     /* translators: %s number of images that failed */
                     'bulkFixFailed'    => __( '%s images could not be generated.', 'product-image-seo' ),
                     'bulkFixNothing'   => __( 'No images needed alt text.', 'product-image-seo' ),
+                    'bulkQueued'       => __( 'Queued — waiting for the background processor…', 'product-image-seo' ),
+                    /* translators: 1: images done, 2: total images */
+                    'bulkRunningImgs'  => __( 'Generating alt text… %1$s of %2$s images', 'product-image-seo' ),
+                    /* translators: 1: generated, 2: skipped, 3: failed */
+                    'bulkCounts'       => __( '%1$s generated · %2$s skipped · %3$s failed', 'product-image-seo' ),
+                    'bulkComplete'     => __( 'Completed!', 'product-image-seo' ),
+                    'starting'         => __( 'Starting…', 'product-image-seo' ),
+                    'startBulkFix'     => __( 'Start Bulk Fix', 'product-image-seo' ),
                     'bands'         => array(
                         'missing'    => __( 'Missing', 'product-image-seo' ),
                         'weak'       => __( 'Weak', 'product-image-seo' ),

@@ -61,10 +61,14 @@ $prodimg_seo_current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $
         </p>
 
         <div id="prodimg-seo-bulk-progress-container" hidden>
+            <div class="prodimg-bulkfix-status" role="status" aria-live="polite">
+                <span class="prodimg-spinner" id="prodimg-seo-bulk-spinner" aria-hidden="true"></span>
+                <strong id="prodimg-seo-bulk-status-text"><?php esc_html_e( 'Queued — waiting for the background processor…', 'product-image-seo' ); ?></strong>
+            </div>
             <div class="prodimg-progress">
                 <div id="prodimg-seo-bulk-progress-bar" class="prodimg-progress__bar" style="width: 0%;"></div>
             </div>
-            <p id="prodimg-seo-bulk-progress-text" class="prodimg-progress__label">0%</p>
+            <p id="prodimg-seo-bulk-progress-text" class="prodimg-progress__label"></p>
         </div>
     </div>
 

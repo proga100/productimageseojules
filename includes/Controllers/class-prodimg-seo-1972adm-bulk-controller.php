@@ -29,6 +29,23 @@ class Prodimg_Seo_1972adm_Bulk_Controller {
             return;
         }
 
+        // Refuse to double-start: a second run while actions are still queued
+        // would have the old jobs reporting into the new run's progress.
+        if ( function_exists( 'as_get_scheduled_actions' ) ) {
+            $in_flight = as_get_scheduled_actions(
+                array(
+                    'hook'     => 'prodimg_seo_1972adm_process_product_batch',
+                    'status'   => array( ActionScheduler_Store::STATUS_PENDING, ActionScheduler_Store::STATUS_RUNNING ),
+                    'per_page' => 1,
+                ),
+                'ids'
+            );
+            if ( ! empty( $in_flight ) ) {
+                wp_send_json_error( __( 'A bulk run is already in progress. Please wait for it to finish.', 'product-image-seo' ) );
+                return;
+            }
+        }
+
         // Normally we'd take selected IDs or filter parameters, for now we assume 'generate for all missing' or receive IDs
         $product_ids = isset( $_POST['product_ids'] ) ? array_map( 'absint', (array) wp_unslash( $_POST['product_ids'] ) ) : array();
 
@@ -64,6 +81,31 @@ class Prodimg_Seo_1972adm_Bulk_Controller {
         if ( ! $progress ) {
             wp_send_json_success( array( 'status' => 'idle' ) );
             return;
+        }
+
+        // Self-heal: if a background job died (e.g. PHP timeout) its batch never
+        // reports back, which would leave the UI polling "processing" forever.
+        // When Action Scheduler has nothing left for our hook, the run is over —
+        // account any unreported remainder as failed and complete the run.
+        if ( 'processing' === $progress['status'] && function_exists( 'as_get_scheduled_actions' ) ) {
+            $remaining = as_get_scheduled_actions(
+                array(
+                    'hook'     => 'prodimg_seo_1972adm_process_product_batch',
+                    'status'   => array( ActionScheduler_Store::STATUS_PENDING, ActionScheduler_Store::STATUS_RUNNING ),
+                    'per_page' => 1,
+                ),
+                'ids'
+            );
+            if ( empty( $remaining ) ) {
+                $done     = (int) $progress['images_generated'] + (int) $progress['images_skipped'] + (int) $progress['images_failed'];
+                $expected = isset( $progress['total_images'] ) ? (int) $progress['total_images'] : $done;
+                if ( $expected > $done ) {
+                    $progress['images_failed'] = (int) $progress['images_failed'] + ( $expected - $done );
+                }
+                $progress['completed_batches'] = $progress['total_batches'];
+                $progress['status']            = 'completed';
+                set_transient( 'prodimg_seo_1972adm_bulk_progress', $progress, HOUR_IN_SECONDS );
+            }
         }
 
         wp_send_json_success( $progress );

@@ -83,8 +83,39 @@ class Prodimg_Seo_1972adm_Bulk_Processor {
             return new WP_Error( 'action_scheduler_missing', __( 'Action Scheduler is not available.', 'product-image-seo' ) );
         }
 
-        $batches = array_chunk( $product_ids, 10 );
+        // One product per background action: a batch of many products makes
+        // dozens of multi-second API calls in a single PHP request and dies on
+        // max_execution_time, silently freezing progress. Per-product actions
+        // bound each job's runtime and give the UI product-level granularity.
+        $batches       = array_chunk( $product_ids, 1 );
         $total_batches = count( $batches );
+
+        // Expected image workload, so the UI can report real per-image progress.
+        // Deduped: an image shared by two products is generated once (the second
+        // product finds it filled and skips it).
+        $skip_existing = 'yes' === $this->settings->get( 'skip_existing', 'yes' );
+        $seen_images   = array();
+        $total_images  = 0;
+        foreach ( $product_ids as $pid ) {
+            $product = wc_get_product( $pid );
+            if ( ! $product ) {
+                continue;
+            }
+            foreach ( $this->calculator->get_product_image_ids( $product ) as $att_id ) {
+                $att_id = absint( $att_id );
+                if ( ! $att_id || isset( $seen_images[ $att_id ] ) ) {
+                    continue;
+                }
+                $seen_images[ $att_id ] = true;
+                if ( $skip_existing ) {
+                    $alt = get_post_meta( $att_id, '_wp_attachment_image_alt', true );
+                    if ( ! empty( $alt ) ) {
+                        continue; // Will be skipped, not part of the workload.
+                    }
+                }
+                $total_images++;
+            }
+        }
 
         // Setup transient for progress tracking. Image counters are the honest
         // measure of a run (products may hold several images, or none).
@@ -92,6 +123,7 @@ class Prodimg_Seo_1972adm_Bulk_Processor {
             'total_batches'     => $total_batches,
             'completed_batches' => 0,
             'total_products'    => count( $product_ids ),
+            'total_images'      => $total_images,
             'images_generated'  => 0,
             'images_skipped'    => 0,
             'images_failed'     => 0,
@@ -110,11 +142,11 @@ class Prodimg_Seo_1972adm_Bulk_Processor {
             return;
         }
 
-        $counts = array(
-            'generated' => 0,
-            'skipped'   => 0,
-            'failed'    => 0,
-        );
+        // Each image is a multi-second remote API call; make sure this job is
+        // not killed by the default 30s limit mid-request.
+        if ( function_exists( 'set_time_limit' ) ) {
+            set_time_limit( 300 ); // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged -- long-running background job; each image is a remote AI call.
+        }
 
         foreach ( $product_ids as $product_id ) {
             $product = wc_get_product( $product_id );
@@ -124,12 +156,12 @@ class Prodimg_Seo_1972adm_Bulk_Processor {
 
             $featured_id = $product->get_image_id();
             if ( $featured_id ) {
-                $counts[ $this->process_image( $product_id, $featured_id, 'featured' ) ]++;
+                $this->bump_progress( $this->process_image( $product_id, $featured_id, 'featured' ) );
             }
 
             $gallery_ids = $product->get_gallery_image_ids();
             foreach ( $gallery_ids as $gid ) {
-                $counts[ $this->process_image( $product_id, $gid, 'gallery' ) ]++;
+                $this->bump_progress( $this->process_image( $product_id, $gid, 'gallery' ) );
             }
 
             if ( $product->is_type( 'variable' ) ) {
@@ -138,14 +170,31 @@ class Prodimg_Seo_1972adm_Bulk_Processor {
                     if ( $child ) {
                         $vid = $child->get_image_id();
                         if ( $vid ) {
-                            $counts[ $this->process_image( $child_id, $vid, 'variation' ) ]++;
+                            $this->bump_progress( $this->process_image( $child_id, $vid, 'variation' ) );
                         }
                     }
                 }
             }
         }
 
-        $this->update_progress( $counts );
+        $this->update_progress();
+    }
+
+    /**
+     * Record one image outcome in the progress transient immediately, so the
+     * UI shows live movement instead of waiting for a whole batch to finish.
+     *
+     * @param string $outcome 'generated' | 'skipped' | 'failed'.
+     * @return void
+     */
+    private function bump_progress( $outcome ) {
+        $progress = get_transient( 'prodimg_seo_1972adm_bulk_progress' );
+        if ( ! is_array( $progress ) ) {
+            return;
+        }
+        $key = 'images_' . $outcome;
+        $progress[ $key ] = ( isset( $progress[ $key ] ) ? (int) $progress[ $key ] : 0 ) + 1;
+        set_transient( 'prodimg_seo_1972adm_bulk_progress', $progress, HOUR_IN_SECONDS );
     }
 
     /**
@@ -192,21 +241,18 @@ class Prodimg_Seo_1972adm_Bulk_Processor {
     }
 
     /**
-     * Merge a batch's image outcomes into the progress transient.
+     * Mark one batch (one product) finished. Image counters are bumped live in
+     * bump_progress(); this only advances batch completion + flushes stats.
      *
-     * @param array $counts { generated:int, skipped:int, failed:int }.
      * @return void
      */
-    private function update_progress( $counts = array() ) {
+    private function update_progress() {
         // A batch just wrote new alt text / scores — refresh the dashboard stats.
         Prodimg_Seo_1972adm_Statistics::flush_cache();
 
         $progress = get_transient( 'prodimg_seo_1972adm_bulk_progress' );
         if ( is_array( $progress ) ) {
             $progress['completed_batches']++;
-            $progress['images_generated'] = ( isset( $progress['images_generated'] ) ? $progress['images_generated'] : 0 ) + ( isset( $counts['generated'] ) ? $counts['generated'] : 0 );
-            $progress['images_skipped']   = ( isset( $progress['images_skipped'] ) ? $progress['images_skipped'] : 0 ) + ( isset( $counts['skipped'] ) ? $counts['skipped'] : 0 );
-            $progress['images_failed']    = ( isset( $progress['images_failed'] ) ? $progress['images_failed'] : 0 ) + ( isset( $counts['failed'] ) ? $counts['failed'] : 0 );
             if ( $progress['completed_batches'] >= $progress['total_batches'] ) {
                 $progress['status'] = 'completed';
             }
